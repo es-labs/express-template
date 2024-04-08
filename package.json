@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@es-labs/esm": "^0.0.21",
-    "@es-labs/node": "^0.0.38",
+    "@es-labs/node": "^0.0.39",
     "esm": "^3.2.25",
     "express": "^4.19.2",
     "express-jsdoc-swagger": "^1.8.0",
