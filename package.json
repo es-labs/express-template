@@ -55,6 +55,6 @@
     "eslint": "^9.1.0",
     "node-mocks-http": "^1.14.1",
     "prettier": "^3.2.5",
-    "supertest": "^6.3.4"
+    "supertest": "^7.0.0"
   }
 }
