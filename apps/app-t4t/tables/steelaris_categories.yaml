@@ -1,0 +1,143 @@
+conn: knex1
+name: steelaris_categories
+alias: sc
+displayName: Categories
+view: admin,editor,viewer # user-defined roles
+create: admin,editor
+update: admin,editor
+delete: admin
+deleteLimit: 10
+import: true
+export: admin,editor # can export from csv
+multiSelect: false
+cols:
+  id:
+    label: ID
+    auto: pk
+    hide: true
+    add: readonly
+    edit: readonly
+  name:
+    label: Category Name
+    alias: sc_name
+    type: string
+    filter: true
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: text
+  parent_id:
+    label: Parent # key text...
+    type: autocomplete # change to auto complete
+    add: true
+    # hide: true
+    # filter: true
+    edit: true
+    options:
+      parentCol: '' # use column to get parent value affecting a child
+      parentTableColName: '' # the column name in the parent table
+      childCol: 'parent_id' # affect child column in this table
+      conn: knex1
+      tableName: steelaris_categories_virtual # this is view table that create as a mirroring steelaris_categories so it can be used as a source for parent_id (self relation) must use postfix _virtual !!
+      alias: sc
+      limit: 8
+      strict: true # cannot enter own values, must be selected
+      key: id
+      text: name
+      display: text # TBD key or text or both
+    ui:
+      tag: autocomplete
+      # exact match needed?
+      default: 'N/A'
+  parent_name:  # New column
+    label: Parent Name
+    type: string
+    add: readonly
+    edit: readonly
+    filter: false
+    ui:
+      tag: input
+      attrs:
+        type: text
+        readonly: true
+    options:
+      dependsOn: parent_id  # This column depends on parent_id
+      sourceTable: steelaris_categories_virtual  # Table to fetch the parent name
+      sourceColumn: name  # Column in the source table to fetch the name
+      keyColumn: id  # Column in the source table to match with parent_id
+  image: # test single file upload
+    label: Image
+    add: true
+    edit: true
+    type: string
+    ui:
+      url: http://127.0.0.1:3000/uploads/category/ # can be served from URL
+      tag: files
+      attrs:
+        multiple: false
+        accept: image/*
+        maxCount: 1 # ant design vue a-upload
+      multer:
+        folder: apps/app-steelaris/uploads/category
+        options:
+          limits:
+            files: 1
+            fileSize: 10000000
+  is_enable:
+    label: Is Enable
+    type: integer
+    default: 1
+    edit: true
+    add: true
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: ''
+            value: ''
+          - label: 'Yes'
+            value: 1
+          - label: 'No'
+            value: 0
+  is_in_menu:
+    label: In Menu
+    type: integer
+    add: true
+    edit: true
+    default: 0
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: ''
+            value: ''
+          - label: 'Yes'
+            value: 1
+          - label: 'No'
+            value: 0
+  is_on_homepage:
+    label: In Homepage
+    type: integer
+    add: true
+    edit: true
+    view: false
+    default: 0
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: ''
+            value: ''
+          - label: 'Yes'
+            value: 1
+          - label: 'No'
+            value: 0
