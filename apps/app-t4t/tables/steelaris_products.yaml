@@ -1,0 +1,467 @@
+conn: knex1
+name: steelaris_products
+alias: sp
+displayName: Products
+view: admin,editor,viewer # user-defined roles
+create: admin,editor
+update: admin,editor
+delete: admin
+deleteLimit: 10
+search: true #if you want to use simple search
+import: true
+columns: true #if you want to filter columns's visibility
+export: admin,editor # can export from csv
+multiSelect: false
+cols:
+  id:
+    label: ID
+    auto: pk
+    view: true
+    add: false
+    edit: readonly
+  attribute_set_id:
+    label: Attribute Set # key text...
+    type: autocomplete # change to auto complete
+    # hide: true
+    # filter: true
+    add: true
+    view: false # default was true, so if you want to hide it in table list, set it to false
+    edit: true
+    options:
+      parentCol: '' # use column to get parent value affecting a child
+      parentTableColName: '' # the column name in the parent table
+      childCol: '' # affect child column in this table
+      conn: knex1
+      tableName: steelaris_product_attributes
+      limit: 8
+      strict: true # cannot enter own values, must be selected
+      key: id
+      text: name
+      display: text # TBD key or text or both
+    ui:
+      tag: autocomplete
+      # exact match needed?
+      # default?
+  thumbnail: # test single file upload
+    label: Thumbnail
+    add: true
+    edit: true
+    type: string
+    ui:
+      url: http://127.0.0.1:3000/uploads/product/ # can be served from URL
+      tag: files
+      attrs:
+        type: image # use for thumbnails image in table list
+        multiple: true
+        accept: image/*
+        maxCount: 1 # ant design vue a-upload
+      multer:
+        folder: apps/app-steelaris/uploads/product
+        options:
+          limits:
+            files: 1
+            fileSize: 10000000
+  product_name:
+    label: Name
+    type: string
+    filter: true
+    search: true #need this properties to make this column as searchable
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: text
+  sku:
+    label: SKU
+    type: string
+    filter: true
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: text
+  price:
+    label: Price
+    type: decimal
+    filter: true
+    add: true
+    edit: true
+    default: 0.00
+    ui:
+      tag: input
+      attrs:
+        type: number
+        step: 0.01
+  special_price:
+    label: Special Price
+    type: integer
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: 0
+    ui:
+      tag: input
+      attrs:
+        type: number
+  special_price_from:
+    label: Special Price From
+    type: date
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: date
+  special_price_to:
+    label: Special Price To
+    type: date
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: date
+  tax_class:
+    label: Tax Class
+    type: string
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: text
+  quantity:
+    label: Quantity
+    type: integer
+    filter: true
+    add: true
+    edit: true
+    default: 0
+    ui:
+      tag: input
+      attrs:
+        type: number
+  is_manage_stock:
+    label: Manage Stock
+    type: integer
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: 0
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'No'
+            value: 0
+          - label: 'Yes'
+            value: 1
+  min_qty_allowed:
+    label: Minimum Quantity Allowed
+    type: integer
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: 0
+    ui:
+      tag: input
+      attrs:
+        type: number
+  max_qty_allowed:
+    label: Maximum Quantity Allowed
+    type: integer
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: 0
+    ui:
+      tag: input
+      attrs:
+        type: number
+  enable_product:
+    label: Status
+    type: integer
+    default: 1
+    edit: true
+    add: true
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'Enabled'
+            value: 1
+          - label: 'Disabled'
+            value: 0
+  is_has_weight:
+    label: Has Weight
+    type: integer
+    default: 0
+    view: false
+    edit: true
+    add: true
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'No'
+            value: 0
+          - label: 'Yes'
+            value: 1
+  weight:
+    label: Weight
+    type: decimal
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: 0.00
+    ui:
+      tag: input
+      attrs:
+        type: number
+        step: 0.01
+  weight_unit:
+    label: Weight Unit
+    type: enum
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: 'kg'
+    ui:
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'kg'
+            value: 'kg'
+          - label: 'lbs'
+            value: 'lbs'
+  visibility:
+    label: Visibility
+    type: enum
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: 'Catalog & Search'
+    ui:
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'Not Visible'
+            value: 'not visible'
+          - label: 'Catalog'
+            value: 'catalog'
+          - label: 'Search'
+            value: 'search'
+          - label: 'Catalog & Search'
+            value: 'Catalog & Search'
+  category_id:
+    label: Category
+    type: autocomplete
+    add: true
+    edit: true
+    options:
+      parentCol: ''
+      parentTableColName: ''
+      childCol: 'category_id'
+      conn: knex1
+      tableName: steelaris_categories
+      alias: sc
+      limit: 8
+      strict: true
+      key: id
+      text: name
+      display: text
+    ui:
+      tag: autocomplete
+      default: 'N/A'
+  set_product_as_new_from:
+    label: Set Product as New From
+    type: date
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: date
+  set_product_as_new_to:
+    label: Set Product as New To
+    type: date
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: date
+  country_id:
+    label: Country of Manufacture
+    type: autocomplete
+    add: true
+    edit: true
+    options:
+      parentCol: ''
+      parentTableColName: ''
+      childCol: 'country_id'
+      conn: knex1
+      tableName: steelaris_countries
+      alias: sc
+      limit: 8
+      strict: true
+      key: id
+      text: name
+      display: text
+    ui:
+      tag: autocomplete
+      default: 'N/A'
+  product_purchase_limit:
+    label: Product Purchase Limit
+    type: integer
+    filter: true
+    view: false
+    add: true
+    edit: true
+    default: 0
+    ui:
+      tag: input
+      attrs:
+        type: number
+  height:
+    label: Height
+    type: decimal
+    filter: true
+    add: true
+    edit: true
+    default: 0.00
+    ui:
+      tag: input
+      attrs:
+        type: number
+        step: 0.01
+  length:
+    label: Length
+    type: decimal
+    filter: true
+    add: true
+    edit: true
+    default: 0.00
+    ui:
+      tag: input
+      attrs:
+        type: number
+        step: 0.01
+  width:
+    label: Width
+    type: decimal
+    filter: true
+    add: true
+    edit: true
+    default: 0.00
+    ui:
+      tag: input
+      attrs:
+        type: number
+        step: 0.01
+  volume:
+    label: Volume
+    type: decimal
+    filter: true
+    add: true
+    edit: true
+    default: 0.00
+    ui:
+      tag: input
+      attrs:
+        type: number
+        step: 0.01
+  color:
+    label: Color
+    type: autocomplete
+    add: true
+    edit: true
+    options:
+      parentCol: ''
+      parentTableColName: ''
+      childCol: 'color'
+      conn: knex1
+      tableName: steelaris_colours
+      alias: sc
+      limit: 8
+      strict: true
+      key: id
+      text: name
+      display: text
+    ui:
+      tag: autocomplete
+  zone:
+    label: Zone
+    type: autocomplete
+    add: true
+    edit: true
+    options:
+      parentCol: ''
+      parentTableColName: ''
+      childCol: 'zone'
+      conn: knex1
+      tableName: steelaris_zones
+      alias: sc
+      limit: 8
+      strict: true
+      key: id
+      text: name
+      display: text
+    ui:
+      tag: autocomplete
+  size:
+    label: Size
+    type: string
+    filter: true
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: text
+  content:
+    label: Description
+    type: text
+    filter: true
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: textarea-editor #new tag element for wysiwyg editor textarea
+      attrs:
+        rows: 5
