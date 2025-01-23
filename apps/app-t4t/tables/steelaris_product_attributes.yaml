@@ -1,0 +1,169 @@
+conn: knex1
+name: steelaris_product_attributes
+alias: spa
+displayName: Product Attributes
+view: admin,editor,viewer # user-defined roles
+create: admin,editor
+update: admin,editor
+delete: admin
+child: true
+deleteLimit: 10
+import: true
+export: admin,editor # can export from csv
+multiSelect: false
+cols:
+  id:
+    label: ID
+    auto: pk
+    hide: true
+    add: readonly
+    edit: readonly
+  code:
+    label: Attribute Code
+    type: string
+    filter: true
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: text
+  name:
+    label: Attribute Label
+    type: string
+    filter: true
+    add: true
+    edit: true
+    default: ''
+    ui:
+      tag: input
+      attrs:
+        type: text
+  required:
+    label: Required
+    type: string
+    add: true
+    edit: true
+    default: 'No'
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'Yes'
+            value: 'Yes'
+          - label: 'No'
+            value: 'No'
+  system:
+    label: System
+    type: string
+    add: true
+    edit: true
+    default: 'No'
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'Yes'
+            value: 'Yes'
+          - label: 'No'
+            value: 'No'
+  visible:
+    label: Visible
+    type: string
+    add: true
+    edit: true
+    default: 'No'
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'Yes'
+            value: 'Yes'
+          - label: 'No'
+            value: 'No'
+  scope:
+    label: Scope
+    type: string
+    add: true
+    edit: true
+    default: 'Global'
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'Global'
+            value: 'Global'
+          - label: 'Website'
+            value: 'Website'
+          - label: 'Store'
+            value: 'Store'
+  searchable:
+    label: Searchable
+    type: string
+    add: true
+    edit: true
+    default: 'No'
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'Yes'
+            value: 'Yes'
+          - label: 'No'
+            value: 'No'
+  comparable:
+    label: Comparable
+    type: string
+    add: true
+    edit: true
+    default: 'No'
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'Yes'
+            value: 'Yes'
+          - label: 'No'
+            value: 'No'
+  use_in_layered_navigation:
+    label: Use in Layered Navigation
+    type: string
+    add: true
+    edit: true
+    default: 'No'
+    ui:
+      display: label
+      tag: select
+      attrs:
+        multiple: false
+        options:
+          - label: 'Yes'
+            value: 'Yes'
+          - label: 'No'
+            value: 'No'
+  values:
+    label: Values (Separated By Comma)
+    type: string
+    filter: true
+    add: true
+    edit: true
+    default: ''
+    ui:
+      display: label
+      tag: select-tags # new tags ui attribute for select-tags and the value was comma separated
+      attrs:
+        mode: tags # tags or multiple
+        options:
