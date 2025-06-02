@@ -8,7 +8,6 @@ const PdfKit = require('pdfkit')
 
 const services = require('@es-labs/node/services')
 const sleep = require('@es-labs/node/utils/sleep')
-const gcp = require('@es-labs/node/services/gcp')
 const { memoryUpload, storageUpload } = require('@es-labs/node/express/upload')
 
 const { UPLOAD_STATIC, UPLOAD_MEMORY } = process.env
@@ -133,7 +132,6 @@ module.exports = express.Router()
   // TODO /esm/upload-fe-testing.js
   // test uploads
   // body action: 'read' | 'write', filename: 'my-file.txt', bucket: 'bucket name'
-  .post('/gcp-sign', gcp.getSignedUrl)
   .post('/upload-disk', storageUpload(UPLOAD_STATIC[0]).any(), (req,res) => { // avatar is form input name // single('filedata')
     try {
       // console.log('files', req, req.files)

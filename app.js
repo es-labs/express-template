@@ -1,5 +1,4 @@
 'use strict'
-
 const url = require('url')
 const http = require('http')
 const https = require('https')
@@ -39,7 +38,7 @@ const server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.cr
 // USERLAND - Add APM tool
 
 require('@es-labs/node/express/preRoute')(app, express)
-const graphqlWsServer = require('@es-labs/node/express/graphql')(app, server)
+
 const services = require('@es-labs/node/services')
 const authService = require('@es-labs/node/auth')
 
@@ -53,7 +52,6 @@ const cleanup = async (message, exitCode = 0, coreDump = false, timeOutMs = 1000
   if (server) {
     server.close(async () => {
       try {
-        await graphqlWsServer?.close()
         await services.stop()
         // or should process.exit be placed here?
       } catch (e) {
@@ -102,22 +100,7 @@ try {
   // https://github.com/expressjs/express/issues/4256
   // https://github.com/expressjs/express/issues/3748
 
-// https://stackoverflow.com/questions/44327291/express-js-wrap-every-middleware-route-in-decorator
-const Layer          = require('express/lib/router/layer')
-const handle_request = Layer.prototype.handle_request
-Layer.prototype.handle_request = function(req, res, next) {
-  if (!this.isWrapped && this.method) {
-    let handle  = this.handle
-    this.handle = function(req, res, next) { // this is basically your wrapper
-      // console.log(req.url)
-      const rv = handle.apply(this, arguments)
-      if (rv instanceof Promise) rv.then(result => result).catch(error => next(error))
-      else return rv
-    }
-    this.isWrapped = true
-  }
-  return handle_request.apply(this, arguments)
-}
+// https://stackoverflow.com/questions/44327291/express-js-wrap-every-middleware-route-in-decorator - TO CHECK AND REMOVE for express 5
 
 try {
   console.log('Start App Routes Load')
@@ -125,18 +108,17 @@ try {
   console.log('Start Common Routes Load')
   require('./router')(app); // common routes
   console.log('Start Fallback Routes Load')
-  app.use('/api/**', (req, res) =>
-    res.status(404).json({ error: 'Not Found' })
-  )
+  app.use('/api/:wildcard', (req, res) => res.status(404).json({ error: 'Not Found' }))
   console.log('Routes Load Completed')
 } catch (e) {
-  console.log('Route loading exception', e.toString())
+  console.log('Route loading exception', e, e.toString())
 }
 // END ROUTES
 
 // OpenAPI
 const { OPENAPI_OPTIONS } = process.env
-const openApiOptions = JSON.parse(OPENAPI_OPTIONS || null)
+// TBD when lib is ready for ExpressJS 5
+const openApiOptions = null // JSON.parse(OPENAPI_OPTIONS || null)
 if (openApiOptions) {
   openApiOptions.baseDir = __dirname
   const expressJSDocSwagger = require('express-jsdoc-swagger')
@@ -145,18 +127,12 @@ if (openApiOptions) {
 
 // websockets
 server.on('upgrade', (request, socket, head) => {
-  const pathname = url.parse(request.url).pathname
-  if (pathname === '/subscriptions') {
-    // upgrade the graphql server
-    graphqlWsServer.handleUpgrade(request, socket, head, (ws) => {
-      graphqlWsServer.emit('connection', ws, request)
-    })
-  }
   console.log('upgrade event')
+  const pathname = url.parse(request.url).pathname // if (pathname === '/some-match') { }
 })
 
 require('@es-labs/node/express/postRoute')(app, express)
-
+app.use(":wildcard", (req, res) => res.status(404).json({ Error: '404 Not Found...' }))
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 // 'Bad Request': 400, 'Unauthorized': 401, 'Forbidden': 403, 'Not Found': 404, 'Conflict': 409, 'Unprocessable Entity': 422, 'Internal Server Error': 500,
 app.use((error, req, res, next) => {
@@ -174,5 +150,6 @@ app.use((error, req, res, next) => {
   }
   return !res.headersSent ? res.status(500).json({ message }) : next()
 })
+
 
 module.exports = { server }
