@@ -28,7 +28,7 @@ const storageUpload = () => {
     storage: multer.diskStorage({
       destination: (req, file, cb) => {
         const key = file.fieldname
-        const { folder } = req.table.fileConfigUi[key]?.multer // console.log('folder, file', folder, file)
+        const { folder } = req.table.fileConfigUi[key].multer // console.log('folder, file', folder, file)
         return cb(null, folder)
       },
       filename: (req, file, cb) => cb(null, file.originalname), // file.fieldname, file.originalname
@@ -36,7 +36,7 @@ const storageUpload = () => {
     fileFilter: (req, file, cb) => {
       // TBD check on individual file size
       const key = file.fieldname
-      const { options } = req.table.fileConfigUi[key]?.multer
+      const { options } = req.table.fileConfigUi[key].multer
       if (!req.fileCount) req.fileCount = { }
       if (!req.fileCount[key]) req.fileCount[key] = 0
       const maxFileLimit = options?.limits?.files || 1
@@ -49,7 +49,7 @@ const storageUpload = () => {
       // if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
       //   return cb(new Error('Invalid file type!'), false)
       // }
-      cb(null, true) // Accept the file
+      return cb(null, true) // Accept the file
     },
     limits: {
       // files: 3,
@@ -136,7 +136,7 @@ const routes = (options) => {
   return express.Router()
   .get('/healthcheck', (req, res) => res.send('t4t ok - 0.0.1'))
   .get('/config/:table', authUser, generateTable, async (req, res) => {
-    if (!req.table.view) throw 'Forbidden - Table Info'
+    if (!req.table.view) throw new Error('Forbidden - Table Info')
     res.json(req.table) // return the table info...
   })
   .post('/autocomplete/:table', authUser, generateTable, async (req, res) => {
