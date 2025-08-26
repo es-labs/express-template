@@ -14,7 +14,7 @@
     "csv-parse": "^6.1.0",
     "fido2-lib": "^3.5.3",
     "pdfkit": "^0.17.1",
-    "selfsigned": "^2.4.1"
+    "selfsigned": "^3.0.1"
   },
   "keywords": [],
   "author": "",
