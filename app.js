@@ -23,17 +23,15 @@ process.on('SIGQUIT', handleExitSignal)
 process.on('uncaughtException', handleExitException)
 process.on('unhandledRejection', handleExitRejection)
 
-const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE } = process.env
+const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA, HTTPS_PASSPHRASE } = process.env
 const https_opts = {}
-if (HTTPS_CERTIFICATE) {
-  https_opts.key = HTTPS_PRIVATE_KEY
-  https_opts.cert = HTTPS_CERTIFICATE
-  // UNUSED AT THE MOMENT
-  // passphrase = (fs.readFileSync('passphrase.txt')).toString()
-  // pfx = fs.readFileSync('8ab20f7b-51b9-4c09-a2e0-1918bb9fb37f.pfx')
-  // ca = fs.readFileSync('ca.cert')
-}
-const server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app)
+if (HTTPS_CERTIFICATE) https_opts.cert = HTTPS_CERTIFICATE
+if (HTTPS_PRIVATE_KEY) https_opts.key = HTTPS_PRIVATE_KEY
+if (HTTPS_CA) https_opts.ca = HTTPS_CERTIFICATE
+if (HTTPS_PASSPHRASE) https_opts.passphrase = HTTPS_PASSPHRASE // (fs.readFileSync('passphrase.txt')).toString()
+// pfx TBD
+
+const server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app) // fs.readFileSync('ca.cert')
 
 // USERLAND - Add APM tool
 
