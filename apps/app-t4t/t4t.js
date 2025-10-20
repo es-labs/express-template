@@ -6,7 +6,7 @@ const yaml = require('js-yaml')
 const multer = require('multer')
 
 const svc = require('@es-labs/node/services')
-const { memoryUpload } = require('@es-labs/node/express/upload')
+const { memoryUpload } = require('../../base/upload')
 const {
   TABLE_CONFIGS_FOLDER_PATH, TABLE_CONFIGS_CSV_SIZE, TABLE_CONFIGS_UPLOAD_SIZE, TABLE_CUSTOM_PATH,
   TABLE_USER_ID_KEY, TABLE_USER_ROLE_KEY, TABLE_ORG_ID_KEY

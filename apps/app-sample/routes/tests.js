@@ -8,7 +8,7 @@ const PdfKit = require('pdfkit')
 
 const services = require('@es-labs/node/services')
 const sleep = require('@es-labs/node/utils/sleep')
-const { memoryUpload, storageUpload } = require('@es-labs/node/express/upload')
+const { memoryUpload, storageUpload } = require('../../../base/upload')
 
 const { UPLOAD_STATIC, UPLOAD_MEMORY } = process.env
 
