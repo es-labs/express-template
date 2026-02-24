@@ -33,7 +33,6 @@ const preRoute = (app, express) => {
     console.log('helmet setup done')
   } catch (e) {
     console.error('[helmet setup error]', e.toString());
-    throw(new Error())
   }
 
     // -------- CORS --------
@@ -50,7 +49,6 @@ const preRoute = (app, express) => {
     console.info('cors options done')
   } catch (e) {
     console.error('[cors options error]', e.toString())
-    throw(new Error())
   }
   // Set CORS defaults if certain CORS headers are missing
   try {
@@ -65,7 +63,6 @@ const preRoute = (app, express) => {
     }
   } catch (e) {
     console.error('[cors defaults error]', e.toString())
-    throw(new Error())
   }
 
   // express-limiter, compression, use reverse proxy
@@ -80,15 +77,14 @@ const preRoute = (app, express) => {
     app.use((req, res, next) => {
       const rawMatch = BODYPARSER_RAW_ROUTES?.split(',')?.find(route => p2r.match(route)(req.originalUrl))
       if (rawMatch) { // raw routes - ignore bodyparser json
-        next()
+        return next()
       } else {
-        express.json( JSON.parse(BODYPARSER_JSON || null) || { limit: '2mb' })(req, res, next)
+        return express.json( JSON.parse(BODYPARSER_JSON || null) || { limit: '2mb' })(req, res, next)
       }
     })
     app.use(express.urlencoded( JSON.parse(BODYPARSER_URLENCODED || null) || { extended: true, limit: '2mb' })) // https://stackoverflow.com/questions/29175465/body-parser-extended-option-qs-vs-querystring/29177740#29177740
   } catch (e) {
     console.error('[bodyparser setup error]', e.toString());
-    throw(new Error())
   }
   console.info('bodyparser setup done')
 

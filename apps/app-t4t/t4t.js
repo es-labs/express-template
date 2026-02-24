@@ -140,15 +140,13 @@ const routes = (options) => {
     res.json(req.table) // return the table info...
   })
   .post('/autocomplete/:table', authUser, generateTable, async (req, res) => {
-    let rows = {}
     const { table } = req
-
     let { key, text, search, parentTableColName, parentTableColVal, limit = 20 } = req.body
     // TBD use key to parentTable Col
 
     const query = svc.get(table.conn)(table.name).where(key, 'like', `%${search}%`).orWhere(text, 'like', `%${search}%`)
     if (parentTableColName && parentTableColVal !== undefined) query.andWhere(parentTableColName, parentTableColVal) // AND filter - OK
-    rows = await query.clone().limit(limit) // TODO orderBy
+    let rows = await query.clone().limit(limit) // TODO orderBy
     rows = rows.map(row => {
       const textKeys = text?.split(',')
       const texts = []
