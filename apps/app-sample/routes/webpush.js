@@ -9,6 +9,7 @@ const fcm = require('@es-labs/node/comms/fcm')
 const webpush = require('@es-labs/node/comms/webpush')
 
 console.log('WARNING Auth bypass in webpush.js')
+
 const authUser = (req, res, next) => {
   req.decoded = { id: 1 }
   next()
@@ -27,7 +28,7 @@ module.exports = express.Router()
     await authFns.updateUser({ id }, { pnToken: '' })
     res.json({ status: 'unsub'})
   })
-  .post('/send/:id', /* authUser */ async (req, res) => {
+  .post('/send/:id', /* authUser, */ async (req, res) => {
     // sending...
     try {
       const { id } = req.params
