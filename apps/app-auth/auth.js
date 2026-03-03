@@ -1,10 +1,10 @@
 'use strict'
 const express = require('express')
 const auth = require('@es-labs/node/auth')
-const own = require('@es-labs/node/express/controller/auth/own')
-const oauth = require('@es-labs/node/express/controller/auth/oauth')
-const oidc = require('@es-labs/node/express/controller/auth/oidc')
-const saml = require('@es-labs/node/express/controller/auth/saml')
+const own = require('../../base/controller/auth/own')
+const oauth = require('../../base/controller/auth/oauth')
+const oidc = require('../../base/controller/auth/oidc')
+const saml = require('../../base/controller/auth/saml')
 
 exports.myauthRoute = express.Router()
   .post('/login', own.login)

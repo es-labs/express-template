@@ -19,8 +19,8 @@ const path = require('path')
 before(async () => {
   require(path.join(process.cwd(), 'env'))
   await require('@es-labs/node/config')(process.cwd())
-  require('@es-labs/node/express/init')() // TODELETE require(path.join(process.cwd(), 'common', 'init'))()
-  require('@es-labs/node/express/preRoute')(app, express) // TODELETE require(path.join(process.cwd(), 'common', 'preRoute'))(app, express)
+  require('../../../../base/init')() // TODELETE require(path.join(process.cwd(), 'common', 'init'))()
+  require('../../../../base/preRoute')(app, express) // TODELETE require(path.join(process.cwd(), 'common', 'preRoute'))(app, express)
   process.env.WS_PORT = '' // disable websocket for now
 
   require(path.join(process.cwd(), 'apps', 'apploader'))(app)

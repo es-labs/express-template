@@ -111,12 +111,11 @@ exports.find = async (req, res) => {
   if (page < 1) page = 1
   let rv = { results: [], total: 0 }
   let rows
-  let query = null
+  let query = svc.get(table.conn)(table.name)
 
   let columns = [`${table.name}.*`]
   if (table.select) columns = table.select.split(',') // custom columns... TODO need to add table name?
 
-  query = svc.get(table.conn)(table.name)
   query = query.where({})
 
   // TODO handle filters for joins...
@@ -180,7 +179,6 @@ exports.findOne = async (req, res) => {
   const { table } = req
   const where = formUniqueKey(table, req.query.__key)
   if (!where) return res.status(400).json({}) // bad request
-  let rv = {}
   let columns = [`${table.name}.*`]
   if (table.select) columns = table.select.split(',') // custom columns... TODO need to add table name?
   let query = svc.get(table.conn)(table.name).where(where)  
@@ -196,7 +194,7 @@ exports.findOne = async (req, res) => {
       columns = [...columns, table2 + '.' + table2Text + ' as ' + joinCol] // add a join colomn
     }
   }
-  rv = await query.column(...columns).first()
+  let rv = await query.column(...columns).first()
   rv = rv ? kvDb2Col(rv, joinCols, table.cols) : null // return null if not found
   return res.status(rv ? 200 : 404).json(rv)  
 }
@@ -316,7 +314,7 @@ exports.create = async (req, res) => {
       }
     }
   }
-  let rv = null
+  let rv
   const trx = await svc.get(table.conn).transaction()
 	try {
     let query = svc.get(table.conn)(table.name).insert(body)
