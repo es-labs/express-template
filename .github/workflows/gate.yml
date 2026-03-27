@@ -1,0 +1,91 @@
+name: CI / CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # JOB 1 – Run unit tests
+  # ─────────────────────────────────────────────
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+        # The workflow stops here automatically if tests exit with a non-zero
+        # code — no deploy job will be triggered.
+
+  # ─────────────────────────────────────────────
+  # JOB 2 – Wait for a human to approve deploy
+  # Only runs after "test" succeeds.
+  # ─────────────────────────────────────────────
+  request-approval:
+    name: Request Deployment Approval
+    needs: test                 # blocked until tests pass
+    runs-on: ubuntu-latest
+    # "production" is a GitHub Environment configured with required reviewers.
+    # Add your authorized users/teams there in:
+    #   Settings → Environments → production → Required reviewers
+    environment:
+      name: production
+
+    steps:
+      - name: Approval gate
+        run: |
+          echo "✅ Tests passed. Deployment was approved — proceeding."
+
+  # ─────────────────────────────────────────────
+  # JOB 3 – Deploy
+  # Only runs after approval is granted.
+  # ─────────────────────────────────────────────
+  deploy:
+    name: Deploy to Production
+    needs: request-approval     # blocked until reviewer clicks "Approve"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build --if-present
+
+      # ── Replace the step below with your real deploy command ──────────────
+      - name: Deploy application
+        run: |
+          echo "🚀 Deploying to production..."
+          # e.g. npm run deploy
+          #      npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+          #      aws s3 sync ./dist s3://my-bucket --delete
+        env:
+          # Expose any secrets your deploy script needs
+          NODE_ENV: production
+          # VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
