@@ -3,70 +3,39 @@ import http from "http";
 import https from "https";
 import express from "express";
 import expressJSDocSwagger from "express-jsdoc-swagger";
-import init from "@es-labs/node/express/init";
 import preRoute from "@es-labs/node/express/preRoute";
 import postRoute from "@es-labs/node/express/postRoute";
-import sleep from "@es-labs/node/utils/sleep";
 import appsLoader from "./apps/apploader.js";
-import baseRouter from "./base/router/index.js";
+import routeBase from "./common/router/index.js";
+import { errorHandler, notFoundHandler } from './common/middleware/error.js';
 
 import * as services from '@es-labs/node/services';
 import * as authService from '@es-labs/node/auth';
 
-const app = express();
-
-init();
-
 // setup graceful exit
-const handleExitSignal = async (signal) => await cleanup(`Signal ${signal}`, 0) // NOSONAR
-const handleExitException = async (err, origin) => await cleanup(`Uncaught Exception. error: ${err?.stack || err} origin: ${origin}`, 1) // NOSONAR
-const handleExitRejection = async (reason, promise) => await cleanup(`Unhandled Rejection. reason: ${reason?.stack || reason}`, 1) // NOSONAR
-process.on('SIGINT', handleExitSignal)
-process.on('SIGTERM', handleExitSignal)
-process.on('SIGQUIT', handleExitSignal)
-process.on('uncaughtException', handleExitException)
-process.on('unhandledRejection', handleExitRejection)
+// **WebSockets/SSE:** You need to track connections manually and close them. For WS, broadcast a "server shutting down" message, then close all clients before server.close().
+let shuttingDown = false;
 
-const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA, HTTPS_PASSPHRASE } = process.env
-const https_opts = {}
-if (HTTPS_CERTIFICATE) https_opts.cert = HTTPS_CERTIFICATE
-if (HTTPS_PRIVATE_KEY) https_opts.key = HTTPS_PRIVATE_KEY
-if (HTTPS_CA) https_opts.ca = HTTPS_CERTIFICATE
-if (HTTPS_PASSPHRASE) https_opts.passphrase = HTTPS_PASSPHRASE // (fs.readFileSync('passphrase.txt')).toString()
-// pfx TBD
-
-const server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app) // fs.readFileSync('ca.cert')
-
-// USERLAND - Add APM tool
-
-preRoute(app, express)
-
-// const services = (await import('@es-labs/node/services')).default;
-// const authService = (await import('@es-labs/node/auth')).default;
-
-// CLEANUP
-const cleanup = async (message, exitCode = 0, coreDump = false, timeOutMs = 1000) => {
-  console.log(message)
-  console.log(`
-  node win - cannot see messages
-  node bash - can see messages
-  `)
+const gracefulShutdown = async (signal) => {
+  const timeOutMs = 30000
+  console.log(`Cleanup initiated by signal: ${signal}`);
+  shuttingDown = true;
+  setTimeout(() => { // give the LB time to notice the 503 and stop routing
+    console.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, timeOutMs);
   if (server) {
     server.close(async () => {
-      try {
-        await services.stop()
-        // or should process.exit be placed here?
-      } catch (e) {
-        console.error(e)
-      }
-    })
+      await services.stop(); // promise all...
+      console.log('process exiting gracefully');
+      return process.exit(0)
+    });
   }
-  console.log('cleaning up and awaiting exit...')
-  await sleep(timeOutMs) // from here on... does not get called on uncaught exception crash
-  console.log('exiting') // require('fs').writeSync(process.stderr.fd, `bbbbbbbbbbbb`)
-  return coreDump ? process.abort : process.exit(exitCode)
-  // setTimeout(() => console.log('exiting'), timeOutMs).unref()
 }
+
+['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach(signal => process.on(signal, gracefulShutdown)); // SIGKILL cannot be caught
+process.on('uncaughtException', (err, origin) => console.log(`Uncaught Exception - error: ${err} origin: ${origin}` && process.exit(1)));
+process.on('unhandledRejection', (reason, promise) => console.log(`Unhandled Rejection - promise: ${promise} reason: ${reason}` && process.exit(1)));
 
 // SERVICES
 services.start()
@@ -75,6 +44,18 @@ try {
 } catch (e) {
   console.log(e)
 }
+
+const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA, HTTPS_PASSPHRASE } = process.env
+const https_opts = {}
+if (HTTPS_CERTIFICATE) https_opts.cert = HTTPS_CERTIFICATE
+if (HTTPS_PRIVATE_KEY) https_opts.key = HTTPS_PRIVATE_KEY
+if (HTTPS_CA) https_opts.ca = HTTPS_CERTIFICATE
+if (HTTPS_PASSPHRASE) https_opts.passphrase = HTTPS_PASSPHRASE // (fs.readFileSync('passphrase.txt')).toString()
+
+const app = express();
+const server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app) // fs.readFileSync('ca.cert')
+preRoute(app, express)
+
 
 // ROUTES
 
@@ -108,7 +89,7 @@ try {
   console.log('Start App Routes Load')
   appsLoader(app) // add your APIs here
   console.log('Start Common Routes Load')
-  baseRouter(app); // common routes
+  routeBase(app); // common routes
   console.log('Start Fallback Routes Load')
   app.use('/api/:wildcard', (req, res) => res.status(404).json({ error: 'Not Found' }))
   console.log('Routes Load Completed')
@@ -136,21 +117,12 @@ postRoute(app, express)
 app.use(":wildcard", (req, res) => res.status(404).json({ Error: '404 Not Found...' }))
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 // 'Bad Request': 400, 'Unauthorized': 401, 'Forbidden': 403, 'Not Found': 404, 'Conflict': 409, 'Unprocessable Entity': 422, 'Internal Server Error': 500,
-app.use((error, req, res, next) => {
-  // error middleware - 200s should not reach here
-  // console.log('typeof error', error instanceof Error)
-  console.log('error middleware', error)
-  let message = 'Unknown Error'
-  if (error.message) {
-    // console.log('Error Object', error.name, error.name, error.stack)
-    message = (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev') ? error.stack : error.message
-  } else if (typeof error === 'string') {
-    message = error
-  } else if (error?.toString) {
-    message = error.toString()
-  }
-  return !res.headersSent ? res.status(500).json({ message }) : next()
-})
+
+// 404 — must come after all valid routes
+
+app.use(notFoundHandler);
+app.use(errorHandler);
+
 
 export {
   server
