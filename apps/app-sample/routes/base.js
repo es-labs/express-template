@@ -1,7 +1,5 @@
-'use strict'
-
-const express = require('express')
-const s = require('@es-labs/node/services')
+import express from "express";
+import * as s from "@es-labs/node/services";
 
 function openMissingFile() {
   fs.readFile('somefile4.txt', (err, data) => {
@@ -14,7 +12,7 @@ function openMissingFile() {
 // Server can respond to requests.
 // Server can respond to requests and can connect to database.
 // Server can respond to requests, can connect to database, and can connect with other third-party systems and integrations
-module.exports = express.Router()
+export default express.Router()
   .get('/', (req, res) => res.send({ status: 'app-sample OK' }))
   .get('/healthcheck', (req, res) => res.send({ status: 'app-sample/healthcheck OK' }))
   .get('/check-db', async (req, res) => {

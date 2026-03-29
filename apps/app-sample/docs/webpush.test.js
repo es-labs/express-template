@@ -1,9 +1,9 @@
-const request = require('supertest');
-const express = require('express');
-const webpushRouter = require('../routes/webpush');
-const { authFns } = require('@es-labs/node/auth');
-const fcm = require('@es-labs/node/comms/fcm');
-const webpush = require('@es-labs/node/comms/webpush');
+import request from "supertest";
+import express from "express";
+import webpushRouter from "../routes/webpush";
+import { authFns } from "@es-labs/node/auth";
+import fcm from "@es-labs/node/comms/fcm";
+import webpush from "@es-labs/node/comms/webpush";
 
 jest.mock('@es-labs/node/auth');
 jest.mock('@es-labs/node/comms/fcm');

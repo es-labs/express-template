@@ -1,5 +1,5 @@
-const path = require('path')
-const dotenv = require('dotenv')
+import path from "path";
+import dotenv from "dotenv";
 
 const { NODE_ENV } = process.env
 

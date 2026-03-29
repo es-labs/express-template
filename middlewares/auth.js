@@ -1,5 +1,3 @@
-'use strict'
-
 const authIsAdmin = async (req, res, next) => {
   if (req.decoded.groups.includes('admin')) {
     return next()
@@ -9,6 +7,4 @@ const authIsAdmin = async (req, res, next) => {
   }
 }
 
-module.exports = {
-  authIsAdmin
-}
+export default { authIsAdmin };

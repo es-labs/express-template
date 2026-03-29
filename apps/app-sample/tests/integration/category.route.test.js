@@ -1,26 +1,23 @@
-const { describe, it, before, after, beforeEach } = require('node:test')
-const assert = require('node:assert')
+import express from "express";
+import { describe, it, before, after, beforeEach } from "node:test";
+import assert from "node:assert";
+import request from "supertest";
+import newCategory from "../mock-data/new-category.json";
+import path from "path";
 
-const request = require('supertest')
-const express = require('express')
 const app = express()
-
-const newCategory = require('../mock-data/new-category.json')
-
 let services
 let createdCategoryId
 let authObj = {}
 let endpointUrl
-
-const path = require('path')
 
 /*
 // beforeAll
 before(async () => {
   require(path.join(process.cwd(), 'env'))
   await require('@es-labs/node/config')(process.cwd())
-  require('../../../../base/init')() // TODELETE require(path.join(process.cwd(), 'common', 'init'))()
-  require('../../../../base/preRoute')(app, express) // TODELETE require(path.join(process.cwd(), 'common', 'preRoute'))(app, express)
+  require('@es-labs/node/express/init')() // TODELETE require(path.join(process.cwd(), 'common', 'init'))()
+  require('@es-labs/node/express/preRoute')(app, express) // TODELETE require(path.join(process.cwd(), 'common', 'preRoute'))(app, express)
   process.env.WS_PORT = '' // disable websocket for now
 
   require(path.join(process.cwd(), 'apps', 'apploader'))(app)

@@ -1,8 +1,5 @@
-'use strict'
-
-const express = require('express')
+import express from "express";
 // const { authUser } = require('@es-labs/node/auth')
-
 
 // channel
 // https://stackoverflow.com/questions/33858927/how-to-obtain-the-chat-id-of-a-private-telegram-channel
@@ -20,7 +17,7 @@ const express = require('express')
 // Clicking on it you make it as administrator./33126743/how-do-i-add-my-bot-to-a-channel
 
 
-module.exports = express.Router()
+export default express.Router()
   .get('/', (req, res) => res.send('Webhooks OK'))
   // body {
   //   msisdn: '6588888888',

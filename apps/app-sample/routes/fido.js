@@ -1,4 +1,3 @@
-'use strict'
 // If using nip.io, need to use HTTPS & domain is LAN address + nip.io
 // need to set rpID, origin and CORS (in <environment>.env.js)
 // careful of all the conversions! :)
@@ -6,9 +5,8 @@
 // https://webauthn.guide/
 // https://github.com/OWASP/SSO_Project
 // https://github.com/webauthn-open-source/fido2-lib
-
-const express = require('express')
-const { Fido2Lib } = require("fido2-lib")
+import express from "express";
+import { Fido2Lib } from "fido2-lib";
 
 const b64_b64url = (inStr) => inStr.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 const b64url_b64 = (inStr) => inStr.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((inStr.length % 4) ? 4 - (inStr.length % 4) : 0)
@@ -62,7 +60,7 @@ let testInfo = { }
 let registerChallenge = '33EHav-jZ1v9qwH783aU-j0ARx6r5o-YHh-wd7C6jPbd7Wh6ytbIZosIIACehwf9-s6hXhySHO-HHUjEwZS29w' //  base64url
 let validateChallenge = '' // ab
 
-module.exports = express.Router()
+export default express.Router()
   .get('/register', async (req, res) => {
     try {
       const registrationOptions = await f2l.attestationOptions()

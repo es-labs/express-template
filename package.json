@@ -3,6 +3,7 @@
   "description": "express template",
   "version": "0.0.6",
   "private": true,
+  "type": "module",
   "author": "aaronjxz@gmail.com",
   "license": "MIT",
   "main": "index.js",
@@ -44,21 +45,25 @@
     "test:e2e": "start-server-and-test start http://localhost:8080 test",
     "update-commit-hash": "git rev-parse --verify --short HEAD > commit-hash"
   },
+  "comment": {
+    "@es-labs/nodex": "^0.0.54"
+  },
   "dependencies": {
     "@es-labs/esm": "^0.0.34",
-    "@es-labs/node": "^0.0.54",
+    "@es-labs/node": "file:../jscommon/libs/node",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "express-jsdoc-swagger": "^1.8.0",
     "js-yaml": "^4.1.1",
     "mysql": "^2.18.1",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.0.2",
+    "eslint": "^10.1.0",
     "node-mocks-http": "^1.17.2",
     "prettier": "^3.8.1",
-    "start-server-and-test": "^2.1.5"
+    "start-server-and-test": "^3.0.0"
   }
 }

@@ -1,9 +1,8 @@
-'use strict'
-const csvParse = require('csv-parse')
-const svc = require('@es-labs/node/services')
-const {
+import csvParse from "csv-parse";
+import * as svc from "@es-labs/node/services";
+import {
   setAuditData
-} = require('../t4t-utils.js')
+} from "../t4t-utils.js";
 
 // custom function demo
 // when country table is uploaded, state data is also created (csv needs to have sufficient data for state row)
@@ -87,7 +86,7 @@ const upload = async (req, res) => {
     })
 }
 
-module.exports = {
+export default {
   country: {
     upload
   }

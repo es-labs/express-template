@@ -1,23 +1,21 @@
-'use strict'
-const express = require('express')
+import express from "express";
 // const path = require('path')
-const fs = require('fs')
-const yaml = require('js-yaml')
-const multer = require('multer')
-
-const svc = require('@es-labs/node/services')
-const { memoryUpload } = require('../../base/upload')
+import fs from "fs";
+import yaml from "js-yaml";
+import multer from "multer";
+import * as svc from "@es-labs/node/services";
+import { memoryUpload } from "@es-labs/node/express/upload";
 const {
   TABLE_CONFIGS_FOLDER_PATH, TABLE_CONFIGS_CSV_SIZE, TABLE_CONFIGS_UPLOAD_SIZE, TABLE_CUSTOM_PATH,
   TABLE_USER_ID_KEY, TABLE_USER_ROLE_KEY, TABLE_ORG_ID_KEY
 } = process.env
-
-const {
+import {
   noAuthFunc, processJson, roleOperationMatch
-} = require('./t4t-utils.js')
-
-const base = require('./t4t-base.js')
-const custom = TABLE_CUSTOM_PATH ? require(TABLE_CUSTOM_PATH) : { }
+} from "./t4t-utils.js";
+import base from "./t4t-base.js";
+const custom = {};
+// const custom = TABLE_CUSTOM_PATH ? (await import(TABLE_CUSTOM_PATH)).default : { };
+// const custom = TABLE_CUSTOM_PATH ? require(TABLE_CUSTOM_PATH) : { }
 const uploadMemory =  {
   limits: { files : 1, fileSize: Number(TABLE_CONFIGS_CSV_SIZE) || 500000 }
 }
@@ -68,7 +66,7 @@ const generateTable = async (req, res, next) => { // TODO get config info from a
   try {
     const tableKey = req.params.table // 'books' // its the table name also
 
-    // const docPath = path.resolve(__dirname, `./tables/${tableKey}.yaml`)
+    // const docPath = path.resolve(new URL(".", import.meta.url).pathname, `./tables/${tableKey}.yaml`)
     const docPath = TABLE_CONFIGS_FOLDER_PATH + `${tableKey}.yaml`
     const doc = yaml.load(fs.readFileSync(docPath, 'utf8'))
     req.table = JSON.parse(JSON.stringify(doc))
@@ -203,4 +201,4 @@ const routes = (options) => {
   // }
 }
 
-module.exports = routes
+export default routes

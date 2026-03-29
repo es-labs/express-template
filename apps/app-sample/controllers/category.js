@@ -1,8 +1,6 @@
-'use strict'
+import * as s from "@es-labs/node/services";
 
-const s = require('@es-labs/node/services')
-
-exports.create = async (req, res, next) => {
+const create = async (req, res, next) => {
   try {
     const rv = await s.get('knex1')('categories').insert(req.body)
     return res.status(201).json({ id: rv[0] })
@@ -11,7 +9,7 @@ exports.create = async (req, res, next) => {
   }
 }
 
-exports.findOne = async (req, res, next) => {
+const findOne = async (req, res, next) => {
   try {
     const category = await s.get('knex1')('categories').where({ id: req.params.id }).first()
     if (category)
@@ -23,7 +21,7 @@ exports.findOne = async (req, res, next) => {
   }
 }
 
-exports.update = async (req, res, next) => {
+const update = async (req, res, next) => {
   try {
     const count = await s.get('knex1')('categories').where({ id: req.params.id }).update(req.body)
     return res.status(count ? 200 : 404).json({ count })
@@ -32,7 +30,7 @@ exports.update = async (req, res, next) => {
   }
 }
 
-exports.find = async (req, res, next) => {
+const find = async (req, res, next) => {
   try {
     const limit = req.query.limit ? req.query.limit : 2
     const page = req.query.page ? req.query.page : 0
@@ -44,7 +42,7 @@ exports.find = async (req, res, next) => {
   }
 }
 
-exports.remove = async (req, res, next) => {
+const remove = async (req, res, next) => {
   try {
     const count = await s.get('knex1').knex('categories').where({ id: req.params.id }).delete()
     return res.status(count ? 200 : 404).json({ count })
@@ -53,3 +51,10 @@ exports.remove = async (req, res, next) => {
   }
 }
 
+export default {
+  create,
+  findOne,
+  update,
+  find,
+  remove
+}

@@ -1,12 +1,10 @@
 'use strict'
-
-const fs = require('fs')
-const express = require('express')
-const { authUser } = require('@es-labs/node/auth')
+import express from "express";
+import { authUser } from "@es-labs/node/auth";
 
 const { APP_NAME, APP_VERSION, API_PORT, HTTPS_CERTIFICATE } = process.env
 
-module.exports = express.Router({caseSensitive: true})
+export default express.Router({caseSensitive: true})
   /**
    * GET /api/healthcheck
    * @summary Healthcheck endpoint

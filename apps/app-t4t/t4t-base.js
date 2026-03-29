@@ -1,13 +1,14 @@
-const csvParse = require('csv-parse')
-const { Parser } = require('@json2csv/plainjs')
-const svc = require('@es-labs/node/services')
-
-const {
+import { parse } from 'csv-parse';
+import { Parser } from "@json2csv/plainjs";
+import * as svc from "@es-labs/node/services";
+import {
   isInvalidInput, mapRelation, formUniqueKey, kvDb2Col, setAuditData
-} = require('./t4t-utils.js')
+} from "./t4t-utils.js";
 
+//import csvParse from "csv-parse";
+const csvParse = parse;
 
-exports.upload = async (req, res) => {
+const upload = async (req, res) => {
   console.log('base upload')
   const { table } = req
   if (!table.import) throw new Error('Forbidden - Upload')
@@ -96,7 +97,7 @@ exports.upload = async (req, res) => {
     })
 }
 
-exports.find = async (req, res) => {
+const find = async (req, res) => {
   if (!req.table.view) throw new Error('Forbidden - List All')
   const { table } = req
   let { page = 1, limit = 25, filters = null, sorter = null, csv = '' } = req.query
@@ -174,7 +175,7 @@ exports.find = async (req, res) => {
   }
 }
 
-exports.findOne = async (req, res) => {
+const findOne = async (req, res) => {
   if (!req.table.view) throw new Error('Forbidden - List One')
   const { table } = req
   const where = formUniqueKey(table, req.query.__key)
@@ -199,7 +200,7 @@ exports.findOne = async (req, res) => {
   return res.status(rv ? 200 : 404).json(rv)  
 }
 
-exports.remove = async (req, res) => {
+const remove = async (req, res) => {
   if (!req.table.delete) throw new Error('Forbidden - Delete')
   const { table } = req
   const { ids } = req.body
@@ -240,7 +241,7 @@ exports.remove = async (req, res) => {
   }
 }
 
-exports.update = async (req, res) => {
+const update = async (req, res) => {
   if (!req.table.update) throw new Error('Forbidden - Update')
   const { body, table } = req
   const where = formUniqueKey(table, req.query.__key)
@@ -291,7 +292,7 @@ exports.update = async (req, res) => {
   return res.json({ count })
 }
 
-exports.create = async (req, res) => {
+const create = async (req, res) => {
   if (!req.table.create) throw new Error('Forbidden - Create')
   const { table, body } = req
   for (let key in table.cols) {
@@ -335,4 +336,13 @@ exports.create = async (req, res) => {
   // rv = await query.clone()
   // const recordKey = rv?.[0] // id - also... disallow link tables input... for creation
   return res.status(201).json(rv)
+}
+
+export default {
+  upload,
+  find,
+  findOne,
+  remove,
+  update,
+  create
 }

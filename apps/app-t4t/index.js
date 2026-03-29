@@ -1,6 +1,5 @@
-'use strict'
-
-const router = require('express').Router()
+import express from "express";
+import t4t from "./t4t.js";
 
 // export your routes here - make sure no clashes
 function mockAuthUser (req, res, next) {
@@ -13,8 +12,8 @@ function mockAuthUser (req, res, next) {
   next()
 }
 
-const t4t = require('./t4t')({ authFunc: mockAuthUser })
+const router = express.Router();
 
-module.exports = ({ app, routePrefix }) => {
-  app.use(routePrefix, router.use('/', t4t))
+export default ({ app, routePrefix }) => {
+  app.use(routePrefix, router.use('/', t4t({ authFunc: mockAuthUser })))
 }

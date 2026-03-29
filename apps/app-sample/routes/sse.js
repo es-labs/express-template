@@ -1,6 +1,4 @@
-'use strict'
-
-const express = require('express')
+import express from "express";
 let clients = []
 
 function sendEventsToAll(data) {
@@ -8,7 +6,7 @@ function sendEventsToAll(data) {
   clients.forEach(client => client.res.write(`data: ${JSON.stringify(data)}`))
 }
 
-module.exports = express.Router({caseSensitive: true})
+export default express.Router({caseSensitive: true})
   .get('/register', (req, res) => {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',

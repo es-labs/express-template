@@ -1,10 +1,8 @@
-'use strict'
+import express from "express";
+import { authUser } from "@es-labs/node/auth";
+import categoryController from "../controllers/category.js";
 
-const express = require('express')
-const { authUser } = require('@es-labs/node/auth')
-const categoryController = require('../controllers/category')
-
-module.exports = express.Router()
+export default express.Router()
   .post('/categories', authUser, categoryController.create)
   .patch('/categories/:id', authUser, categoryController.update)
   .get('/categories/:id', authUser, categoryController.findOne)

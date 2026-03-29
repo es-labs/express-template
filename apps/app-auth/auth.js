@@ -1,12 +1,11 @@
-'use strict'
-const express = require('express')
-const auth = require('@es-labs/node/auth')
-const own = require('../../base/controller/auth/own')
-const oauth = require('../../base/controller/auth/oauth')
-const oidc = require('../../base/controller/auth/oidc')
-const saml = require('../../base/controller/auth/saml')
+import express from "express";
+import * as auth from "@es-labs/node/auth";
+import * as own from "@es-labs/node/express/controller/auth/own";
+import * as oauth from "@es-labs/node/express/controller/auth/oauth";
+import * as oidc from "@es-labs/node/express/controller/auth/oidc";
+import * as saml from "@es-labs/node/express/controller/auth/saml";
 
-exports.myauthRoute = express.Router()
+export const myauthRoute = express.Router()
   .post('/login', own.login)
   .post('/otp', own.otp)
   .post('/refresh', auth.authRefresh)
@@ -27,14 +26,14 @@ exports.myauthRoute = express.Router()
   })
 
 
-exports.oauthRoute = express.Router().get('/callback', oauth.callbackOAuth)
+export const oauthRoute = express.Router().get('/callback', oauth.callbackOAuth)
 
-exports.oidcRoute = express.Router()
+export const oidcRoute = express.Router()
   .get('/login', oidc.login)
   .get('/auth', oidc.auth)
   .get('/refresh', oidc.refresh)
 
-exports.samlRoute = express.Router()
+export const samlRoute = express.Router()
   .get('/login', saml.login)
   .post('/callback', saml.auth)
 

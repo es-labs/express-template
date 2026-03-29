@@ -1,12 +1,11 @@
 'use strict'
-
-const express = require('express')
-const { 
+import express from "express";
+import { 
   // authUser,
   authFns
-} = require('@es-labs/node/auth')
-const fcm = require('@es-labs/node/comms/fcm')
-const webpush = require('@es-labs/node/comms/webpush')
+} from "@es-labs/node/auth";
+import * as fcm from "@es-labs/node/comms/fcm";
+import * as webpush from "@es-labs/node/comms/webpush";
 
 console.log('WARNING Auth bypass in webpush.js')
 
@@ -15,7 +14,7 @@ const authUser = (req, res, next) => {
   next()
 }
 
-module.exports = express.Router()
+export default express.Router()
   .get('/vapid-public-key', (req, res) => res.json({ publicKey: webpush.getPubKey() }))
   .post('/sub', authUser, async (req, res) => {
     const { id } = req.decoded

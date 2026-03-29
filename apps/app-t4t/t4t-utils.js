@@ -2,7 +2,7 @@ const {
   TABLE_USER_ID_KEY, TABLE_USER_ROLE_KEY, TABLE_ORG_ID_KEY
 } = process.env
 
-exports.noAuthFunc = (req, res, next) => {
+export const noAuthFunc = (req, res, next) => {
     const message = 'no user auth middleware set'
     console.log({
       error: message,
@@ -16,7 +16,7 @@ exports.noAuthFunc = (req, res, next) => {
     res.status(500).send(message)
 }
 
-exports.isInvalidInput = (col, val, key = null) => {
+export const isInvalidInput = (col, val, key = null) => {
   const inputTypeNumbers = ['number', 'range', 'date', 'datetime-local', 'month', 'time', 'week']
   const inputTypeText = ['text','tel','email','password','url','search']
   const { ui, required, multiKey } = col
@@ -45,7 +45,7 @@ exports.isInvalidInput = (col, val, key = null) => {
   return false
 }
 
-exports.processJson = async (req, res, next) => {
+export const processJson = async (req, res, next) => {
   if (req.files) { // it is formdata
     let obj = {}
     for (let key in req.body) {
@@ -58,7 +58,7 @@ exports.processJson = async (req, res, next) => {
 }
 
 // both are comma seperated strings
-exports.roleOperationMatch = (role, operation, col = null) => {
+export const roleOperationMatch = (role, operation, col = null) => {
   // console.log('roleOperationMatch (col, role, operation)', col, role, operation)
   try {
     const operations = operation.split(',')
@@ -73,7 +73,7 @@ exports.roleOperationMatch = (role, operation, col = null) => {
   return false
 }
 
-exports.formUniqueKey = (table, args) => {
+export const formUniqueKey = (table, args) => {
   if (table.pk) return { [table.name + '.' + table.pk] : args } // return for pk
   const where = {} // return for multiKey
   const val_a = args.split('|')
@@ -90,7 +90,7 @@ exports.formUniqueKey = (table, args) => {
   return (Object.keys(where).length) ? where : null
 }
 
-exports.mapRelation = (key, col) => {
+export const mapRelation = (key, col) => {
   // foreignKey get from yaml config, so make sure there is foreignKey
   const table1Id = col?.options?.foreignKey
   const table2 = col?.options?.tableName
@@ -107,7 +107,7 @@ exports.mapRelation = (key, col) => {
 
 // for reads
 // map a key value of a row from DB read...  to desired output for that key (db field)
-exports.kvDb2Col = (_row, _joinCols, _tableCols) => {
+export const kvDb2Col = (_row, _joinCols, _tableCols) => {
   for (let k in _row) {
     if (_tableCols[k]) {
       if (_tableCols[k].hide === 'omit') delete _row[k]
@@ -129,7 +129,7 @@ exports.kvDb2Col = (_row, _joinCols, _tableCols) => {
   return _row
 }
 
-exports.setAuditData = (req, op, keys = '', body = '') => ({
+export const setAuditData = (req, op, keys = '', body = '') => ({
   user: req?.decoded[TABLE_USER_ID_KEY] || '---',
   timestamp: new Date(),
   db_name: req.table.db,

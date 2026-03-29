@@ -58,7 +58,6 @@ Refer to following files for SPA sample (uses fido2-lib in backend)
 |  |  +- tables/ : configurable table & crud
 |  |  +- tests/ : Jest tests for custom application
 |  |  +- uploads/ : for file uploads
-|  |  +- graphql-schema.js : application GraphQL schemas and resolvers
 |  |  +- dev.sqlite3 : sqlite DB with schema and data
 |  |  +- test.http : rest API commands testing VSCode plugin (Rest Client - humao.rest-client)
 |  |  +- test.py: run python from express

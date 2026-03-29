@@ -1,12 +1,21 @@
-'use strict'
-const url = require('url')
-const http = require('http')
-const https = require('https')
-const express = require('express')
-const app = express()
+import url from "url";
+import http from "http";
+import https from "https";
+import express from "express";
+import expressJSDocSwagger from "express-jsdoc-swagger";
+import init from "@es-labs/node/express/init";
+import preRoute from "@es-labs/node/express/preRoute";
+import postRoute from "@es-labs/node/express/postRoute";
+import sleep from "@es-labs/node/utils/sleep";
+import appsLoader from "./apps/apploader.js";
+import baseRouter from "./base/router/index.js";
 
-require('./base/init')()
-const sleep = require('@es-labs/node/utils/sleep')
+import * as services from '@es-labs/node/services';
+import * as authService from '@es-labs/node/auth';
+
+const app = express();
+
+init();
 
 // setup graceful exit
 const handleExitSignal = async (signal) => await cleanup(`Signal ${signal}`, 0) // NOSONAR
@@ -30,10 +39,10 @@ const server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.cr
 
 // USERLAND - Add APM tool
 
-require('./base/preRoute')(app, express)
+preRoute(app, express)
 
-const services = require('@es-labs/node/services')
-const authService = require('@es-labs/node/auth')
+// const services = (await import('@es-labs/node/services')).default;
+// const authService = (await import('@es-labs/node/auth')).default;
 
 // CLEANUP
 const cleanup = async (message, exitCode = 0, coreDump = false, timeOutMs = 1000) => {
@@ -81,7 +90,7 @@ try {
   // DO use custom error classes like BadRequestError as it makes sorting errors out easier
 
   // const asyncWrapper = fn => (...args) => fn(...args).catch(args[2])
-  // module.exports = asyncWrapper
+  // export default asyncWrapper
   // USAGE:
   // const wrap = require('./<path-to>/asyncWrapper')
   // app.get('/', wrap(async (req, res) => { ... }))
@@ -97,9 +106,9 @@ try {
 
 try {
   console.log('Start App Routes Load')
-  require('./apps/apploader')(app) // add your APIs here
+  appsLoader(app) // add your APIs here
   console.log('Start Common Routes Load')
-  require('./base/router')(app); // common routes
+  baseRouter(app); // common routes
   console.log('Start Fallback Routes Load')
   app.use('/api/:wildcard', (req, res) => res.status(404).json({ error: 'Not Found' }))
   console.log('Routes Load Completed')
@@ -113,8 +122,7 @@ const { OPENAPI_OPTIONS } = process.env
 // TBD when lib is ready for ExpressJS 5
 const openApiOptions = null // JSON.parse(OPENAPI_OPTIONS || null)
 if (openApiOptions) {
-  openApiOptions.baseDir = __dirname
-  const expressJSDocSwagger = require('express-jsdoc-swagger')
+  openApiOptions.baseDir = new URL(".", import.meta.url).pathname
   expressJSDocSwagger(app)(openApiOptions)
 }
 
@@ -124,7 +132,7 @@ server.on('upgrade', (request, socket, head) => {
   const pathname = url.parse(request.url).pathname // if (pathname === '/some-match') { }
 })
 
-require('./base/postRoute')(app, express)
+postRoute(app, express)
 app.use(":wildcard", (req, res) => res.status(404).json({ Error: '404 Not Found...' }))
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 // 'Bad Request': 400, 'Unauthorized': 401, 'Forbidden': 403, 'Not Found': 404, 'Conflict': 409, 'Unprocessable Entity': 422, 'Internal Server Error': 500,
@@ -144,5 +152,6 @@ app.use((error, req, res, next) => {
   return !res.headersSent ? res.status(500).json({ message }) : next()
 })
 
-
-module.exports = { server }
+export {
+  server
+};

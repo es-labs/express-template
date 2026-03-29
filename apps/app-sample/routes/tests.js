@@ -1,18 +1,15 @@
-'use strict'
-
-const path = require('path')
-const fs = require('fs')
-const { spawn } = require('child_process')
-const express = require('express')
-const PdfKit = require('pdfkit')
-
-const services = require('@es-labs/node/services')
-const sleep = require('@es-labs/node/utils/sleep')
-const { memoryUpload, storageUpload } = require('../../../base/upload')
+import path from "path";
+import fs from "fs";
+import { spawn } from "child_process";
+import express from "express";
+import PdfKit from "pdfkit";
+import * as services from "@es-labs/node/services";
+import sleep from "@es-labs/node/utils/sleep";
+import { memoryUpload, storageUpload } from "@es-labs/node/express/upload";
 
 const { UPLOAD_STATIC, UPLOAD_MEMORY } = process.env
 
-module.exports = express.Router()
+export default express.Router()
   .get('/', (req, res) => {
     res.json({
       endpoints: ['/stream', '/get-html']

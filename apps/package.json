@@ -6,14 +6,15 @@
   "directories": {
     "test": "tests"
   },
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@json2csv/plainjs": "^7.0.6",
-    "csv-parse": "^6.1.0",
-    "fido2-lib": "^3.5.7",
-    "pdfkit": "^0.17.2",
+    "csv-parse": "^6.2.1",
+    "fido2-lib": "^3.5.9",
+    "pdfkit": "^0.18.0",
     "selfsigned": "^5.5.0"
   },
   "keywords": [],
