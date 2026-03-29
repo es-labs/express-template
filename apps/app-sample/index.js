@@ -1,6 +1,6 @@
 // import config from '@es-labs/node/config';
 // TBD; handle vault in production
-import './common/env.js' // setup env vars
+import '../../common/env.js' // setup env vars
 import { server } from './app.js';
 
 (async function() {

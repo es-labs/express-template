@@ -29,13 +29,23 @@ Always finding new things to implement / improve in this list!
 - [chore] update README.md, update dependencies, removed base64url package
 - [chore] improve table editor app
 
+### 0.0.8 [in progress]
+- [feat] use Claude AI and Copilot to improve design and code
+- [migrate] express version 5
+- [migrate] pure ES modules
+- [migrate] use NodeJS native test - TBD
+- [migrate] use NodeJS native env - TBD
+- [feat] - structure for microservice - TBD
+- [feat] - sample MCP server - TBD
+- [github] - github actions approval gates - TBD
+- [github] - github actions deployment to containers - TBD
+
 ### For next sprint / version
 - [feat] add commitizen, add semantic-release?
 - [next-in-pipeline] add more express-jsdoc-swagger to routes
 - [next-in-pipeline] fix broken tests and examples
 - [next-in-pipeline] re-implement MQ with redis pubsub?
 - [next-in-pipeline] to use Typescript and tsoa ? or use JSDoc?
-- [research] use ESM instead of CJS - https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
 - [frontend] aria
 - [iaac-cicd] terraform, Kubernetes
 - [backend-testing] research websocket testing

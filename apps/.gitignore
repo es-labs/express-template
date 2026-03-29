@@ -4,6 +4,7 @@
 !apploader.js
 !.env.sample
 !package.json
+!test.http
 
 # EDIT BELOW - comment out environments you want in your project
 

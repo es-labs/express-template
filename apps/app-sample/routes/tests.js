@@ -7,8 +7,6 @@ import * as services from "@es-labs/node/services";
 import sleep from "@es-labs/node/utils/sleep";
 import { memoryUpload, storageUpload } from "@es-labs/node/express/upload";
 
-const { UPLOAD_STATIC, UPLOAD_MEMORY } = process.env
-
 export default express.Router()
   .get('/', (req, res) => {
     res.json({
@@ -34,30 +32,24 @@ export default express.Router()
     child.unref()
     res.json({})
   })
-
   .post('/test-cors-post', (req, res) => { res.send('Cors Done') }) // check CORS
   .post('/test-post-json', (req, res) => { res.json(req.body) }) // check if send header as application/json but body is text
-
-  // test outbound unblocked
-  .get('/outbound', async (req, res) => {
+  .get('/outbound', async (req, res) => { // test outbound unblocked
     const url = req.query.url || 'https://httpbin.org/get'
     const rv = await fetch(url)
     const data = await rv.json()
     res.json(data)
   })
-  // test errors
   .get('/error', (req, res) => { // error caught by error middleware
     req.something.missing = 10
     res.json({ message: 'OK' })
   })
-  .get('/error-handled-rejection', async (req, res) => {
+  .get('/error-handled-rejection', async (req, res) => { // generate hanled promise rejection error
     await Promise.reject(new Error('handled rejection of promise'))
   })
   .get('/error-unhandled-rejection', async (req, res, next) => { // catching error in unhandledException
     Promise.reject(new Error('unhandled rejection of promise')) // call on.process unhandledRejection - promise rejection, unhandled
   })
-
-
   .get('/stream', async (req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain', 'Transfer-Encoding': 'chunked' })
     const chunks = 5
@@ -69,16 +61,14 @@ export default express.Router()
     }  
     res.end()
   })
-
   .get('/get-html', (req, res) => { // render a html page
     const myHtml = (data) => `<h1>Render html, data = ${data.username}</h1>`
     res.type('text/html')
     res.status(200).send( myHtml({ username: 'test name' }) )
   })
-
   .get('/download', (req, res, next) => { // serve a file download, you can add authorization here to control downloads
     const { filename } =  req.query
-    const fullPath = path.join(UPLOAD_STATIC[0].folder, filename)
+    const fullPath = path.join(process.env.UPLOAD_STATIC[0].folder, filename)
 
     // Do not read entire chunk
     // fs.readFile(fullPath, (err, data) => {
@@ -101,12 +91,11 @@ export default express.Router()
     ])
     file.pipe(res)
   })
-
   .get('/download-pdf', (req, res) => {
     const { filename } =  req.query
     const ext = path.extname(filename)
     if (filename && ext === '.pdf') {
-      const fullPath = path.join(UPLOAD_STATIC[0].folder, filename)
+      const fullPath = path.join(process.env.UPLOAD_STATIC[0].folder, filename)
       const pdfDoc = new PdfKit()
       pdfDoc.pipe(fs.createWriteStream(fullPath)) // save as file
       pdfDoc.pipe(res) // stream to response
@@ -129,7 +118,7 @@ export default express.Router()
   // TODO /esm/upload-fe-testing.js
   // test uploads
   // body action: 'read' | 'write', filename: 'my-file.txt', bucket: 'bucket name'
-  .post('/upload-disk', storageUpload(UPLOAD_STATIC[0]).any(), (req,res) => { // avatar is form input name // single('filedata')
+  .post('/upload-disk', storageUpload(process.env.UPLOAD_STATIC[0]).any(), (req,res) => { // avatar is form input name // single('filedata')
     try {
       // console.log('files', req, req.files)
       // body is string, need to parse if json
@@ -142,7 +131,7 @@ export default express.Router()
       res.json({ error: e.message })
     }
   })
-  .post('/upload-memory', memoryUpload(UPLOAD_MEMORY[0]).single('memory'), (req, res) => {
+  .post('/upload-memory', memoryUpload(process.env.UPLOAD_MEMORY[0]).single('memory'), (req, res) => {
     // req.files is array of `photos` files
     // req.body will contain the text fields, if there were any
     res.json({

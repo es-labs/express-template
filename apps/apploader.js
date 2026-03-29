@@ -2,8 +2,6 @@ import appSampleRoutes from './app-sample/routes/index.js';
 import appT4tRoutes from './app-t4t/index.js';
 import appAuthRoutes from './app-auth/index.js';
 
-'use strict'
-
 export default (app) => {
   // your can add more routes here ensure no clash in urlPrefix
   // appSampleRoutes({ app, urlPrefix: '/api/app-second'})
