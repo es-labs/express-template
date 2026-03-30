@@ -1,5 +1,6 @@
 import serveIndex from 'serve-index'
 import history from 'connect-history-api-fallback'
+import { errorHandler, notFoundHandler } from "./middleware/error.js";
 
 const postRoute = (app, express) => {
   let  { UPLOAD_STATIC, WEB_STATIC } = process.env
@@ -27,6 +28,12 @@ const postRoute = (app, express) => {
       app.use(item.url, express.static(item.folder, item.options)) // { extensions: ['html'], index: false }
     })
   }
+
+  // app.use(":wildcard", (req, res) => res.status(404).json({ Error: '404 Not Found...' }))
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+  // 'Bad Request': 400, 'Unauthorized': 401, 'Forbidden': 403, 'Not Found': 404, 'Conflict': 409, 'Unprocessable Entity': 422, 'Internal Server Error': 500,
+  app.use(notFoundHandler); // 404 — must come after all valid routes
+  app.use(errorHandler);
 
   return this
 }

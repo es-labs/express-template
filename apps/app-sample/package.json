@@ -1,5 +1,5 @@
 {
-  "name": "app-sample",
+  "name": "@express-template/app-sample",
   "description": "sample application/service",
   "version": "0.0.6",
   "private": true,
@@ -34,7 +34,7 @@
     "update-commit-hash": "git rev-parse --verify --short HEAD > commit-hash"
   },
   "dependencies": {
-    "common": "file:../../common",
+    "@express-template/common": "file:../../common",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "js-yaml": "^4.1.1",

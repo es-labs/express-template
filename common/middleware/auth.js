@@ -7,4 +7,4 @@ const authIsAdmin = async (req, res, next) => {
   }
 }
 
-export default { authIsAdmin };
+export { authIsAdmin };

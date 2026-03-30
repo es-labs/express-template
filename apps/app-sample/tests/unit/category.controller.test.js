@@ -1,10 +1,9 @@
-import '../../../../env.js';
+import '@express-template/common/env' // setup env vars
 // TBD testing websockets using native node testing
 import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import httpMocks from 'node-mocks-http';
 import newCategory from '../mock-data/new-category.json';
-import config from '@es-labs/node/config';
 import * as Services from '@es-labs/node/services';
 import CategoryController from '../../controllers/category.js';
 
@@ -21,7 +20,6 @@ beforeEach(() => {
 
 // beforeAll
 before(async () => {
-  await config(process.cwd());
   services = Services;
   await services.start();
   categoryController = CategoryController;

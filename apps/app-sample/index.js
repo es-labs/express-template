@@ -1,8 +1,6 @@
-// import config from '@es-labs/node/config';
-// TBD; handle vault in production
-import '../../common/env.js' // setup env vars
+import '@express-template/common/env' // setup env - TBD: handle vault in production
 import { server } from './app.js';
-import * as z from "zod";
+// import * as z from "zod";
 // const Player = z.object({ 
 //   username: z.string(),
 //   xp: z.number()

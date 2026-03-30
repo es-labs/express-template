@@ -19,7 +19,6 @@
 + <env>.pem (need to create your own)
 + db (example running scripts used to populate knex-supported db)
 
-
 ### <env>.gcp.json Example
 
 Google Service Key - Recommended to set sufficient permissions for deployment only
