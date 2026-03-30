@@ -35,13 +35,13 @@ Always finding new things to implement / improve in this list!
 - [migrate] use pure ES modules
 - [migrate] use NodeJS native env
 - [migrate] use @es-labs/jslib
-- [feat] - structure for microservice - IN PROGRESS
-- [github] - github actions deployment to containers - IN PROGRESS
+- [feat] - structure for microservice - IN PROGRESS Dockerfile
+- [github] - github actions deployment to containers - IN PROGRESS deployments
 - [github] - github actions approval gates - TBD
-- [feat] - sample MCP server - IN PROGRESS
+- [feat] - sample MCP server - TBD
 - [feat] - sample WebSocket service - TBD
-- [migrate] use NodeJS native test - TBD
 - [fix] - close websockets (otherwise has force kill) - TBD
+- [migrate] use NodeJS native test - TBD
 
 ### For next sprint / version
 - [feat] copilot to generate JSDocs
