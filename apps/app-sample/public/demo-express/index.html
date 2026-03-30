@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Express & Vanilla JS Demos</title>
+  <link rel="icon" href="data:,">
   <style>
     input:invalid {
       border: 2px solid red;
@@ -14,7 +15,7 @@
       border: 2px solid black;
     }
   </style>
-  <script src='https://js.sentry-cdn.com/1a5bdb07fa464814bb1ce95607ffde31.min.js' crossorigin="anonymous" data-lazy="no"></script>
+  <!-- <script src='https://js.sentry-cdn.com/1a5bdb07fa464814bb1ce95607ffde31.min.js' crossorigin="anonymous" data-lazy="no"></script> -->
 </head>
 
 <body>
@@ -76,7 +77,7 @@
   </div>
 
   <script type="text/javascript">
-    LogFilter(['log']) // which console method to filter out...
+    // LogFilter(['log']) // which console method to filter out...
 
     const source = new EventSource('/api/app-sample/sse/register')
     source.addEventListener('message', (message) => {

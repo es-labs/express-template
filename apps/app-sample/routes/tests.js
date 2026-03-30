@@ -4,7 +4,7 @@ import { spawn } from "child_process";
 import express from "express";
 import PdfKit from "pdfkit";
 import * as services from "@es-labs/node/services";
-import sleep from "@es-labs/node/utils/sleep";
+import { sleep } from "@es-labs/node/iso/sleep";
 import { memoryUpload, storageUpload } from "@es-labs/node/express/upload";
 
 export default express.Router()

@@ -1,4 +1,6 @@
 // middleware/errorHandler.js
+import { NotFoundError } from "../errors/AppError.js";
+
 const isDev = process.env.NODE_ENV !== 'production';
 
 /**
