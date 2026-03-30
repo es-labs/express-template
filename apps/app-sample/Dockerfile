@@ -49,12 +49,12 @@ WORKDIR /app/apps/auth-service
 
 ENV NODE_ENV=production \
     SERVICE_NAME=auth-service \
-    PORT=3001
+    API_PORT=3000
 
-EXPOSE 3001
+EXPOSE 3000
 
 # Healthcheck — lets container runtimes know when the service is ready
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://localhost:3001/health || exit 1
+  CMD wget -qO- http://localhost:3000/health || exit 1
 
 CMD ["node", "index.js"]

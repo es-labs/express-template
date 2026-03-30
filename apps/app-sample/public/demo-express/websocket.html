@@ -18,8 +18,7 @@
 
 <script>
   const output = document.querySelector('#output')
-
-  let socket = new WebSocket('ws://127.0.0.1:3001')
+  let socket = new WebSocket('ws://127.0.0.1:3000')
   socket.onopen = function (e) {
     output.innerHTML = '[open] Connection established'
   };

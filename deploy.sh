@@ -46,7 +46,7 @@ else
 fi
 
 # a test run
-# cross-env NODE_ENV=development VAULT="$VAULT" PORT=3001 DEBUG=app:* node --ignore '*.test.js' --watch src bin/www
+# cross-env NODE_ENV=development VAULT="$VAULT" PORT=3000 DEBUG=app:* node --ignore '*.test.js' --watch src bin/www
 # read && exit
 
 # XXXX="docker build -t gcr.io/$GCP_PROJECT_ID/$APP_NAME-$1:$BUILD_TS --target $1 --build-arg ARG_NODE_ENV=$1 --build-arg ARG_API_PORT=3000 ."

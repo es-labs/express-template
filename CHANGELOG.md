@@ -36,21 +36,19 @@ Always finding new things to implement / improve in this list!
 - [migrate] use NodeJS native env
 - [migrate] use @es-labs/jslib
 - [feat] - structure for microservice - IN PROGRESS
+- [github] - github actions deployment to containers - IN PROGRESS
 - [github] - github actions approval gates - TBD
-- [github] - github actions deployment to containers - TBD
 - [feat] - sample MCP server - IN PROGRESS
+- [feat] - sample WebSocket service - TBD
 - [migrate] use NodeJS native test - TBD
 - [fix] - close websockets (otherwise has force kill) - TBD
-- [feat] - sample WebSocket service - TBD
 
 ### For next sprint / version
 - [feat] copilot to generate JSDocs
 - [feat] copilot to generate API Docs
 - [feat] copilot to generate NodeJS native Unit & Integration Tests 
 - [feat] add commitizen, add semantic-release?
-- [next-in-pipeline] add more express-jsdoc-swagger to routes
 - [next-in-pipeline] re-implement MQ with redis pubsub?
-- [next-in-pipeline] to use Typescript and tsoa ? or use JSDoc?
 - [frontend] aria
 - [iaac-cicd] terraform, Kubernetes
 - [backend-testing] research websocket testing

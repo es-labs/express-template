@@ -21,6 +21,7 @@ const preRoute = () => {
   const DEFAULT_STACK_TRACE_LIMIT = 3 // default limit error stack trace to 3 level
   const DEFAULT_SHUTFOWN_TIMEOUT_MS = NODE_ENV === 'production' ? 30000 : 3000
   const {
+    GRACEFUL_EXIT = NODE_ENV === 'development' ? false : true,
     STACK_TRACE_LIMIT = DEFAULT_STACK_TRACE_LIMIT,
     SHUTDOWN_TIMEOUT_MS = DEFAULT_SHUTFOWN_TIMEOUT_MS
    } = process.env
@@ -49,16 +50,10 @@ const preRoute = () => {
     shuttingDown = true;
   }
 
-  ['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach(signal => process.on(signal, gracefulShutdown)); // SIGKILL cannot be caught
-  process.on('uncaughtException', (err, origin) => console.log(`Uncaught Exception - error: ${err} origin: ${origin}` && process.exit(1)));
-  process.on('unhandledRejection', (reason, promise) => console.log(`Unhandled Rejection - promise: ${promise} reason: ${reason}` && process.exit(1)));
-
-  // SERVICES
-  services.start()
-  try {
-    authService.setup(services.get('keyv'), services.get('knex1')) // setup authorization
-  } catch (e) {
-    console.log(e)
+  if (GRACEFUL_EXIT) {
+    ['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach(signal => process.on(signal, gracefulShutdown)); // SIGKILL cannot be caught
+    process.on('uncaughtException', (err, origin) => console.log(`Uncaught Exception - error: ${err} origin: ${origin}` && process.exit(1)));
+    process.on('unhandledRejection', (reason, promise) => console.log(`Unhandled Rejection - promise: ${promise} reason: ${reason}` && process.exit(1)));
   }
 
   const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA, HTTPS_PASSPHRASE } = process.env
@@ -69,6 +64,20 @@ const preRoute = () => {
   if (HTTPS_PASSPHRASE) https_opts.passphrase = HTTPS_PASSPHRASE // (fs.readFileSync('passphrase.txt')).toString()
   const app = express();
   const server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app) // fs.readFileSync('ca.cert')
+
+  // SERVICES need server
+  services.start(app, server)
+  try {
+    authService.setup(services.get('keyv'), services.get('knex1')) // setup authorization
+  } catch (e) {
+    console.log(e)
+  }
+
+  // // skip middleware for WebSocket upgrade requests
+  // app.use((req, res, next) => {
+  //   if (req.headers.upgrade === 'websocket') return next(); // let WS server handle it
+  //   next();
+  // });
 
   app.use('/health', healthRouter); // Mount before auth middleware — healthchecks must be unprotected
 
