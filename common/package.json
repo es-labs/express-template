@@ -14,7 +14,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@es-labs/esm": "file:../../jscommon/libs/esm",
     "@es-labs/node": "file:../../jscommon/libs/node",
     "connect-history-api-fallback": "^2.0.0",
     "cookie-parser": "^1.4.7",
