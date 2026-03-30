@@ -35,10 +35,9 @@ Refer to following files for SPA sample (uses fido2-lib in backend)
 - Refer to following files for SPA sample
   - [apps/app-sample/routes/webpush.js]()
   - [apps/app-sample/public/demo-express/pn.html]()
-- Uses Webpush or Google FCM, Webpush is easier (sample config uses Webpush and runs on http://127.0.0.1:3000)
+- Uses Webpush, Webpush is easier (sample config uses Webpush and runs on http://127.0.0.1:3000)
 - Click the following buttons in order (see their output in console.log and screen):
   - (1) Subscribe PN, (2) Send And Receive Test PN, (3) Unsubscribe PN
-- For Google FCM, setup your firebase account and messaging, also FCM server key in backend
 
 ## Project Structure
 

@@ -86,7 +86,6 @@ paths:
                 mode:
                   type: string
                   enum:
-                    - FCM
                     - Webpush
                 data:
                   type: object

@@ -33,9 +33,9 @@ Always finding new things to implement / improve in this list!
 - [feat] use Claude AI and Copilot to improve design and code
 - [migrate] express version 5
 - [migrate] pure ES modules
-- [migrate] use NodeJS native test - TBD
-- [migrate] use NodeJS native env - TBD
 - [feat] - structure for microservice - TBD
+- [migrate] use NodeJS native env - TBD
+- [migrate] use NodeJS native test - TBD
 - [feat] - sample MCP server - TBD
 - [github] - github actions approval gates - TBD
 - [github] - github actions deployment to containers - TBD

@@ -4,7 +4,6 @@ import {
   // authUser,
   authFns
 } from "@es-labs/node/auth";
-import * as fcm from "@es-labs/node/comms/fcm";
 import * as webpush from "@es-labs/node/comms/webpush";
 
 console.log('WARNING Auth bypass in webpush.js')
@@ -35,22 +34,17 @@ export default express.Router()
       const user = await authFns.findUser({ id })
       let rv = null
 
-      // console.log('FCM TEST', user.pnToken, data.title, data.body)
       if (user && user.pnToken) {
-        if (mode === 'FCM') {
-          rv = await fcm.send(user.pnToken, data.title || '', data.body || '')
-        } else if (mode === 'Webpush') { // Use Webpush
-          const options = {
-            TTL: 60,
-            // headers: {
-            //   'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
-            //   'Content-type': 'application/json'
-            // },
-          } 
-          const subscription = JSON.parse(user.pnToken)
-          // console.log(id, mode, subscription, data, options)
-          rv = await webpush.send(subscription, 'FROM Backend: ' + data, options)
-        }
+        const options = {
+          TTL: 60,
+          // headers: {
+          //   'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
+          //   'Content-type': 'application/json'
+          // },
+        } 
+        const subscription = JSON.parse(user.pnToken)
+        // console.log(id, mode, subscription, data, options)
+        rv = await webpush.send(subscription, 'FROM Backend: ' + data, options)
         res.json({ status: 'sent', mode, rv })
       } else {
         res.status(404).json({ status: 'no user or token'})

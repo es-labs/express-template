@@ -10,19 +10,10 @@
 <body>
   <div>
     <h1>Push Notification <a href="index.html">Back</a></h1>
-    <p>Google FCM still needs work, can subscrube but sending has 401 error [TOFIX]</p>
-    <ul>
-      <li>chrome://settings/content/notifications - add site e.g. http://127.0.0.1:3000</li>
-      <li>https://firebase.google.com/docs/web/setup</li>      
-      <li>https://medium.com/step-up-labs/our-experience-with-firebase-cloud-messaging-318043e667e3</li>
-    </ul>
     <ul>
       <li>ALL - manifest.json</li>
       <li>ALL - service-worker.js</li>
       <li>Webpush - @es-labs/node/esm/pwa.js</li>
-      <li>FCM - firebase-messaging-sw.js</li>
-      <li>FCM - firebase.config.js</li>
-      <li>FCM - js/fcm.js</li>
     </ul>
     <div>
       <p>PN STATE: <span id="txt-pn-state">NA</span></p>
@@ -43,11 +34,6 @@
 <script type="module">
   import { webpushSubscribe, webpushUnsubscribe } from "/esm/pwa.js"; // served from express /esm static route
   import Fetch from "/esm/fetch.js";
-  import { fcmSubscribe } from '/js/fcm.js'
-  import './firebase.config.js'
-
-  const VITE_PWA_PN = 'Webpush' // FCM, Webpush
-  alert('V1.9 Using: ' + VITE_PWA_PN)
   let subState = '[NA]'
   const WEBPUSH_URL = '/api/app-sample/webpush'
 
@@ -84,30 +70,8 @@
 
   async function sub() {
     try {
-      let subscription
-      if (VITE_PWA_PN === "FCM") {
-        subscription = await fcmSubscribe(
-          window.SW_REG,
-          async (token) => {
-            await http.post(WEBPUSH_URL + '/sub', { subscription: token })
-          },
-          (payload) => {
-            // console.log('Message received. ', payload)
-            try {
-              const { title, body } = JSON.parse(payload.data.notification)
-              // console.log(new Date().toISOString(), title, body)
-              alert(`FCM PN Message title=${title} body=${body}`)
-            } catch (e) {
-              console.log('GCM msg error', e.toString())
-            }
-          },
-          { VAPID_KEY: window.CONFIG_VAPID_KEY, FIREBASE_CLIENT: window.CONFIG_FIREBASE_CLIENT }
-        )
-        if (subscription) await http.post(WEBPUSH_URL + '/sub', { subscription })
-      } else if (VITE_PWA_PN === "Webpush") {
-        const { data } = await http.get(WEBPUSH_URL + '/vapid-public-key')
-        subscription = await webpushSubscribe(data.publicKey)
-      }
+      const { data } = await http.get(WEBPUSH_URL + '/vapid-public-key')
+      let subscription = await webpushSubscribe(data.publicKey)
       console.log('subscription', subscription)
       if (subscription) await http.post(WEBPUSH_URL + '/sub', { subscription });
       subState = "[Subscribed]";
@@ -118,7 +82,6 @@
     }
   }
   async function unsub() {
-    // No FCM Unsub
     try {
       if (VITE_PWA_PN === "Webpush") await webpushUnsubscribe();
       await http.post(WEBPUSH_URL + '/unsub', {});
@@ -132,12 +95,7 @@
   async function test() {
     if (subState !== "[Subscribed]") return alert("Need to subscribe first");
     try {
-      let data;
-      if (VITE_PWA_PN === "FCM") {
-        data = { title: "Hello FCM", body: new Date().toLocaleString() };
-      } else if (VITE_PWA_PN === "Webpush") {
-        data = "Hello Webpush " + new Date().toLocaleString();
-      }
+      let data = "Hello Webpush " + new Date().toLocaleString();
       await http.post(WEBPUSH_URL + '/send/1', { mode: VITE_PWA_PN, data });
       console.log('test PN sent')
     } catch (e) {
