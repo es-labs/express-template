@@ -10,7 +10,7 @@ import fido from "./fido.js";
 const router = express.Router();
 
 // export your routes here - make sure no clashes
-export default (app) => {
+export default ({ app }) => {
   app.use('/api/app-sample',
     router.use('/', base), // http://127.0.0.1:3000/api/app-sample/
     router.use('/categories', categories), // http://127.0.0.1:3000/api/app-sample/categories/

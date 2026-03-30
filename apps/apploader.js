@@ -4,7 +4,7 @@ import appAuthRoutes from './app-auth/index.js';
 
 export default (app) => {
   // your can add more routes here ensure no clash in urlPrefix
-  // appSampleRoutes({ app, urlPrefix: '/api/app-second'})
+  // appSampleRoutes({ app, routePrefix: '/api/app-second'})
 
   // some sample/demo routes - you can remove if not needed
   appSampleRoutes({ app, routePrefix: '/api/app-sample'})
