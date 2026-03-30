@@ -34,6 +34,7 @@ Always finding new things to implement / improve in this list!
 - [migrate] use express version 5
 - [migrate] use pure ES modules
 - [migrate] use NodeJS native env
+- [migrate] use @es-labs/jslib
 - [feat] - structure for microservice - IN PROGRESS
 - [github] - github actions approval gates - TBD
 - [github] - github actions deployment to containers - TBD
@@ -55,5 +56,5 @@ Always finding new things to implement / improve in this list!
 - [backend-testing] research websocket testing
 
 ### For future product improvement
-- [@es-labs/node/web/bwc-combobox.js] - enhancement: replace datalist (so can check multiple times on dropdown instead of closing after each check)
-- [@es-labs/node/web/bwc-t4t-form.js] - handle multiple parent values use case of combobox..., handle reset of multiple child columns
+- [@es-labs/jslib/web/bwc-combobox.js] - enhancement: replace datalist (so can check multiple times on dropdown instead of closing after each check)
+- [@es-labs/jslib/web/bwc-t4t-form.js] - handle multiple parent values use case of combobox..., handle reset of multiple child columns

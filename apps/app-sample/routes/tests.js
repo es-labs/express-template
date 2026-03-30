@@ -3,9 +3,9 @@ import fs from "fs";
 import { spawn } from "child_process";
 import express from "express";
 import PdfKit from "pdfkit";
-import * as services from "@es-labs/node/services";
-import { sleep } from "@es-labs/node/iso/sleep";
-import { memoryUpload, storageUpload } from "@es-labs/node/express/upload";
+import * as services from "@es-labs/jslib/services";
+import { sleep } from "@es-labs/jslib/iso/sleep";
+import { memoryUpload, storageUpload } from "@es-labs/jslib/express/upload";
 
 export default express.Router()
   .get('/', (req, res) => {

@@ -1,4 +1,4 @@
-import * as s from "@es-labs/node/services";
+import * as s from "@es-labs/jslib/services";
 
 const create = async (req, res, next) => {
   try {

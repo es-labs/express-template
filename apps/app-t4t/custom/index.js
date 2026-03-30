@@ -1,5 +1,5 @@
 import csvParse from "csv-parse";
-import * as svc from "@es-labs/node/services";
+import * as svc from "@es-labs/jslib/services";
 import {
   setAuditData
 } from "../t4t-utils.js";

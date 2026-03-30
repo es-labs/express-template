@@ -10,8 +10,8 @@ import http from "http";
 import https from "https";
 import express from "express";
 
-import * as services from '@es-labs/node/services';
-import * as authService from '@es-labs/node/auth';
+import * as services from '@es-labs/jslib/services';
+import * as authService from '@es-labs/jslib/auth';
 
 import { healthRouter } from './health/router.js';
 
@@ -33,8 +33,8 @@ const preRoute = () => {
   let shuttingDown = false;
 
   const gracefulShutdown = async (signal) => {
+    if (shuttingDown) return; // prevent multiple signals from triggering multiple shutdowns
     console.log(`Cleanup initiated by signal: ${signal}`);
-    shuttingDown = true;
     setTimeout(() => { // give the LB time to notice the 503 and stop routing
       console.error('Forced shutdown after timeout');
       process.exit(1);
@@ -46,6 +46,7 @@ const preRoute = () => {
         return process.exit(0)
       });
     }
+    shuttingDown = true;
   }
 
   ['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach(signal => process.on(signal, gracefulShutdown)); // SIGKILL cannot be caught

@@ -1,9 +1,9 @@
 import express from "express";
-import * as auth from "@es-labs/node/auth";
-import * as own from "@es-labs/node/express/controller/auth/own";
-import * as oauth from "@es-labs/node/express/controller/auth/oauth";
-import * as oidc from "@es-labs/node/express/controller/auth/oidc";
-import * as saml from "@es-labs/node/express/controller/auth/saml";
+import * as auth from "@es-labs/jslib/auth";
+import * as own from "@es-labs/jslib/express/controller/auth/own";
+import * as oauth from "@es-labs/jslib/express/controller/auth/oauth";
+import * as oidc from "@es-labs/jslib/express/controller/auth/oidc";
+import * as saml from "@es-labs/jslib/express/controller/auth/saml";
 
 export const myauthRoute = express.Router()
   .post('/login', own.login)

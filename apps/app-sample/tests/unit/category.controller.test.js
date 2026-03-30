@@ -4,7 +4,7 @@ import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import httpMocks from 'node-mocks-http';
 import newCategory from '../mock-data/new-category.json';
-import * as Services from '@es-labs/node/services';
+import * as Services from '@es-labs/jslib/services';
 import CategoryController from '../../controllers/category.js';
 
 let services;

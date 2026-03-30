@@ -29,7 +29,7 @@
   "scripts": {
     "app": "node --trace-warnings index.js",
     "app:watch": "node --trace-warnings --watch --watch-preserve-output --watch-path=./apps index.js",
-    "build:lib": "npm i @es-labs/node@latest",
+    "build:lib": "npm i @es-labs/jslib@latest",
     "git:hash": "git rev-parse --verify --short HEAD",
     "git:branch": "git rev-parse --abbrev-ref HEAD",
     "lint": "eslint .",

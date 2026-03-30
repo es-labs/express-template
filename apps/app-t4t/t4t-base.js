@@ -1,6 +1,6 @@
 import { parse } from 'csv-parse';
 import { Parser } from "@json2csv/plainjs";
-import * as svc from "@es-labs/node/services";
+import * as svc from "@es-labs/jslib/services";
 import {
   isInvalidInput, mapRelation, formUniqueKey, kvDb2Col, setAuditData
 } from "./t4t-utils.js";
