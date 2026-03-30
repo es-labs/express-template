@@ -15,16 +15,18 @@
 ./setup-upstream.sh
 ```
 
-2 - Setup for your custom code
+2 - Creating A New Serrvice
 
-```bash
-# setup your env file
-cp apps/.env.sample apps/.env # secret properties can be in apps/.env.secret
-```
+Use `apps/app-sample` as an example on how to create a new service/application.
+
+- Make a copy of the `app-sample` folder in the `apps` folder and rename it (kebab using case)
+- edit the .env and .env.development files (.env.staging, .env.production environments should be in secrets)
+- add `!<your-application-name>` to `apps\.gitignore`
+- all you need to do is edit `<your-application-name>/routes` for your APIs
+- TBD MCP and WS routes
 
 **Important notes**
-- DO NOT develop custom code in `apps/app-sample`. Rename it or copy it to another folder name
-- In apps/apploader.js, change `app-sample` to the folder you are using
+- DO NOT develop in `apps/app-sample`.
 - userland changes ONLY in the `apps` folder, NEVER outside the folder. Contact template maintainer if you need something outside `apps`
 - do note any conflicts to resolve when merging from upstream
 
@@ -57,11 +59,9 @@ git pull upstream <branch or tag> --no-rebase
 git clone https://github.com/es-labs/express-template.git
 cd express-template
 npm i
-cd apps
-npm i
 # Note your custom development folder is `<project root>/apps/app-sample`
 
-cd .. # go back up
+cd apps/app-sample # go back up
 npm run local # see ./package.json scripts
 # For Windows OS: npm run local:win
 
@@ -69,7 +69,7 @@ npm run local # see ./package.json scripts
 NODE_ENV=development npm run lint
 ```
 
-Local development sample sqlite DB `apps/app-sample/dev.sqlite3` already created and populated
+Local development sample sqlite DB `apps/common/dev.sqlite3` already created and populated
 
 If need to **migrate** and **seed**, refer to `dbdeploy` package in `tools` workspace of [https://github.com/es-labs/jscommon]()
 

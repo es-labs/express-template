@@ -2,11 +2,7 @@
 # try to use as much shell scripting a possible
 # actions appear from default branch - https://github.community/t/workflow-files-only-picked-up-from-master/16129/2
 #
-# Supported Container Registries:
-# - [to test] Aliyun OSS
-# - [backlog] AWS S3
-# - [backlog] Azure 
-# - [backlog] GCP Cloud Storage
+# Supported Container Registries: AWS, Alicloud, Digital Ocean
 #
 # Setup the following secrets
 # - CR_USERNAME

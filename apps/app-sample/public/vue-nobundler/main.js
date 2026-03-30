@@ -6,9 +6,7 @@ import '/esm/bwc-combobox.js'
 import '/esm/bwc-fileupload.js'
 import '/esm/bwc-table.js'
 import '/esm/bwc-t4t-form.js'
-
-// import * as sleep from '/esm/sleep.js'
-// console.log(sleep)
+// import { sleep }from '/esm/sleep.js'
 
 import router from './router.js'
 import App from './app.js'
