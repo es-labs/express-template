@@ -7,7 +7,6 @@ import { server } from './app.js';
 // });
 
 (async function() {
-  // await config(new URL('.', import.meta.url).pathname, process.cwd())
   console.info('Globals setup and config done. Starting app... ')
   // if development && hostname == localhost allow TLS - call after config load
   if (process.env.NODE_ENV === 'development') process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0

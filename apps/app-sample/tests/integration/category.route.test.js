@@ -1,3 +1,4 @@
+// TBD import config
 import express from "express";
 import { describe, it, before, after, beforeEach } from "node:test";
 import assert from "node:assert";
@@ -14,8 +15,6 @@ let endpointUrl
 /*
 // beforeAll
 before(async () => {
-  require(path.join(process.cwd(), 'env'))
-  await require('@es-labs/node/config')(process.cwd())
   require('@es-labs/node/express/init')() // TODELETE require(path.join(process.cwd(), 'common', 'init'))()
   require('@es-labs/node/express/preRoute')(app, express) // TODELETE require(path.join(process.cwd(), 'common', 'preRoute'))(app, express)
   process.env.WS_PORT = '' // disable websocket for now
