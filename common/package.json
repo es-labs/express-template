@@ -1,0 +1,36 @@
+{
+  "name": "common",
+  "version": "1.0.0",
+  "description": "common utilities and code for express-template",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "exports": {
+    "./*": "./*.js",
+    "./**/*": "./**/*.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@es-labs/esm": "file:../../jscommon/libs/esm",
+    "@es-labs/node": "file:../../jscommon/libs/node",
+    "connect-history-api-fallback": "^2.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-jsdoc-swagger": "^1.8.0",
+    "helmet": "^8.1.0",
+    "js-yaml": "^4.1.1",
+    "morgan": "^1.10.1",
+    "multer": "^2.1.1",
+    "mysql": "^2.18.1",
+    "path-to-regexp": "^8.4.0",
+    "pg": "^8.20.0",
+    "serve-index": "^1.9.2",
+    "sqlite3": "^5.1.7",
+    "zod": "^4.3.6"
+  }
+}

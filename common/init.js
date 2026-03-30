@@ -8,12 +8,15 @@ import * as authService from '@es-labs/node/auth';
 import { healthRouter } from './health/router.js';
 
 const init = () => {
-  // setup stacktrace limit
+  const { NODE_ENV } = process.env
   const DEFAULT_STACK_TRACE_LIMIT = 3 // default limit error stack trace to 3 level
+  const DEFAULT_SHUTFOWN_TIMEOUT_MS = NODE_ENV === 'production' ? 30000 : 3000
   const {
     STACK_TRACE_LIMIT = DEFAULT_STACK_TRACE_LIMIT,
-  } = process.env
+    SHUTDOWN_TIMEOUT_MS = DEFAULT_SHUTFOWN_TIMEOUT_MS
+   } = process.env
 
+  // setup stacktrace limit
   Error.stackTraceLimit = Number(STACK_TRACE_LIMIT) || DEFAULT_STACK_TRACE_LIMIT
 
   // setup graceful exit
@@ -21,13 +24,12 @@ const init = () => {
   let shuttingDown = false;
 
   const gracefulShutdown = async (signal) => {
-    const timeOutMs = 30000
     console.log(`Cleanup initiated by signal: ${signal}`);
     shuttingDown = true;
     setTimeout(() => { // give the LB time to notice the 503 and stop routing
       console.error('Forced shutdown after timeout');
       process.exit(1);
-    }, timeOutMs);
+    }, SHUTDOWN_TIMEOUT_MS);
     if (server) {
       server.close(async () => {
         await services.stop(); // promise all...

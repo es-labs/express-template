@@ -1,6 +1,6 @@
 {
-  "name": "express-template",
-  "description": "express template",
+  "name": "app-sample",
+  "description": "sample application/service",
   "version": "0.0.6",
   "private": true,
   "type": "module",
@@ -28,30 +28,23 @@
   },
   "scripts": {
     "app": "node --trace-warnings index.js",
-    "localx": "NODE_ENV=development npm run app",
+    "local": "NODE_ENV=development npm run app",
     "test": "NODE_ENV=development node --test --test-only",
     "test:e2e": "start-server-and-test start http://localhost:8080 test",
     "update-commit-hash": "git rev-parse --verify --short HEAD > commit-hash"
   },
-  "comment": {
-    "@es-labs/nodex": "^0.0.54"
-  },
   "dependencies": {
-    "@es-labs/esm": "^0.0.34",
-    "@es-labs/node": "file:../jscommon/libs/node",
+    "common": "file:../../common",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "express-jsdoc-swagger": "^1.8.0",
     "js-yaml": "^4.1.1",
     "mysql": "^2.18.1",
     "pg": "^8.20.0",
-    "sqlite3": "^5.1.7"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.1.0",
-    "node-mocks-http": "^1.17.2",
-    "prettier": "^3.8.1",
-    "start-server-and-test": "^3.0.0"
+    "sqlite3": "^5.1.7",
+    "@json2csv/plainjs": "^7.0.6",
+    "csv-parse": "^6.2.1",
+    "fido2-lib": "^3.5.9",
+    "pdfkit": "^0.18.0",
+    "selfsigned": "^5.5.0"
   }
 }

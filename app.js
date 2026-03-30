@@ -1,6 +1,6 @@
-import preRoute from "@es-labs/node/express/preRoute";
-import postRoute from "@es-labs/node/express/postRoute";
 import init from "./common/init.js";
+import preRoute from "./common/preRoute.js";
+import postRoute from "./common/postRoute.js";
 import appsLoader from "./apps/apploader.js";
 import { errorHandler, notFoundHandler } from './common/middleware/error.js';
 

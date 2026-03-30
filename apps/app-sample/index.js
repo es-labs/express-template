@@ -2,6 +2,11 @@
 // TBD; handle vault in production
 import '../../common/env.js' // setup env vars
 import { server } from './app.js';
+import * as z from "zod";
+// const Player = z.object({ 
+//   username: z.string(),
+//   xp: z.number()
+// });
 
 (async function() {
   // await config(new URL('.', import.meta.url).pathname, process.cwd())

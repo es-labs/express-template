@@ -1,13 +1,14 @@
-import preRoute from "@es-labs/node/express/preRoute";
-import postRoute from "@es-labs/node/express/postRoute";
 import init from "../../common/init.js";
+import preRoute from "../../common/preRoute.js";
+import postRoute from "../../common/postRoute.js";
+
 import { errorHandler, notFoundHandler } from '../../common/middleware/error.js';
-import appRoutes from './routes/index.js';
+import apiRoutes from './routes/index.js';
 
 const { app, express, server } = init() // setup services and graceful exit
 preRoute(app, express)
-// appsLoader(app) // add your APIs here
-appRoutes({ app, routePrefix: '/api/app-sample'})
+// TBD setup WS if any
+apiRoutes({ app, routePrefix: '/api/app-sample'})
 postRoute(app, express)
 // app.use(":wildcard", (req, res) => res.status(404).json({ Error: '404 Not Found...' }))
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
