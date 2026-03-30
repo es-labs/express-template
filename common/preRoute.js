@@ -65,6 +65,15 @@ const preRoute = () => {
   const app = express();
   const server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app) // fs.readFileSync('ca.cert')
 
+  // intercept upgrades before Express sees them
+  server.on('upgrade', (req, socket, head) => {
+    // Let the WS server handle it — do nothing here if services.start sets up WS internally
+    // This prevents Express middleware from touching upgrade requests
+    if (req.headers['upgrade']?.toLowerCase() !== 'websocket') {
+      socket.destroy();
+    }
+  });
+
   // SERVICES need server
   services.start(app, server)
   try {
@@ -73,11 +82,12 @@ const preRoute = () => {
     console.log(e)
   }
 
-  // // skip middleware for WebSocket upgrade requests
-  // app.use((req, res, next) => {
-  //   if (req.headers.upgrade === 'websocket') return next(); // let WS server handle it
-  //   next();
-  // });
+  // skip middleware for WebSocket upgrade requests
+  app.use((req, res, next) => {
+    // if (req.headers.upgrade?.toLowerCase() === 'websocket') return next('route');
+    if (req.headers.upgrade?.toLowerCase() === 'websocket') return next(); // let WS server handle it
+    next();
+  });
 
   app.use('/health', healthRouter); // Mount before auth middleware — healthchecks must be unprotected
 

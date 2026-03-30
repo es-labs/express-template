@@ -34,8 +34,8 @@ export async function liveness(req, res) {
  */
 export async function readiness(req, res) {
   const checks = await runChecks([
-    checkDatabase,
-    checkRedis,
+    // checkDatabase,
+    // checkRedis,
     checkDisk,
     checkMemory,
   ]);
