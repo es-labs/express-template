@@ -1,3 +1,12 @@
+// legacy files are
+// this file...
+// ./ecosystem.config.js
+// ./apps/.env.development
+// ./apps/.env.production
+// ./index.js
+// ./app.js
+// ./Dockerfile
+// .dockerignore
 import { loadEnvFile } from 'node:process';
 import path from 'node:path';
 
