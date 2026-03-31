@@ -11,8 +11,4 @@ export default (app) => {
 
   // table for table experimental app
   appT4tRoutes({ app, routePrefix: '/api/t4t'}) // TODO: need to fix t4t-fe.js to make URL configurable
-
-  // authentication stuff Below - you can remove if not needed (be aware of routing if you are customizing your auth)
-  // routes used are: /api/auth (own auth rollout), /api/oauth, /api/oidc, /api/saml
-  appAuthRoutes({ app, routePrefix: '/api'})
 }
