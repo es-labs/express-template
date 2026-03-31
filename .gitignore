@@ -7,8 +7,8 @@ apps/*
 
 # npm
 node_modules
-package-lock.json
-yarn.lock
+# package-lock.json # do include this, include for apps, exclude for libs, templates ignore copying over this file
+# yarn.lock
 
 # tests
 coverage
