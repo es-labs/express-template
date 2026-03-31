@@ -63,66 +63,62 @@ let orgIdKey = ''
 // __key is reserved property for identifying row in a table
 // | is reserved for seperating columns that make the multiKey
 const generateTable = async (req, res, next) => { // TODO get config info from a table
-  try {
-    const tableKey = req.params.table // 'books' // its the table name also
+  const tableKey = req.params.table // 'books' // its the table name also
 
-    // const docPath = path.resolve(new URL(".", import.meta.url).pathname, `./tables/${tableKey}.yaml`)
-    const docPath = TABLE_CONFIGS_FOLDER_PATH + `${tableKey}.yaml`
-    const doc = yaml.load(fs.readFileSync(docPath, 'utf8'))
-    req.table = JSON.parse(JSON.stringify(doc))
+  // const docPath = path.resolve(new URL(".", import.meta.url).pathname, `./tables/${tableKey}.yaml`)
+  const docPath = TABLE_CONFIGS_FOLDER_PATH + `${tableKey}.yaml`
+  const doc = yaml.load(fs.readFileSync(docPath, 'utf8'))
+  req.table = JSON.parse(JSON.stringify(doc))
 
-    // generated items
-    req.table.pk = ''
-    req.table.multiKey = []
-    req.table.required = []
-    req.table.auto = []
-    req.table.fileConfigUi = {}
+  // generated items
+  req.table.pk = ''
+  req.table.multiKey = []
+  req.table.required = []
+  req.table.auto = []
+  req.table.fileConfigUi = {}
 
-    const { database, filename } = svc.get(req?.table?.conn)?.client?.config?.connection || {}
-    req.table.db = database || filename || 'DB Not Found'
+  const { database, filename } = svc.get(req?.table?.conn)?.client?.config?.connection || {}
+  req.table.db = database || filename || 'DB Not Found'
 
-    // permissions settings
-    req.table.view = roleOperationMatch(req.decoded[roleKey], req.table.view)
-    const acStr = '/autocomplete'
-    const acLen = acStr.length
-    if (req.path.substring(req.path.length - acLen) === acStr) {
-      console.log('auto complete here...')
-      return next()
-    }
-    req.table.create = roleOperationMatch(req.decoded[roleKey], req.table.create)
-    req.table.update = roleOperationMatch(req.decoded[roleKey], req.table.update)
-    req.table.delete = roleOperationMatch(req.decoded[roleKey], req.table.delete)
-    req.table.import = roleOperationMatch(req.decoded[roleKey], req.table.import)
-    req.table.export = roleOperationMatch(req.decoded[roleKey], req.table.export)
-
-    // sanitize
-    req.table.deleteLimit = Number(req.table.deleteLimit) || -1
-
-    // can return for autocomplete... req.path
-    const cols = req.table.cols
-    for (let key in cols) {
-      const col = cols[key]
-      if (col.auto) {
-        if (col.auto === 'pk') {
-          req.table.pk = key
-        } else {
-          req.table.auto.push(key)
-        }
-      }
-      if (col.multiKey) req.table.multiKey.push(key)
-      if (col.required) req.table.required.push(key)
-      if (col?.ui?.tag === 'files') req.table.fileConfigUi[key] = col?.ui
-
-      col.editor = !(col.editor && !roleOperationMatch(req.decoded[roleKey], col.editor, key))
-      if (!col.editor && col.edit) col.edit = 'readonly'
-      col.creator = !(col.creator && !roleOperationMatch(req.decoded[roleKey], col.creator, key))
-      if (!col.creator && col.add) col.add = 'readonly'
-    }
-    // console.log(req.table)
+  // permissions settings
+  req.table.view = roleOperationMatch(req.decoded[roleKey], req.table.view)
+  const acStr = '/autocomplete'
+  const acLen = acStr.length
+  if (req.path.substring(req.path.length - acLen) === acStr) {
+    console.log('auto complete here...')
     return next()
-  } catch (e) {
-    return res.status(500).json({ error: e.toString() })
   }
+  req.table.create = roleOperationMatch(req.decoded[roleKey], req.table.create)
+  req.table.update = roleOperationMatch(req.decoded[roleKey], req.table.update)
+  req.table.delete = roleOperationMatch(req.decoded[roleKey], req.table.delete)
+  req.table.import = roleOperationMatch(req.decoded[roleKey], req.table.import)
+  req.table.export = roleOperationMatch(req.decoded[roleKey], req.table.export)
+
+  // sanitize
+  req.table.deleteLimit = Number(req.table.deleteLimit) || -1
+
+  // can return for autocomplete... req.path
+  const cols = req.table.cols
+  for (let key in cols) {
+    const col = cols[key]
+    if (col.auto) {
+      if (col.auto === 'pk') {
+        req.table.pk = key
+      } else {
+        req.table.auto.push(key)
+      }
+    }
+    if (col.multiKey) req.table.multiKey.push(key)
+    if (col.required) req.table.required.push(key)
+    if (col?.ui?.tag === 'files') req.table.fileConfigUi[key] = col?.ui
+
+    col.editor = !(col.editor && !roleOperationMatch(req.decoded[roleKey], col.editor, key))
+    if (!col.editor && col.edit) col.edit = 'readonly'
+    col.creator = !(col.creator && !roleOperationMatch(req.decoded[roleKey], col.creator, key))
+    if (!col.creator && col.add) col.add = 'readonly'
+  }
+  // console.log(req.table)
+  return next()
 }
 
 const routes = (options) => {

@@ -12,13 +12,9 @@ export const myauthRoute = express.Router()
   .get('/logout', own.logout)
   .get('/verify', auth.authUser, async (req, res) => res.json({}))
   .get('/me', auth.authUser, (req, res) => {
-    try {
-      const { id } = req.decoded
-      // you can also get more user information from here from a datastore
-      return res.status(200).json({ user: id, ts: Date.now() })
-    } catch (e) {
-      return res.status(500).json({ message: e.toString() })
-    }
+    const { id } = req.decoded
+    // you can also get more user information from here from a datastore
+    return res.status(200).json({ user: id, ts: Date.now() })
   })
   .post('/signup', (req, res) => {
     // NOSONAR let encryptedPassword = bcrypt.hashSync(clearPassword, process.env.SALT_ROUNDS)

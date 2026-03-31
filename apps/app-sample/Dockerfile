@@ -1,3 +1,37 @@
+- Use Copilot & Claude AI to collect error metrics and log
+- status codes / endpoint (shows direction) / HTTP VERB
+- individual email, SMS
+- cooloff time for each of the severity levels
+  - SMS/Email severe 1 - critical - disruption (server, timeout, authorization))
+  - SMS/Email severe 2 - high - degradation ()
+  - Daily email - severe 3 - partial degradation ()
+  - Daily email - severe 4 - no impact - 
+- every day delete data errors more than 8 days SLA each day
+- HubSpot Retries... (need to alert only if all failed))
+- unhandled exception / unhandled rejection ?
+- logs DB...n severity 1 & 2 send immediately
+- if logs DB goes down... Vision to manage...
+- take into account volume of errors within X minutes cron
+- aggregated log table
+- use AI to help with this
+- handling of backflow cronjob limit by time... or by record limit... getting...
+- handle service down error ?
+- modules
+  - whatsapp, call, Admin UI, Admin Backend, AI module down, translator modules error?
+
+
+## Digital Ocean CR
+# username and password is same api token generated in DO dashboard
+# CR_HOST=registry.digitalocean.com
+# CR_NS=es-labs
+
+## Digital Ocean App Platform:
+# set liveness probe
+# set Public HTTP port to 3000
+# add VPC if need to connect to other services
+# option to use dedicated (extra fee) or static egress IPs
+
+
 # docker login --username $CR_USERNAME --password-stdin $CR_HOST
 # docker build -t $CR_HOST/$CR_NS/$CR_IMAGENAME:${{ github.event.inputs.tag_ci }} \
 #  --target $DOCKERFILE_TARGET \

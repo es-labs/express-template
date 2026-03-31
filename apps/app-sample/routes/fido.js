@@ -62,133 +62,99 @@ let validateChallenge = '' // ab
 
 export default express.Router()
   .get('/register', async (req, res) => {
-    try {
-      const registrationOptions = await f2l.attestationOptions()
-      const userId = 'bXl1c2Vy' // base64url // 'aaronjxz' // (convert to Uint8Array on client side)
+    const registrationOptions = await f2l.attestationOptions()
+    const userId = 'bXl1c2Vy' // base64url // 'aaronjxz' // (convert to Uint8Array on client side)
   
-      registrationOptions.challenge = registerChallenge
-      registrationOptions.user = {
-        id: userId,
-        name: 'name-' + userId, // if use email...
-        displayName: 'displayName-' + userId,
-      }
-        res.json(registrationOptions)  
-    } catch (e) {
-      res.status(500).json({
-        error: 'register get',
-        message: e.toString()
-      })
+    registrationOptions.challenge = registerChallenge
+    registrationOptions.user = {
+      id: userId,
+      name: 'name-' + userId, // if use email...
+      displayName: 'displayName-' + userId,
     }
-
+    res.json(registrationOptions)  
   })
   .post('/register', async (req, res) => {
-    try {
-      const regResponse = req.body
-      regResponse.rawId = b_ab( b64url_b(regResponse.rawId) )
-      // NOSONAR
-      // console.log('bbbbb', regResponse, b_b64url((ab_b(regResponse.rawId))))
+    const regResponse = req.body
+    regResponse.rawId = b_ab( b64url_b(regResponse.rawId) )
+    // NOSONAR
+    // console.log('bbbbb', regResponse, b_b64url((ab_b(regResponse.rawId))))
   
-      const attestationExpectations = {
-        challenge: registerChallenge,
-        origin,
-        factor: 'either'
-      }
-  
-      const regResult = await f2l.attestationResult(regResponse, attestationExpectations)
-
-      // registration complete!
-      // save publicKey and counter from regResult to user's info for future authentication calls
-      const authnrData = regResult.authnrData
-			const credId = authnrData.get("credId") // ArrayBuffer
-      const counter = authnrData.get("counter") // int
-      const publicKey = authnrData.get("credentialPublicKeyPem") // string
-
-      testInfo = {
-        credId, // same as rawId
-        counter,
-        publicKey
-      }
-      console.log(credId, counter, publicKey)
-
-      res.json({ msg: 'register ok' })
-    } catch (e) {
-      console.log(e)
-      res.status(500).json({
-        error: 'register post',
-        message: e.toString()
-      })
+    const attestationExpectations = {
+      challenge: registerChallenge,
+      origin,
+      factor: 'either'
     }
+  
+    const regResult = await f2l.attestationResult(regResponse, attestationExpectations)
+
+    // registration complete!
+    // save publicKey and counter from regResult to user's info for future authentication calls
+    const authnrData = regResult.authnrData
+		const credId = authnrData.get("credId") // ArrayBuffer
+    const counter = authnrData.get("counter") // int
+    const publicKey = authnrData.get("credentialPublicKeyPem") // string
+
+    testInfo = {
+      credId, // same as rawId
+      counter,
+      publicKey
+    }
+    console.log(credId, counter, publicKey)
+
+    res.json({ msg: 'register ok' })
   })
-
   .get('/validate', async (req, res) => {
-    try {
-      const authnOptions = await f2l.assertionOptions()
-      console.log(authnOptions)
+    const authnOptions = await f2l.assertionOptions()
+    console.log(authnOptions)
 
-      validateChallenge = authnOptions.challenge // store challenge
+    validateChallenge = authnOptions.challenge // store challenge
 
-      authnOptions.challenge = b_b64url(ab_b(authnOptions.challenge))
-      const credentialId = b_b64(ab_b(testInfo.credId))
-      authnOptions.allowCredentials = []
-      authnOptions.allowCredentials.push({ type: "public-key", id: credentialId })
-      // {
-      //   challenge: ArrayBuffer {
-      //     [Uint8Contents]: <93 7c 29 e4 ee b3 56 f9 14 b8 67 8d d0 18 71 8f 54 1d 3a 5f 22 0d b4 1b eb fd 3b 86 3d 1d 79 f0 63 ca 0a c3 42 1c 48 0e 65 fa 45 e2 49 b8 af 92 7a 74 0f 68 b6 1e 5a 06 
-      // 59 55 3f 54 c9 16 7b 88 31 0d ed 7f 31 91 d5 7a d4 38 dc f9 e9 53 e1 c7 af 51 c6 fe 9d 82 e9 5e de f2 42 d9 91 15 2f 05 cf 8d f6 5e ... 28 more bytes>,
-      //     byteLength: 128
-      //   },
-      //   timeout: 120000,
-      //   rpId: '192-168-18-8.nip.io',
-      //   userVerification: 'required'
-      // }
+    authnOptions.challenge = b_b64url(ab_b(authnOptions.challenge))
+    const credentialId = b_b64(ab_b(testInfo.credId))
+    authnOptions.allowCredentials = []
+    authnOptions.allowCredentials.push({ type: "public-key", id: credentialId })
+    // {
+    //   challenge: ArrayBuffer {
+    //     [Uint8Contents]: <93 7c 29 e4 ee b3 56 f9 14 b8 67 8d d0 18 71 8f 54 1d 3a 5f 22 0d b4 1b eb fd 3b 86 3d 1d 79 f0 63 ca 0a c3 42 1c 48 0e 65 fa 45 e2 49 b8 af 92 7a 74 0f 68 b6 1e 5a 06 
+    // 59 55 3f 54 c9 16 7b 88 31 0d ed 7f 31 91 d5 7a d4 38 dc f9 e9 53 e1 c7 af 51 c6 fe 9d 82 e9 5e de f2 42 d9 91 15 2f 05 cf 8d f6 5e ... 28 more bytes>,
+    //     byteLength: 128
+    //   },
+    //   timeout: 120000,
+    //   rpId: '192-168-18-8.nip.io',
+    //   userVerification: 'required'
+    // }
 
-      // NOSONAR add
-      // allowCredentials: [
-      //   { type: "public-key", id: credentialId }
-      // ]
-      res.json(authnOptions)
-    } catch (e) {
-      console.log(e)
-      res.status(500).json({
-        error: 'validate get',
-        message: e.toString()
-      })
-    }
+    // NOSONAR add
+    // allowCredentials: [
+    //   { type: "public-key", id: credentialId }
+    // ]
+    res.json(authnOptions)
   })
   .post('/validate', async (req, res) => {
-    try {
-      const regResponse = req.body
-      regResponse.rawId = b_ab( b64url_b(regResponse.rawId) )
+    const regResponse = req.body
+    regResponse.rawId = b_ab( b64url_b(regResponse.rawId) )
 
-      const assertionExpectations = {
-        // Remove the following comment if allowCredentials has been added into authnOptions so the credential received will be validate against allowCredentials array.
-        // allowCredentials: [{
-        //     id: "lTqW8H/lHJ4yT0nLOvsvKgcyJCeO8LdUjG5vkXpgO2b0XfyjLMejRvW5oslZtA4B/GgkO/qhTgoBWSlDqCng4Q==",
-        //     type: "public-key",
-        //     transports: ["usb"]
-        // }],
-        challenge: b_b64url(ab_b(validateChallenge)), // "eaTyUNnyPDDdK8SNEgTEUvz1Q8dylkjjTimYd5X7QAo-F8_Z1lsJi3BilUpFZHkICNDWY8r9ivnTgW7-XZC3qQ", // validateChallenge
-        origin,
-        factor: "either",
-        publicKey: testInfo.publicKey,
-        prevCounter: testInfo.counter,
-        userHandle: 'test'
-      }
-
-      const credentialId = b_b64(ab_b(testInfo.credId))
-      assertionExpectations.allowCredentials = []
-      assertionExpectations.allowCredentials.push({ type: "public-key", id: credentialId })
-
-      // const authnResult = 
-      await f2l.assertionResult(regResponse, assertionExpectations) // will throw on error
-      // console.log(authnResult)
-      res.json({ msg: 'validate ok' })
-    } catch (e) {
-      console.log(e)
-      res.status(500).json({
-        error: 'validate post',
-        message: e.toString()
-      })
+    const assertionExpectations = {
+      // Remove the following comment if allowCredentials has been added into authnOptions so the credential received will be validate against allowCredentials array.
+      // allowCredentials: [{
+      //     id: "lTqW8H/lHJ4yT0nLOvsvKgcyJCeO8LdUjG5vkXpgO2b0XfyjLMejRvW5oslZtA4B/GgkO/qhTgoBWSlDqCng4Q==",
+      //     type: "public-key",
+      //     transports: ["usb"]
+      // }],
+      challenge: b_b64url(ab_b(validateChallenge)), // "eaTyUNnyPDDdK8SNEgTEUvz1Q8dylkjjTimYd5X7QAo-F8_Z1lsJi3BilUpFZHkICNDWY8r9ivnTgW7-XZC3qQ", // validateChallenge
+      origin,
+      factor: "either",
+      publicKey: testInfo.publicKey,
+      prevCounter: testInfo.counter,
+      userHandle: 'test'
     }
 
+    const credentialId = b_b64(ab_b(testInfo.credId))
+    assertionExpectations.allowCredentials = []
+    assertionExpectations.allowCredentials.push({ type: "public-key", id: credentialId })
+
+    // const authnResult = 
+    await f2l.assertionResult(regResponse, assertionExpectations) // will throw on error
+    // console.log(authnResult)
+    res.json({ msg: 'validate ok' })
   })

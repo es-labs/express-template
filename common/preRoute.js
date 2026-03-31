@@ -120,7 +120,7 @@ const preRoute = () => {
     // csurf not needed at the moment  
   } catch (e) {
     console.error('[helmet setup error]', e.toString());
-    throw(new Error())
+    throw e
   }
 
   // -------- CORS --------
@@ -136,7 +136,7 @@ const preRoute = () => {
     console.info('cors options done')
   } catch (e) {
     console.error('[cors options error]', e.toString())
-    throw(new Error())
+    throw e
   }
   // Set CORS defaults if certain CORS headers are missing
   try {
@@ -151,7 +151,7 @@ const preRoute = () => {
     }
   } catch (e) {
     console.error('[cors defaults error]', e.toString())
-    throw(new Error())
+    throw e
   }
 
   // express-limiter, compression, use reverse proxy
@@ -173,7 +173,7 @@ const preRoute = () => {
     app.use(express.urlencoded( JSON.parse(BODYPARSER_URLENCODED || null) || { extended: true, limit: '2mb' })) // https://stackoverflow.com/questions/29175465/body-parser-extended-option-qs-vs-querystring/29177740#29177740
   } catch (e) {
     console.error('[bodyparser setup error]', e.toString());
-    throw(new Error())
+    throw e
   }
   console.info('bodyparser setup done');
 

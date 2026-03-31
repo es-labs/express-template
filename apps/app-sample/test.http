@@ -6,7 +6,6 @@ GET http://127.0.0.1:3000/health
 ### Readiness endpoint
 GET http://127.0.0.1:3000/health/ready
 
-
 ### Test healthcheck
 # GET http://127.0.0.1:3000/api/healthcheck
 # GET http://127.0.0.1:3000/api/unknown

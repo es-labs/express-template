@@ -60,15 +60,12 @@ export const processJson = async (req, res, next) => {
 // both are comma seperated strings
 export const roleOperationMatch = (role, operation, col = null) => {
   // console.log('roleOperationMatch (col, role, operation)', col, role, operation)
-  try {
-    const operations = operation.split(',')
-    const roles = role.split(',')
-    for (const _role of roles) {
-      for (const _operation of operations) {
-        if (_operation === _role) return true
-      }
+  const operations = operation.split(',')
+  const roles = role.split(',')
+  for (const _role of roles) {
+    for (const _operation of operations) {
+      if (_operation === _role) return true
     }
-  } catch (e) {
   }
   return false
 }

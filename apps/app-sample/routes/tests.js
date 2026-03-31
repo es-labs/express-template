@@ -119,17 +119,13 @@ export default express.Router()
   // test uploads
   // body action: 'read' | 'write', filename: 'my-file.txt', bucket: 'bucket name'
   .post('/upload-disk', storageUpload(process.env.UPLOAD_STATIC[0]).any(), (req,res) => { // avatar is form input name // single('filedata')
-    try {
-      // console.log('files', req, req.files)
-      // body is string, need to parse if json
-      res.json({
-        ok: true, // success
-        message: 'Uploaded',
-        body: req.body
-      })
-    } catch (e) {
-      res.json({ error: e.message })
-    }
+    // console.log('files', req, req.files)
+    // body is string, need to parse if json
+    res.json({
+      ok: true, // success
+      message: 'Uploaded',
+      body: req.body
+    })
   })
   .post('/upload-memory', memoryUpload(process.env.UPLOAD_MEMORY[0]).single('memory'), (req, res) => {
     // req.files is array of `photos` files

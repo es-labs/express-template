@@ -41,9 +41,7 @@ describe('categoryController.create', () => {
     await categoryController.create(req, res)
     expect(res.statusCode).toBe(201)
     expect(res._isEndCalled()).toBeTruthy()
-    try {
-      createdCategoryId = res._getJSONData().id
-    } catch (e) { console.log(e.toString()) }
+    createdCategoryId = res._getJSONData().id
   })
   // it('should return JSON body in response', async () => {
   //   TodoModel.create.mockReturnValue(newTodo)

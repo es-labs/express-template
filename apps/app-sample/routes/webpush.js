@@ -28,29 +28,24 @@ export default express.Router()
   })
   .post('/send/:id', /* authUser, */ async (req, res) => {
     // sending...
-    try {
-      const { id } = req.params
-      const { mode, data = {} } = req.body
-      const user = await authFns.findUser({ id })
-      let rv = null
+    const { id } = req.params
+    const { mode, data = {} } = req.body
+    const user = await authFns.findUser({ id })
+    let rv = null
 
-      if (user && user.pnToken) {
-        const options = {
-          TTL: 60,
-          // headers: {
-          //   'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
-          //   'Content-type': 'application/json'
-          // },
-        } 
-        const subscription = JSON.parse(user.pnToken)
-        // console.log(id, mode, subscription, data, options)
-        rv = await webpush.send(subscription, 'FROM Backend: ' + data, options)
-        res.json({ status: 'sent', mode, rv })
-      } else {
-        res.status(404).json({ status: 'no user or token'})
-      }
-    } catch (e) {
-      console.log(e) // need more info
-      res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Send Error: contact admin' : e })
+    if (user && user.pnToken) {
+      const options = {
+        TTL: 60,
+        // headers: {
+        //   'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
+        //   'Content-type': 'application/json'
+        // },
+      } 
+      const subscription = JSON.parse(user.pnToken)
+      // console.log(id, mode, subscription, data, options)
+      rv = await webpush.send(subscription, 'FROM Backend: ' + data, options)
+      res.json({ status: 'sent', mode, rv })
+    } else {
+      res.status(404).json({ status: 'no user or token'})
     }
   })
