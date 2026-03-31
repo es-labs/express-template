@@ -14,7 +14,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "tmp-dependencies": {
-    "@es-labs/jslib": "file:../../jscommon/libs/jslib",
+    "@es-labs/jslib": "file:../../jscommon/libs/jslib"
   },
   "dependencies": {
     "@es-labs/jslib": "0.0.2",
