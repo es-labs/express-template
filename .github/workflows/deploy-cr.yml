@@ -62,7 +62,7 @@ jobs:
           echo "docker file path: ${{ github.event.inputs.dockerfile_path }}"
           echo "environment: ${{ github.event.inputs.cr_env }}"
       - name: Add checkout plugin
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.tag_gr }}
       - name: Build and push image to CR
@@ -72,7 +72,8 @@ jobs:
         run: |
           # cat password.txt |
           echo $CR_PASSWORD | docker login --username $CR_USERNAME --password-stdin $CR_HOST
-          docker build -t $CR_HOST/$CR_NS/$CR_IMAGENAME:${{ github.event.inputs.tag_ci }} \
+          docker build -f apps/$CR_IMAGENAME/Dockerfile \
+            -t $CR_HOST/$CR_NS/$CR_IMAGENAME:${{ github.event.inputs.tag_ci }} \
             --target $DOCKERFILE_TARGET \
             --build-arg ARG_NODE_ENV=${{ github.event.inputs.cr_env }} \
             --build-arg ARG_API_PORT=3000 \

@@ -2,9 +2,13 @@ name: CI / CD Pipeline
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
+    paths:
+      - 'services/auth-service/**'
   pull_request:
-    branches: [main, master]
+    branches: [main]
+    paths:
+      - 'services/auth-service/**'
 
 jobs:
   # ─────────────────────────────────────────────
