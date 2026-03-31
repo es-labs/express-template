@@ -84,9 +84,9 @@ COPY --from=build /app/apps/${APP_NAME}                ./apps/${APP_NAME}/
 # Copy app-level node_modules if they exist (non-hoisted deps)
 # COPY --from=deps  /app/apps/${APP_NAME}/node_modules   ./apps/${APP_NAME}/node_modules/
 
-ENV NODE_ENV=production \
-    SERVICE_NAME=${APP_NAME} \
-    API_PORT=${API_PORT}
+# ENV NODE_ENV=production \
+#     SERVICE_NAME=${APP_NAME} \
+#     API_PORT=${API_PORT}
 
 # Set final WORKDIR before dropping to non-root user
 WORKDIR /app/apps/${APP_NAME}
@@ -97,7 +97,7 @@ USER appuser
 EXPOSE ${API_PORT}
 
 # Healthcheck uses $API_PORT via shell expansion
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://localhost:${API_PORT}/health || exit 1
+# HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+#   CMD wget -qO- http://localhost:${API_PORT}/health || exit 1
 
 CMD ["node", "index.js"]
