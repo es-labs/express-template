@@ -62,7 +62,7 @@ jobs:
           echo "docker file path: ${{ github.event.inputs.dockerfile_path }}"
           echo "environment: ${{ github.event.inputs.cr_env }}"
       - name: Add checkout plugin
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.tag_gr }}
       - name: Build and push image to CR
