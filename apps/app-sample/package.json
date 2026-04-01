@@ -27,7 +27,7 @@
     "npm": ">=10"
   },
   "scripts": {
-    "app": "node --trace-warnings index.js",
+    "app": "node --trace-warnings src/index.js",
     "local": "NODE_ENV=development npm run app",
     "test": "NODE_ENV=development node --test --test-only",
     "test:e2e": "start-server-and-test start http://localhost:8080 test",

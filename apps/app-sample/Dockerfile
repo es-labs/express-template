@@ -1,25 +1,3 @@
-- Use Copilot & Claude AI to collect error metrics and log
-- status codes / endpoint (shows direction) / HTTP VERB
-- individual email, SMS
-- cooloff time for each of the severity levels
-  - SMS/Email severe 1 - critical - disruption (server, timeout, authorization))
-  - SMS/Email severe 2 - high - degradation ()
-  - Daily email - severe 3 - partial degradation ()
-  - Daily email - severe 4 - no impact - 
-- every day delete data errors more than 8 days SLA each day
-- HubSpot Retries... (need to alert only if all failed))
-- unhandled exception / unhandled rejection ?
-- logs DB...n severity 1 & 2 send immediately
-- if logs DB goes down... Vision to manage...
-- take into account volume of errors within X minutes cron
-- aggregated log table
-- use AI to help with this
-- handling of backflow cronjob limit by time... or by record limit... getting...
-- handle service down error ?
-- modules
-  - whatsapp, call, Admin UI, Admin Backend, AI module down, translator modules error?
-
-
 ## Digital Ocean CR
 # username and password is same api token generated in DO dashboard
 # CR_HOST=registry.digitalocean.com
@@ -31,11 +9,9 @@
 # add VPC if need to connect to other services
 # option to use dedicated (extra fee) or static egress IPs
 
-
 # docker login --username $CR_USERNAME --password-stdin $CR_HOST
 # docker build -t $CR_HOST/$CR_NS/$CR_IMAGENAME:${{ github.event.inputs.tag_ci }} \
 #  --target $DOCKERFILE_TARGET \
-#  --build-arg ARG_NODE_ENV=${{ github.event.inputs.cr_env }} \
 #  --build-arg ARG_API_PORT=3000 \
 #  $DOCKERFILE_PATH || exit 1001
 # ARG <name>[=<default value>]
@@ -43,7 +19,6 @@
 # ARG SETTINGS
 # RUN ./run/init-stuff $SETTINGS
 #
-# ENV NODE_ENV $ARG_NODE_ENV
 # ENV PORT $ARG_API_PORT
 # ENV API_PORT $ARG_API_PORT
 #
@@ -58,7 +33,7 @@
 #   -t express-template/app-sample:latest \
 #   .
 
-# Set Node Version - version 22 can remove esm shim... if no top level await
+# Set Node Version - version 22
 ARG NODE_VERSION=22
 ARG API_PORT=3000
 ARG APP_NAME=app-sample
@@ -118,8 +93,7 @@ COPY --from=build /app/apps/${APP_NAME}                ./apps/${APP_NAME}/
 # Copy app-level node_modules if they exist (non-hoisted deps)
 # COPY --from=deps  /app/apps/${APP_NAME}/node_modules   ./apps/${APP_NAME}/node_modules/
 
-# ENV NODE_ENV=production \
-#     SERVICE_NAME=${APP_NAME} \
+# ENV SERVICE_NAME=${APP_NAME} \
 #     API_PORT=${API_PORT}
 
 # Set final WORKDIR before dropping to non-root user
@@ -134,4 +108,4 @@ EXPOSE ${API_PORT}
 # HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 #   CMD wget -qO- http://localhost:${API_PORT}/health || exit 1
 
-CMD ["node", "index.js"]
+CMD ["node", "src/index.js"]

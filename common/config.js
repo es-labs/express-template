@@ -1,8 +1,8 @@
 import { loadEnvFile } from 'node:process';
 import path from 'node:path';
 
-// Determine the environment and construct the file path
-const envFileName = `.env.${process.env.NODE_ENV || 'development'}`;
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'; // default to development if NODE_ENV is not set
+const envFileName = `.env.${process.env.NODE_ENV}`;
 const envFilePath = path.resolve(process.cwd(), envFileName);
 
 try {

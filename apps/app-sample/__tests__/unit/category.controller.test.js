@@ -5,7 +5,7 @@ import assert from 'node:assert';
 import httpMocks from 'node-mocks-http';
 import newCategory from '../mock-data/new-category.json';
 import * as Services from '@es-labs/jslib/services';
-import CategoryController from '../../controllers/category.js';
+import CategoryController from '../../src/controllers/category.js';
 
 let services;
 let createdCategoryId;

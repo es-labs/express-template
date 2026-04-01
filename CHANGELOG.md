@@ -29,25 +29,34 @@ Always finding new things to implement / improve in this list!
 - [chore] update README.md, update dependencies, removed base64url package
 - [chore] improve table editor app
 
-### 0.0.8 [in progress]
+### 0.0.8 [done]
 - [feat] use Claude AI and Copilot to improve design and code
 - [migrate] use express version 5
 - [migrate] use pure ES modules
 - [migrate] use NodeJS native env
 - [migrate] use @es-labs/jslib
-- [feat] - structure for microservice - IN PROGRESS Dockerfile
-- [github] - github actions deployment to containers - IN PROGRESS deployments
-- [github] - github actions approval gates - TBD
-- [feat] - sample MCP server - TBD
-- [feat] - sample WebSocket service - TBD
-- [fix] - close websockets (otherwise has force kill) - TBD
-- [migrate] use NodeJS native test - TBD
+- [feat] - structure for microservice
+- [github] - github actions deployment to containers
 
-### For next sprint / version
+### 0.0.8 [in progress]
+- [feat] add commitizen, add husky (or native git hooks), add semantic-release?
+- https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization
+- [feat] AI assisted commits and PRs
+- [feat] AI assisted release
+- [github] - github actions approval gates
+- [feat] - sample MCP server
+- [feat] - sample WebSocket service
+- [fix] - close websockets (otherwise has force kill)
+- [migrate] use NodeJS native test
+
+
+### Planned
+- [feat] audit log / per service? - implicit - trigger for mutable & explicit - for adding to immutable
+- [feat] AI code review
+- [feat] continuous document and test updates using AI skill
 - [feat] copilot to generate JSDocs
 - [feat] copilot to generate API Docs
 - [feat] copilot to generate NodeJS native Unit & Integration Tests 
-- [feat] add commitizen, add semantic-release?
 - [next-in-pipeline] re-implement MQ with redis pubsub?
 - [frontend] aria
 - [iaac-cicd] terraform, Kubernetes
