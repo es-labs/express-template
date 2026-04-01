@@ -27,9 +27,8 @@
     "npm": ">=10"
   },
   "scripts": {
-    "app": "node --trace-warnings src/index.js",
-    "local": "NODE_ENV=development npm run app",
-    "test": "NODE_ENV=development node --test --test-only",
+    "start": "node --trace-warnings src/index.js",
+    "test": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./src/**/__tests__/*.test.js",
     "test:e2e": "start-server-and-test start http://localhost:8080 test",
     "update-commit-hash": "git rev-parse --verify --short HEAD > commit-hash"
   },

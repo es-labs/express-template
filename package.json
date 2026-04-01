@@ -32,17 +32,23 @@
     "build:lib": "npm i @es-labs/jslib@latest",
     "git:hash": "git rev-parse --verify --short HEAD",
     "git:branch": "git rev-parse --abbrev-ref HEAD",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix --no-fix-warnings --no-report-warnings .",
+
+    "lint": "eslint 'apps/**/src/**/*.js' 'common/**/*.js'",
+    "lint:fix": "eslint --fix --no-fix-warnings --no-report-warnings 'apps/**/src/**/*.js' 'common/**/*.js'",
+    "docs:generate": "node scripts/generate-openapi.js",
+    "docs:validate": "swagger-cli validate docs/openapi/openapi.merged.yaml",
+
     "prepare": "git config core.hooksPath ./git-hooks || echo 'Can not set git hooks'",
     "prettier:check": "prettier --check apps/**/*.{js,json}",
     "prettier:write": "prettier --write apps/**/*.{js,json}",
-    "local": "NODE_ENV=development npm run app",
-    "local:win": "set NODE_ENV=development&&npm run app",
-    "test": "NODE_ENV=development node --test --test-only",
-    "test:win": "set NODE_ENV=development&&node --test --test-only",
-    "test:env:win": "set EDITOR=vim && echo $EDITOR",
+    "test:workspace": "npm run test --workspace=apps/app-sample",
+    "test:workspaces": "npm run test --workspaces",
+    "test:cover-only": "node --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info --test __tests__/**/*.spec.js",
     "test:e2e": "start-server-and-test start http://localhost:8080 test",
+
+    "prepare2": "husky",
+    "commit": "cz",
+    "release:auth": "semantic-release -e ./release/auth-service.release.config.cjs",
     "update-commit-hash": "git rev-parse --verify --short HEAD > commit-hash"
   },
   "dependencies": {

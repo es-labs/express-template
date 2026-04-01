@@ -1,6 +1,5 @@
 // ? set globals here
 // ? caution - avoid name clashes with native JS libraries, other libraries, other globals
-import morgan from 'morgan'
 import helmet from 'helmet'
 import cors from 'cors'
 import pathToRegexp from 'path-to-regexp'
@@ -14,7 +13,7 @@ import * as services from '@es-labs/jslib/services';
 import * as authService from '@es-labs/jslib/auth';
 
 import { healthRouter } from './health/router.js';
-
+import { logger } from './logger.js';
 
 const preRoute = () => {
   const { NODE_ENV } = process.env
@@ -101,8 +100,54 @@ const preRoute = () => {
 
   // ------ LOGGING ------
   if (ENABLE_LOGGER) {
-    app.use(morgan('combined', { stream: process.stdout, skip: (req, res) => res.statusCode < 400 })) // errors
-    app.use(morgan('combined', { stream: process.stderr, skip: (req, res) => res.statusCode >= 400 })) // ok
+    const wsOPtions = JSON.parse(process.env.WS_OPTIONS || null) || {}
+    // HTTP request logging middleware with timeout handling
+    // handles: socket timeouts, client aborts, close connections, normal responses
+    // and prevents duplicate logs
+    app.use((req, res, next) => {
+      // error level 5xx
+      // warn level 4xx
+      // info for 2xx-3xx
+      req.logger = logger;
+      req.startTime = Date.now();
+      req.socket.setTimeout(wsOPtions.WS_KEEEPALIVE_MS || 30000); // 30 seconds
+      let logged = false; // Prevent duplicate logs
+
+      // Log incoming request
+      req.logger.info(`${req.method} ${req.path}`, {
+        method: req.method,
+        path: req.path,
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+      });
+
+      const logResponse = (status, reason = null) => {
+        if (logged) return;
+        logged = true;
+        const duration = Date.now() - req.startTime;
+        const logLevel = status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info';
+        req.logger[logLevel](`${req.method} ${req.path} ${status}`, {
+          method: req.method,
+          path: req.path,
+          status,
+          duration: `${duration}ms`,
+          ...(reason && { reason }),
+        });
+      };
+
+      // Log on normal response finish
+      res.on('finish', () => logResponse(res.statusCode));
+
+      // Handle client disconnect/abort
+      req.on('aborted', () => logResponse(0, 'client_aborted'));
+      res.on('close', () => {
+        if (!res.writableEnded) logResponse(0, 'connection_closed');
+      });
+
+      // Handle socket timeout
+      req.socket.on('timeout', () => logResponse(408, 'socket_timeout'));
+      next();
+    });
   }
 
   // ------ SECURITY ------
