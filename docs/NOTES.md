@@ -23,3 +23,30 @@ js-template
   - api documentation
   - test generation
   - jsdoc for typing and autocomplete on IDE
+
+
+### Rebase Or Merge
+
+Scenario 1: Large Team (50+ developers)
+- Strategy: Squash merge to main
+- Reason: Keeps history clean, easier to track PRs
+- GitHub setting: Default to squash merge
+- Branch protection: Require PR reviews before merge
+
+**recommended** Scenario 2: Monorepo with Multiple Teams 
+- Strategy: Merge commits with meaningful messages
+- Reason: Need to track which team merged what
+- Command: git merge --no-ff
+- Message: "Merge PR #123: Feature X (Team A)"
+
+Scenario 3: Microservices
+- Strategy: Squash merge per service
+- Reason: Each service is independent, one commit = one deploy
+- Per-service branch protection with squash merge
+
+Scenario 4: Open Source Project
+- Strategy: Rebase + merge
+- Reason: Linear history, clean for contributors
+- Setting: Allow rebase merge in GitHub
+- Enforce: Require commits to be signed
+

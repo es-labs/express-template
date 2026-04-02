@@ -1,133 +1,215 @@
 #!/usr/bin/env node
 // scripts/generate-openapi.js
 //
-// Generates an individual openapi.yaml for each microservice,
-// then merges all three into a single docs/openapi/openapi.merged.yaml
-// that is served by the API Gateway's Swagger UI.
+// Generates docs/openapi/openapi.merged.yaml from Zod v4 schemas.
+// Uses zod-openapi — no monkey-patching, no separate registry object.
 //
-// Usage:
-//   node scripts/generate-openapi.js           # generates all
-//   node scripts/generate-openapi.js auth      # generates auth only
+// Usage:  node scripts/generate-openapi.js
 
-import swaggerJsdoc from 'swagger-jsdoc';
-import fs from 'fs';
-import path from 'path';
-import yaml from 'js-yaml';
-import base from '../docs/openapi/base.definition.js';
+import { writeFileSync, mkdirSync } from 'fs';
+import { resolve, dirname, relative } from 'path';
 import { fileURLToPath } from 'url';
+import yaml from 'js-yaml';
+import { createDocument } from 'zod-openapi';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Importing schemas makes them available to createDocument via .meta({ id })
+import {
+  RegisterBodySchema,
+  LoginBodySchema,
+  TokenResponseSchema,
+  MessageResponseSchema,
+  ErrorResponseSchema,
+} from '../shared/schemas/auth.schema.js';
 
-const ROOT = path.resolve(__dirname, '..');
+// Import error schema explicitly so it is included as a reusable component
+import '../shared/schemas/error.schema.js';
 
-const SERVICES = [
-  {
-    name:  'auth-service',
-    title: 'Auth Service API',
-    description: 'User registration and JWT-based authentication.',
-    version: require('../services/auth-service/package.json').version,
-    apis:  ['./services/auth-service/src/routes/*.js'],
-    port:  3001,
+import {
+  PaymentSchema,
+  CreatePaymentBodySchema,
+  PaymentParamsSchema,
+} from '../shared/schemas/payment.schema.js';
+
+import {
+  NotificationSchema,
+  SendNotificationBodySchema,
+  NotificationParamsSchema,
+} from '../shared/schemas/notification.schema.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT      = resolve(__dirname, '..');
+
+// ── Reusable error response content block ──────────────────────────────────
+const errorContent = {
+  'application/json': { schema: ErrorResponseSchema },
+};
+
+// ── Full OpenAPI document ──────────────────────────────────────────────────
+const document = createDocument({
+  openapi: '3.1.0',
+  info: {
+    title:       'Microservices — Merged API',
+    description: 'Auto-generated from Zod v4 schemas via zod-openapi. Do not edit manually.',
+    version:     '1.0.0',
+    contact:     { name: 'API Support', email: 'support@example.com' },
   },
-  {
-    name:  'payment-service',
-    title: 'Payment Service API',
-    description: 'Payment creation, listing, and retrieval.',
-    version: require('../services/payment-service/package.json').version,
-    apis:  ['./services/payment-service/src/routes/*.js'],
-    port:  3002,
-  },
-  {
-    name:  'notification-service',
-    title: 'Notification Service API',
-    description: 'Send and retrieve email, SMS, and push notifications.',
-    version: require('../services/notification-service/package.json').version,
-    apis:  ['./services/notification-service/src/routes/*.js'],
-    port:  3003,
-  },
-];
-
-// Filter to a specific service if argument supplied
-const filter = process.argv[2];
-const targets = filter
-  ? SERVICES.filter(s => s.name.startsWith(filter))
-  : SERVICES;
-
-if (!targets.length) {
-  console.error(`No service matching "${filter}". Available: ${SERVICES.map(s => s.name).join(', ')}`);
-  process.exit(1);
-}
-
-// Track all generated specs for merging
-const allSpecs = [];
-
-for (const svc of targets) {
-  console.log(`\n📄 Generating OpenAPI spec for ${svc.name}...`);
-
-  const options = {
-    definition: {
-      ...base,
-      info: {
-        ...base.info,
-        title:       svc.title,
-        description: svc.description,
-        version:     svc.version,
+  servers: [
+    { url: 'http://localhost:8080',   description: 'Local (via API Gateway)' },
+    { url: 'https://api.example.com', description: 'Production' },
+  ],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type:         'http',
+        scheme:       'bearer',
+        bearerFormat: 'JWT',
+        description:  'JWT issued by POST /api/v1/auth/login',
       },
-      servers: [
-        { url: `http://localhost:${svc.port}`, description: `Local — ${svc.name} direct` },
-        { url: `http://localhost:8080`,        description: 'Local — via API Gateway' },
-        { url: `https://api.example.com`,      description: 'Production — via API Gateway' },
-      ],
     },
-    apis: svc.apis,
-  };
+  },
+  paths: {
+    // ── Auth ───────────────────────────────────────────────────────────────
+    '/api/v1/auth/register': {
+      post: {
+        tags:    ['Auth'],
+        summary: 'Register a new user',
+        requestBody: {
+          required: true,
+          content:  { 'application/json': { schema: RegisterBodySchema } },
+        },
+        responses: {
+          201: {
+            description: 'User registered successfully',
+            content: { 'application/json': { schema: MessageResponseSchema } },
+          },
+          422: { description: 'Validation error', content: errorContent },
+        },
+      },
+    },
+    '/api/v1/auth/login': {
+      post: {
+        tags:    ['Auth'],
+        summary: 'Authenticate and receive a JWT',
+        requestBody: {
+          required: true,
+          content:  { 'application/json': { schema: LoginBodySchema } },
+        },
+        responses: {
+          200: {
+            description: 'Authentication successful',
+            content: { 'application/json': { schema: TokenResponseSchema } },
+          },
+          401: { description: 'Invalid credentials', content: errorContent },
+          422: { description: 'Validation error',    content: errorContent },
+        },
+      },
+    },
 
-  let spec;
-  try {
-    spec = swaggerJsdoc(options);
-  } catch (err) {
-    console.error(`  ❌ Failed to generate spec: ${err.message}`);
-    process.exit(1);
-  }
+    // ── Payments ───────────────────────────────────────────────────────────
+    '/api/v1/payments': {
+      post: {
+        tags:     ['Payments'],
+        summary:  'Create a new payment',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content:  { 'application/json': { schema: CreatePaymentBodySchema } },
+        },
+        responses: {
+          201: {
+            description: 'Payment created',
+            content: { 'application/json': { schema: PaymentSchema } },
+          },
+          401: { description: 'Unauthorized',     content: errorContent },
+          422: { description: 'Validation error', content: errorContent },
+        },
+      },
+      get: {
+        tags:     ['Payments'],
+        summary:  'List all payments',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Array of payments',
+            content: { 'application/json': { schema: { type: 'array', items: PaymentSchema } } },
+          },
+          401: { description: 'Unauthorized', content: errorContent },
+        },
+      },
+    },
+    '/api/v1/payments/{id}': {
+      get: {
+        tags:     ['Payments'],
+        summary:  'Get a payment by ID',
+        security: [{ bearerAuth: [] }],
+        requestParams: { path: PaymentParamsSchema },
+        responses: {
+          200: {
+            description: 'Payment found',
+            content: { 'application/json': { schema: PaymentSchema } },
+          },
+          401: { description: 'Unauthorized', content: errorContent },
+          404: { description: 'Not found',    content: errorContent },
+        },
+      },
+    },
 
-  // Write individual YAML to services/<name>/docs/openapi.yaml
-  const serviceDocPath = path.join(ROOT, 'services', svc.name, 'docs', 'openapi.yaml');
-  fs.writeFileSync(serviceDocPath, yaml.dump(spec, { lineWidth: 120 }));
-  console.log(`  ✅ Written to ${path.relative(ROOT, serviceDocPath)}`);
+    // ── Notifications ──────────────────────────────────────────────────────
+    '/api/v1/notifications': {
+      post: {
+        tags:     ['Notifications'],
+        summary:  'Send a notification',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content:  { 'application/json': { schema: SendNotificationBodySchema } },
+        },
+        responses: {
+          201: {
+            description: 'Notification sent',
+            content: { 'application/json': { schema: NotificationSchema } },
+          },
+          401: { description: 'Unauthorized',     content: errorContent },
+          422: { description: 'Validation error', content: errorContent },
+        },
+      },
+      get: {
+        tags:     ['Notifications'],
+        summary:  'List all notifications',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Array of notifications',
+            content: { 'application/json': { schema: { type: 'array', items: NotificationSchema } } },
+          },
+          401: { description: 'Unauthorized', content: errorContent },
+        },
+      },
+    },
+    '/api/v1/notifications/{id}': {
+      get: {
+        tags:     ['Notifications'],
+        summary:  'Get a notification by ID',
+        security: [{ bearerAuth: [] }],
+        requestParams: { path: NotificationParamsSchema },
+        responses: {
+          200: {
+            description: 'Notification found',
+            content: { 'application/json': { schema: NotificationSchema } },
+          },
+          401: { description: 'Unauthorized', content: errorContent },
+          404: { description: 'Not found',    content: errorContent },
+        },
+      },
+    },
+  },
+});
 
-  allSpecs.push(spec);
-}
+// ── Write output ───────────────────────────────────────────────────────────
+const outPath = resolve(ROOT, 'docs', 'openapi', 'openapi.merged.yaml');
+mkdirSync(dirname(outPath), { recursive: true });
+writeFileSync(outPath, yaml.dump(document, { lineWidth: 120 }));
 
-// Merge all specs into one combined document
-if (!filter && allSpecs.length > 1) {
-  console.log('\n🔀 Merging all specs into docs/openapi/openapi.merged.yaml...');
-
-  const merged = {
-    ...base,
-    info: { ...base.info, title: 'Microservices — Merged API', version: '1.0.0' },
-    paths:      {},
-    components: JSON.parse(JSON.stringify(base.components)), // deep clone
-    tags:       [],
-  };
-
-  for (const spec of allSpecs) {
-    // Merge paths
-    Object.assign(merged.paths, spec.paths ?? {});
-
-    // Merge schemas
-    Object.assign(merged.components.schemas,   spec.components?.schemas   ?? {});
-    Object.assign(merged.components.responses,  spec.components?.responses  ?? {});
-
-    // Merge tags (deduplicate by name)
-    for (const tag of (spec.tags ?? [])) {
-      if (!merged.tags.find(t => t.name === tag.name)) merged.tags.push(tag);
-    }
-  }
-
-  const mergedPath = path.join(ROOT, 'docs', 'openapi', 'openapi.merged.yaml');
-  fs.writeFileSync(mergedPath, yaml.dump(merged, { lineWidth: 120 }));
-  console.log(`  ✅ Written to ${path.relative(ROOT, mergedPath)}`);
-}
-
-console.log('\n🎉 OpenAPI generation complete.\n');
+console.log(`\n✅ OpenAPI spec written to ${relative(ROOT, outPath)}`);
+console.log(`   Paths:   ${Object.keys(document.paths ?? {}).length}`);
+console.log(`   Schemas: ${Object.keys(document.components?.schemas ?? {}).length}\n`);

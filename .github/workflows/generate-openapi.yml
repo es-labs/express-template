@@ -1,0 +1,77 @@
+name: OpenAPI Docs — Generate & Publish
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'common/schemas/**'
+      - 'common/openapi/**'
+      - 'scripts/generate-openapi.js'
+      - '.github/workflows/generate-openapi.yml'
+  workflow_dispatch:
+
+jobs:
+  generate:
+    name: Generate & validate OpenAPI spec
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Generate merged OpenAPI YAML from Zod schemas
+        run: node scripts/generate-openapi.js
+        # Produces: docs/openapi/openapi.merged.yaml
+        # Source of truth: shared/schemas/*.schema.js
+
+      - name: Validate spec with Redocly
+        run: npx redocly lint docs/openapi/openapi.merged.yaml
+
+      - name: Commit generated spec back to main
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'docs(openapi): regenerate spec from Zod schemas [skip ci]'
+          file_pattern: 'docs/openapi/openapi.merged.yaml'
+          commit_user_name: 'github-actions[bot]'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+
+  publish:
+    name: Publish to GitHub Pages
+    needs: generate
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages:    write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url:  ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Build Redoc static HTML
+        run: |
+          mkdir -p _site
+          npx @redocly/cli build-docs docs/openapi/openapi.merged.yaml \
+            --output _site/index.html \
+            --title "Microservices API"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
