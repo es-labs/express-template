@@ -44,7 +44,7 @@
 // NOSONAR unref, toRef, toRefs, isRef, isProxy, isReactive, isReadonly, defineComponent, getCurrentInstance, reactive, readonly, watch, watchEffect
 import { onMounted, onUpdated, onUnmounted, onBeforeUnmount, ref, computed, reactive, onBeforeUpdate } from 'vue'
 import { useMainStore } from '../../store.js'
-import { http } from '../../../common/plugins/fetch.js'
+import { http } from '@common/vue/plugins/fetch.js'
 
 import { useRouter } from 'vue-router'
 

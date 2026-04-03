@@ -31,12 +31,12 @@
 import { ref, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import { useMainStore } from '../store.js'
 import { useRoute } from 'vue-router'
-import { useMediaQuery } from '../../common/plugins/useMediaQuery'
+import { useMediaQuery } from '../../../common/plugins/useMediaQuery.js'
 
 import parseJwt from '@es-labs/jslib/web/parse-jwt'
 
-import { http } from '../../common/plugins/fetch.js'
-import { useI18n } from '../../common/plugins/i18n.js'
+import { http } from '@common/vue/plugins/fetch.js'
+import { useI18n } from '@common/vue/plugins/i18n.js'
 
 const { VITE_REFRESH_URL, MODE } = import.meta.env
 const store = useMainStore()

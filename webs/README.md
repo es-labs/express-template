@@ -1,66 +1,20 @@
 ## Read Me FIRST!
 
-> Do NOT edit this README. Go to [apps/README.md]() to view and edit user README
->
-> Built from [https://github.com/es-labs/vue-antd-template]()
->
-> For template design principles, see [https://github.com/ais-one/cookbook#important---read-me-first]() 
-
-## Template Maintenance
-
-1 - setup to allow incoming merge from upstream template update
-
-```bash
-# run once only after you `clone`, or `fork` or `delete .git and run git init`
-./setup-upstream.sh
-```
-
-2 - Setup for your custom code
-
 **Important notes** - **TO UPDATE!**
-- DO NOT develop custom code using `apps/web-sample` or `apps/web-sample2`. Rename it or copy it to another folder name
-- Update only your own application folders, `apps/package.json` or `apps/.gitignore` for userland changes, NEVER other filer or folders. Contact template maintainer if you need something outside those.
+- DO NOT develop custom code using `apps/vue-sample` or `apps/vue-minimal`. Rename it or copy it to another folder name
 - do note any conflicts to resolve when merging from upstream
 
-3 - Updating the template
-
-```bash
-# Commit and push to remote before running commands below
-git fetch upstream # includes tags
-git pull upstream <branch or tag> --no-rebase
-# add option "--allow-unrelated-histories" if there conflicts to resolve.
-```
-
-**Suggested Conventions**
-- branch
-  - main = stable
-  - work = working branch
-  - feat-<issue number>
-  - bugfix-<issue number>
-- release tags
-  - use semver, e.g. 1.2.3
-  - should tag main branch
-- environments
-  - development = local machine development
-  - staging = cloud development server
-  - production = cloud production server
 ---
 
 ## Install & Run & E2E Test
 
 ```bash
 npm i
-cd apps
-npm i
-
-npm run sample # run 1st sample web application in <project root>/apps/web-sample
-# Visit `http://127.0.0.1:8080` to view application
-
-npm run sample2 # run 2nd sample web application in <project root>/apps/web-sample2
-# Visit `http://127.0.0.1:8081` to view application
-
-# Note your custom development folder is `<project root>/apps/<your-custom-web-app>`
+cd apps/vue-sample
+npm run dev # run 1st sample web application in <project root>/apps/web-sample
 ```
+
+# Visit `http://127.0.0.1:8080` to view application
 
 **Note For Login**
 
@@ -102,10 +56,7 @@ See [apps/README.md]()
 Setting up your custom frontend
 
 **Notes:**
-- `apps/web-sample` is a sample skeleton that can be used as scaffolding
-  - `envs` folder
-    - `.env` is common to all environments for the app
-    - `.env.[MODE]` indicates the environment file to use (command to use: npx vite build --mode $1)
+- `apps/vue-sample` is a sample skeleton that can be used as scaffolding
   - `ROUTES` property
     - use kebab-case, will be converted to Capital Case in menu display
     - only up to 1 submenu level
@@ -124,7 +75,7 @@ Setting up your custom frontend
 ### Sample Deployment - WIP
 
 1. configure .env.production
-2. run the following workflow `.github\workflows\sample-manual-gh-pages.yml`, select env as production
+2. run the following workflow `.github\workflows\deploy-gh-pages.yml`, select env as production
 
 - https://ideas.digitalocean.com/storage/p/deploy-static-sites-to-spacescdn
 - https://docs.digitalocean.com/products/spaces/reference/s3-compatibility
@@ -150,3 +101,66 @@ Authorization: signatureValue
 - Move the following files to userland folder if possible
   - package.json (may not be necessary)
 - [Why Use Vite](https://indepth.dev/a-note-on-vite-a-very-fast-dev-build-tool/)
+
+
+
+
+> Add your readme content here, edit or remove the ones below
+
+---
+
+## Project Structure
+
+TBD - To Redo
+
+```
++- common/ : codes here user may not need to touch much, commonly used in project
+|  +- plugins/ : i18n, fetch, ws (websocket), useMediaQuery
+|  +- views/ : NotFound, NotAllowed, EmptyView
+|  +- msw.js : for mock service worker [NEED TO SPECIFY PATH TO MOCKS]
+|  +- pwa.js : for PWA (work in progress)
+|  +- sentry.js : for error reporting
++- apps/
+|  +- vue-sample/
+|  |  +- components/
+|  |  +- envs/ : dotenv files here
+|  |  +- layouts/ : your layouts here
+|  |  +- mocks/ : for msw
+|  |  +- public/ : web public html folder
+|  |  +- setups/ : see README.md in here
+|  |  +- style/ : see README.md in here
+|  |  +- tests/ : example.spec.js
+|  |  +- views/ : your pages here
+|  |  +- App.vue
+|  |  +- index.html
+|  |  +- main.js
+|  |  +- playwright.config.js
+|  |  +- router.js
+|  |  +- store.js : or store/index.js
+|  |  +- vite.config.js
+|  +- vue-minimal/ : a minimal vue web app
+|  +- <Your-Custom-Frontend>/: folder with prefix "-web" are your custom frontend code (your frontend repo)
+|  +- .gitignore
+|  +- package.json
+|  +- README.md
++- .gitguardian.yml
++- .gitignore
++- .prettierrc.js
++- CHANGELOG.md
++- eslint.config.js
++- package.json
++- README.md
++- setup-upstream.sh
+```
+
+TO view large bundle sizes
+
+import { visualizer } from 'rollup-plugin-visualizer';
+
+plugins: [
+  vue(),
+  visualizer({
+    open: true,
+    filename: 'dist/stats.html'
+  })
+]

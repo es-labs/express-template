@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // import { useMainStore } from './store.js'
 import { ROUTES, SECURE_ROUTES, PUBLIC_ROUTES } from './setups/routes.js'
-import { authGuard } from './setups/authGuard'
+import { authGuard } from './setups/authGuard.js'
 
 const { BASE_URL } = import.meta.env
 for (const route of SECURE_ROUTES) {

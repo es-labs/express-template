@@ -25,7 +25,6 @@ export default ({ command, mode }) => { // command = serve, build
       // include: ['apps/node_modules/leaflet'],
       // include: ['node_modules/leaflet'],
     },
-    // root: 'apps/web-sample',
     root: '.',
     // publicDir: 'public',
     plugins: [

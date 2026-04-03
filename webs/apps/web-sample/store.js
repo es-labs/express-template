@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import router from './router.js'
-import { http } from '../common/plugins/fetch.js'
+import { http } from '@common/vue/plugins/fetch.js'
 // import aaa from 'https://unpkg.com/swrv@0.3.0/esm/index.js' - will error
 
 const { VITE_INITIAL_SECURE_PATH, VITE_INITIAL_PUBLIC_PATH } = import.meta.env

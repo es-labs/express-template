@@ -34,7 +34,7 @@
 <script setup>
 import { ref, reactive, toRaw, onMounted } from 'vue'
 import { SettingOutlined } from '@ant-design/icons-vue'
-import { http } from '../../../common/plugins/fetch.js'
+import { http } from '@common/vue/plugins/fetch.js'
 const { VITE_API_URL } = import.meta.env
 
 const formState = reactive({

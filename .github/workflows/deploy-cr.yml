@@ -13,7 +13,7 @@
 # - CR_IMAGENAME
 # Specify the following during build
 # - tag_gr
-# - cr_env (dev, uat, prd)
+# - env (development, statging, production) - MIGHT NOT BE NEEDED
 #
 name: IN USE - Container Registry deployment
 
