@@ -12,7 +12,7 @@ import createSentry from '../common/sentry.js' // sentry
 
 import '@es-labs/jslib/web/bwc-loading-overlay' // our own web components
 
-import { version } from '../package.json'
+import { version } from './package.json' with { type: 'json' };
 console.log(`V${version}`)
 
 const app = createApp(App)

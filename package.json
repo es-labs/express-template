@@ -23,8 +23,8 @@
     "express"
   ],
   "engines": {
-    "node": ">=22",
-    "npm": ">=10"
+    "node": ">=24",
+    "npm": ">=11"
   },
   "scripts": {
     "app": "node --trace-warnings index.js",

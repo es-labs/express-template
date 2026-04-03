@@ -4,14 +4,16 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "sample2": "vite --config web-sample2/vite.config.js --mode development",
-    "sample2:build": "vite build --config web-sample2/vite.config.js --mode development"
+    "dev": "vite --mode development",
+    "build:dev": "vite build --mode development",
+    "build": "vite build --mode production"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@common/vue": "file:../../common",
+    "null": "^2.0.0",
     "redoc": "^2.5.2"
   }
 }

@@ -45,3 +45,15 @@ TBD - To Redo
 +- README.md
 +- setup-upstream.sh
 ```
+
+TO view large bundle sizes
+
+import { visualizer } from 'rollup-plugin-visualizer';
+
+plugins: [
+  vue(),
+  visualizer({
+    open: true,
+    filename: 'dist/stats.html'
+  })
+]

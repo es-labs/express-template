@@ -1,12 +1,9 @@
 # DO NOT EDIT
 !.gitignore
 !README.md
-!.env.sample
-!.env.mocked
-!package.json
-!vite.config.js
 !common
 !public
+*/dist
 
 # EDIT BELOW - comment out environments you want in your project
 

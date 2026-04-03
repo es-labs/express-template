@@ -1,23 +1,13 @@
-// import.meta is undefined, process.env is not populated with custom values
+import { loadEnvFile } from 'node:process';
 import vue from '@vitejs/plugin-vue'
-import path from 'path'
-import * as dotenv from 'dotenv'
 
-export default ({ command, mode }) => {
-  dotenv.config({ path: path.join(__dirname, 'envs', '.env') }).parsed
-  const env = dotenv.config({ path: path.join(__dirname, 'envs', '.env.' + mode) }).parsed
-  // console.table({
-  //   __dirname,
-  //   mode,
-  //   command // command = serve, build
-  // })
-  // console.table(env);
-  if (!env) return console.error(`Vite Error: env undefined for mode: ${mode}`)
+export default ({ command, mode }) => { // command = serve, build
+  loadEnvFile(`.env.${mode}`)
   return {
     define: {
       __VUE_PROD_DEVTOOLS__: false
     },
-    base: env.BASE_PATH || '/', // set to '/vite' for dev:build, '/' otherwise
+    base: process.env.BASE_PATH || '/', // set to '/vite' for dev:build, '/' otherwise
     build: {
       esbuildOptions: { // VITE uses esbuild by default
         drop: mode === 'production' ? ['console', 'debugger'] : []
@@ -36,7 +26,7 @@ export default ({ command, mode }) => {
       // include: ['node_modules/leaflet'],
     },
     // root: 'apps/web-sample',
-    root: 'web-sample',
+    root: '.',
     // publicDir: 'public',
     plugins: [
       vue({

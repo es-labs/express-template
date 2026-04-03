@@ -4,10 +4,10 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "sample": "vite --config web-sample/vite.config.js --mode development",
-    "sample:build": "vite build --config web-sample/vite.config.js --mode development",
-    "tbd-local:reload": "vite --force --config apps/vite.config.js",
-    "tbd-local:mocked": "vite --config apps/vite.config.js --mode mocked",
+    "dev": "vite --mode development",
+    "build:dev": "vite build --mode development",
+    "build": "vite build --mode production",
+    "dev:mocked": "vite --config apps/vite.config.js --mode mocked",
     "test": "echo \"Remember to run frontend and backend before test...\" && playwright test"
   },
   "keywords": [],
