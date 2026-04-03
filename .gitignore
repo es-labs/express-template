@@ -1,14 +1,9 @@
-# app
-apps/*
-
-# configs and secret configs
-# .env
-# .env.secret
-
 # npm
 node_modules
-# package-lock.json # do include this, include for apps, exclude for libs, templates ignore copying over this file
-# yarn.lock
+package-lock.json # do include this, include for apps, exclude for libs, templates ignore copying over this file
+
+# app
+apps/*
 
 # tests
 coverage
