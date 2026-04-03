@@ -2,13 +2,13 @@ name: Auth Service — CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [tbd]
     paths:
       - 'services/auth-service/**'
       - 'shared/**'
       - '.github/workflows/deploy-auth-service.yml'
   pull_request:
-    branches: [main]
+    branches: [tbd]
     paths:
       - 'services/auth-service/**'
       - 'shared/**'

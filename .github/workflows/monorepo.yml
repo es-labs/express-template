@@ -1,7 +1,7 @@
 # .github/workflows/deploy-auth-service.yml
 on:
   push:
-    branches: [main]
+    branches: [tbd]
     paths:
       - 'services/auth-service/**'   # ← only triggers for this service
       - 'shared/libs/**'             # ← also trigger if shared code changes

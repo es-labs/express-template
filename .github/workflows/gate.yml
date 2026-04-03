@@ -2,11 +2,11 @@ name: CI / CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [tbd]
     paths:
       - 'services/auth-service/**'
   pull_request:
-    branches: [main]
+    branches: [tbd]
     paths:
       - 'services/auth-service/**'
 

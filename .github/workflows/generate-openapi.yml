@@ -2,7 +2,7 @@ name: OpenAPI Docs — Generate & Publish
 
 on:
   push:
-    branches: [main]
+    branches: [tbd]
     paths:
       - 'common/schemas/**'
       - 'common/openapi/**'
