@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default async function(app_path) {
-  process.env.NODE_ENV = process.env.NODE_ENV || '' // development, dev, prd... (development is on local machine)
+  process.env.NODE_ENV = process.env.NODE_ENV || 'development'
   const { NODE_ENV, VAULT } = process.env
   if (!NODE_ENV) {
     console.log('Exiting No Environment Specified')

@@ -42,8 +42,8 @@ git pull upstream <branch or tag> --no-rebase
   - should tag main branch
 - environments
   - development = local machine development
-  - dev = development server
-  - prd = production server
+  - staging = cloud development server
+  - production = cloud production server
 ---
 
 ## Install & Run & E2E Test
@@ -123,8 +123,8 @@ Setting up your custom frontend
 
 ### Sample Deployment - WIP
 
-1. configure .env.prd
-2. run the following workflow `.github\workflows\sample-manual-gh-pages.yml`, select env as prd
+1. configure .env.production
+2. run the following workflow `.github\workflows\sample-manual-gh-pages.yml`, select env as production
 
 - https://ideas.digitalocean.com/storage/p/deploy-static-sites-to-spacescdn
 - https://docs.digitalocean.com/products/spaces/reference/s3-compatibility
