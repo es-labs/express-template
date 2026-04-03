@@ -1,0 +1,17 @@
+{
+  "name": "web-sample2",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "sample2": "vite --config web-sample2/vite.config.js --mode development",
+    "sample2:build": "vite build --config web-sample2/vite.config.js --mode development"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@common/vue": "file:../../common",
+    "redoc": "^2.5.2"
+  }
+}

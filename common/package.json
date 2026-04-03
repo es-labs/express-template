@@ -1,5 +1,5 @@
 {
-  "name": "@express-template/common",
+  "name": "@common/apps",
   "version": "1.0.0",
   "description": "common utilities and code for express-template",
   "license": "ISC",

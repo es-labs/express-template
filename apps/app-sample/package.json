@@ -27,13 +27,15 @@
     "npm": ">=10"
   },
   "scripts": {
-    "start": "node --trace-warnings src/index.js",
-    "test": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./src/**/__tests__/*.test.js",
+    "start": "node --watch --trace-warnings src/index.js",
+    "test:unit": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./src/**/__tests__/unit/*.test.js",
+    "test:integration": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./src/**/__tests__/integration/*.test.js",
+    "test": "npm run test:unit && npm run test:integration", 
     "test:e2e": "start-server-and-test start http://localhost:8080 test",
     "update-commit-hash": "git rev-parse --verify --short HEAD > commit-hash"
   },
   "dependencies": {
-    "@express-template/common": "file:../../common",
+    "@common/apps": "file:../../common",
     "@json2csv/plainjs": "^7.0.6",
     "csv-parse": "^6.2.1",
     "fido2-lib": "^3.5.9",

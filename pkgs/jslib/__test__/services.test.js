@@ -1,4 +1,4 @@
-import '@express-template/common/env' // setup env vars
+import '@common/apps/env' // setup env vars
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert';
 import StoreKnex from '@es-labs/node/services/db/knex.js';

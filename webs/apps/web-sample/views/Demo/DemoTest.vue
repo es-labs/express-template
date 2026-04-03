@@ -28,9 +28,6 @@
     <p>Non-Reactive Data: {{ nonReactiveData }}</p>
     <p>Reactive Data: {{ reactiveData }}</p>
     <p>Vuex Store: {{ store.user }} <button @click="(e) => store.updateUser({ id: 'AnewId' })">Change Name</button></p>
-    <h2>Test Search and rxjs</h2>
-    <a-input ref="searchRef" placeholder="rxjs search swapi"></a-input>
-    {{ searchResult || 'No Search Result' }}
     <h2>Test Reactivity In Object</h2>
     <p>
       Click to see increment. Also check console.log if onUpdated is called
@@ -48,9 +45,6 @@
 import { onMounted, onUpdated, onUnmounted, onBeforeUnmount, ref, computed, reactive, onBeforeUpdate } from 'vue'
 import { useMainStore } from '../../store.js'
 import { http } from '../../../common/plugins/fetch.js'
-
-import { fromEvent } from 'rxjs'
-import { switchMap, debounceTime, distinctUntilChanged, map } from 'rxjs/operators'
 
 import { useRouter } from 'vue-router'
 
@@ -137,24 +131,6 @@ onMounted(async () => {
     nonReactiveData += 1
     reactiveData.value += 1
   }, 200000)
-
-  const input$ = fromEvent(searchRef.value.$el, 'input') // NOSONAR
-    .pipe(
-      debounceTime(1000),
-      map((e) => e.target.value),
-      // .filter(value => value.length >= 2)
-      distinctUntilChanged(),
-      switchMap((search) =>
-        fetch('https://swapi.dev/api/people/?search=' + search + '&format=json')
-          .then((res) => res.json())
-          .then((data) => data)
-      )
-      // catchError(handleErrorByReturningObservable)
-    )
-    .subscribe((e) => {
-      searchResult.value = JSON.stringify(e)
-      console.log(e)
-    })
 })
 onBeforeUnmount(() => {
   if (timerId) clearInterval(timerId)

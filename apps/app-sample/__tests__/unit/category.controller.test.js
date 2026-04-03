@@ -1,4 +1,4 @@
-import '@express-template/common/config' // setup env vars
+import '@common/apps/config' // setup env vars
 // TBD testing websockets using native node testing
 import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert';
