@@ -1,6 +1,6 @@
 # npm
 node_modules
-package-lock.json # do include this, include for apps, exclude for libs, templates ignore copying over this file
+package-lock.json
 
 # app
 apps/*
