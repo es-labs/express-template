@@ -4,7 +4,8 @@
 !test.http
 !biome.json
 
-# EDIT BELOW - comment out environments you want in your project
+# DO NOT EDIT - .local used for local machine dev secrets
+**/.env.local
 
 # EDIT BELOW - comment out folders you want in your project
 !app-sample

@@ -2,14 +2,10 @@ import { loadEnvFile } from 'node:process';
 import path from 'node:path';
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'; // default to development if NODE_ENV is not set
-const envFileName = `.env.${process.env.NODE_ENV}`;
-const envFilePath = path.resolve(process.cwd(), envFileName);
+const envFilePath = path.resolve(process.cwd(), '.env');
 
-loadEnvFile(envFilePath);
-
-try {
-  console.log(`Loaded environment file: ${envFileName}`);
-} catch (error) {
-  // Handle the case where the file might not exist (e.g. in production when using system env vars)
-  console.log(`Could not load ${envFileName}. Ensure NODE_ENV is set correctly or the file exists.`);
+if (process.env.NODE_ENV === 'development') {
+  // will throw if file doesn't exist, only use for development
+  loadEnvFile(`${envFilePath}.local`); // load this first
+  loadEnvFile(envFilePath);
 }
