@@ -2,6 +2,7 @@
 !.gitignore
 !README.md
 !test.http
+!biome.json
 
 # EDIT BELOW - comment out environments you want in your project
 

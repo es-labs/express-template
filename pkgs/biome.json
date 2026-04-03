@@ -1,0 +1,28 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.0/schema.json",
+  "extends": ["../biome.json"],
+  "javascript": {
+    "globals": [
+      "process",
+      "__dirname",
+      "__filename",
+      "require",
+      "module",
+      "exports",
+      "Buffer"
+    ]
+  },
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noConsoleLog": "error"
+      },
+      "security": {
+        "noGlobalEval": "error"
+      }
+    }
+  },
+  "files": {
+    "includes": ["*/src/**/*.js", "*/src/**/*.ts"]
+  }
+}
