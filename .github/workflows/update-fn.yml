@@ -5,12 +5,12 @@ on:
     # Inputs the workflow accepts.
     inputs:
       fn_csp:
-        description: 'Cloud Service Provider - aliyun, azure, aws, digitalocean, gcp'
+        description: 'Cloud Service Provider - aliyun, aws, digitalocean'
         default: 'aliyun'
         required: true
       fn_servicename:
         description: 'service name'
-        default: 'btv-binance-fc'
+        default: ''
         required: true
       fn_functionname:
         description: 'function name'
