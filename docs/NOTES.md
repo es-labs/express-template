@@ -60,3 +60,17 @@ Scenario 4: Open Source Project
 - Setting: Allow rebase merge in GitHub
 - Enforce: Require commits to be signed
 
+
+
+## Github Action Vars
+
+NPM_AUTH_TOKEN
+
+ACCESS_KEY_ID
+ACCESS_KEY_SECRET
+
+CR_USERNAME
+CR_PASSWORD
+vars.CR_HOST
+vars.CR_NS
+vars.CR_IMAGENAME
