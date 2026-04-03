@@ -15,7 +15,7 @@
 # - bucket (bucket name - e.g. test-www-dev)
 # - env (dev, uat, prd)
 #
-name: Deploy To Bucket
+name: IN USE - Deploy To Bucket
 
 # on: [push]
 on:
@@ -114,3 +114,26 @@ jobs:
       - name: Sync files to S3 bucket
         run: |
           aws s3 sync dist s3://${{ github.event.inputs.bucket }} --delete
+  deploy-oss2: # Alibaba Cloud OSS via AWS CLI
+      needs: run-build
+      if: github.event.inputs.provider == 'oss2'
+      runs-on: ubuntu-latest
+      steps:
+        - name: Download artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: my-build
+            path: ${{ github.workspace }}/apps/${{ github.event.inputs.app }}/dist
+
+        - name: Configure AWS CLI for OSS
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+            aws-region: ap-southeast-1
+
+        - name: Sync files to OSS bucket
+          run: |
+            aws s3 sync dist s3://${{ github.event.inputs.bucket }} \
+              --delete \
+              --endpoint-url https://${{ secrets.OSS_ENDPOINT }}

@@ -1,12 +1,11 @@
 ## folder structure
 
-apps
-common
-docs
-pkgs
-scripts
-webs
-
+- apps: backend applications
+- common: common javascript used by the apps folder (TBD also for other folders), also common schemas
+- docs: documentation
+- pkgs: packages can be uploaded to npm
+- scripts: deploy, documentation scripts
+- webs: frontend applications using VueJS
 
 ## TBD
 js-template
@@ -62,31 +61,7 @@ Scenario 4: Open Source Project
 
 
 
-## Github Action Vars
+## precommits
 
-NPM_AUTH_TOKEN
-
-ACCESS_KEY_ID
-ACCESS_KEY_SECRET
-
-CR_USERNAME
-CR_PASSWORD
-vars.CR_HOST
-vars.CR_NS
-vars.CR_IMAGENAME
-
-
-# .prettierrc.cjs
-```
-module.exports = {
-  arrowParens: 'always', // avoid
-  bracketSpacing: true,
-  endOfLine: 'auto',
-  printWidth: 300,
-  semi: false,
-  singleQuote: true,
-  tabWidth: 2,
-  trailingComma: 'none',
-  // arrowParens: 'avoid'
-}
-```
+- use biome for formatting and linting
+- git guardian (use native Github for now)

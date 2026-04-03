@@ -19,6 +19,9 @@ export default ({ command, mode }) => {
     },
     base: env.BASE_PATH || '/', // set to '/vite' for dev:build, '/' otherwise
     build: {
+      esbuildOptions: { // VITE uses esbuild by default
+        drop: mode === 'production' ? ['console', 'debugger'] : []
+      }
       // sourcemap: true,
       // rollupOptions: {
       //   // external: [ 'react' ] // ignore react stuff

@@ -15,7 +15,7 @@
 # - tag_gr
 # - cr_env (dev, uat, prd)
 #
-name: CR deployment
+name: IN USE - Container Registry deployment
 
 on:
   workflow_dispatch:

@@ -32,13 +32,16 @@
     "build:lib": "npm i @es-labs/jslib@latest",
     "git:hash": "git rev-parse --verify --short HEAD",
     "git:branch": "git rev-parse --abbrev-ref HEAD",
-    "lint": "eslint 'apps/**/src/**/*.js' 'common/**/*.js'",
-    "lint:fix": "eslint --fix --no-fix-warnings --no-report-warnings 'apps/**/src/**/*.js' 'common/**/*.js'",
+    "lint": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "check:apps": "biome check --write apps",
+    "check:libs": "biome check --write libs",
+    "check:webs": "biome check --write webs",
+    "ci": "biome ci .",
     "docs:generate": "node scripts/generate-openapi.js",
     "docs:validate": "swagger-cli validate docs/openapi/openapi.merged.yaml",
     "prepare": "git config core.hooksPath ./git-hooks || echo 'Can not set git hooks'",
-    "prettier:check": "prettier --check apps/**/*.{js,json}",
-    "prettier:write": "prettier --write apps/**/*.{js,json}",
     "test:workspace": "npm run test --workspace=apps/app-sample",
     "test:workspaces": "npm run test --workspaces",
     "test:cover-only": "node --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info --test __tests__/**/*.spec.js",
@@ -49,11 +52,9 @@
     "update-commit-hash": "git rev-parse --verify --short HEAD > commit-hash"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@biomejs/biome": "2.4.10",
     "@redocly/cli": "^2.25.3",
-    "eslint": "^10.1.0",
     "node-mocks-http": "^1.17.2",
-    "prettier": "^3.8.1",
     "start-server-and-test": "^3.0.0"
   },
   "workspaces": [
