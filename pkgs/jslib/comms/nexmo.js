@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 //NOSONAR
 // nexmo.isms('6596935500', 'Blah ' + new Date())
@@ -8,15 +8,11 @@ const { NEXMO_KEY, NEXMO_SECRET, NEXMO_SENDER = 'SMSnotice' } = process.env
 // sms = 6511112222
 // one at a time...
 export const send = async (sms, message, from) => {
-  try {
-    if (!from) from = NEXMO_SENDER
-    if (sms && message) {
-      return await fetch(`https://rest.nexmo.com/sms/json?api_key=${NEXMO_KEY}&api_secret=${NEXMO_SECRET}&to=${sms}&from=${from}&text=${message}`)
-    }
-  } catch (e) {
-    console.log('send', e.toString())      
+  if (!from) from = NEXMO_SENDER
+  if (sms && message) {
+    // just throw if failed
+    await fetch(`https://rest.nexmo.com/sms/json?api_key=${NEXMO_KEY}&api_secret=${NEXMO_SECRET}&to=${sms}&from=${from}&text=${message}`)
   }
-  return null
 }
 
 // sms = 6511112222
@@ -38,7 +34,7 @@ export const ismsSend = async (sms, message, from) => {
       return await fetch(url, options)
     }
   } catch (e) {
-    console.log('ismsSend', e.toString())      
+    // console.log('ismsSend', e.toString())      
   }
   return null
 }

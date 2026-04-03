@@ -13,7 +13,6 @@ class SignPad extends HTMLElement {
     super()
     const shadowRoot = this.attachShadow({ mode: 'open' })
     shadowRoot.appendChild(template.content.cloneNode(true))
-    console.log('SignPad()')
     this.mouse = {
       current: { x: 0, y: 0 },
       previous: { x: 0, y: 0 },
@@ -40,7 +39,6 @@ class SignPad extends HTMLElement {
   }
 
   set value(val) {
-    // console.log('setting value', val)
     this.setAttribute('value', val || '')
   }
 
@@ -61,9 +59,6 @@ class SignPad extends HTMLElement {
     // const styleSheetList = this.shadowRoot.styleSheets // do this here, not in constructor
     // const bg_rule = styleSheetList[0].cssRules[0]
     // const yyy = context_rule.style.getPropertyValue('--vcxwc-sign-pad-background-color')
-    // console.log('bg', bg_rule.style.backgroundColor, yyy)
-
-    // console.log('connect sign')
     this.mouse = {
       current: { x: 0, y: 0 },
       previous: { x: 0, y: 0 },
@@ -71,17 +66,14 @@ class SignPad extends HTMLElement {
       move: false
     }
 
-    // console.log('has value?', this.hasAttribute('value'), this.getAttribute('value'))
     if (!this.hasAttribute('value')) this.setAttribute('value', '')
 
     const el = this.shadowRoot.querySelector('#canvas')
-    // console.log('canvas w h', el.width, el.height)
     const ctx = el.getContext('2d')
     ctx.translate(0.5, 0.5)
     ctx.imageSmoothingEnabled = false
 
     const ctx2d = JSON.parse(this.getAttribute('context2d'))
-    // console.log('ctx2d', ctx2d)
     for (const k in ctx2d) {
       // strokeStyle, lineWidth
       ctx[k] = ctx2d[k]
@@ -94,7 +86,6 @@ class SignPad extends HTMLElement {
   adoptedCallback() {}
 
   disconnectedCallback() {
-    // console.log('disconnect sign')
     const el = this.shadowRoot.querySelector('#canvas')
     el.removeEventListener('mousedown', this.handleMouseDown)
     el.removeEventListener('mouseup', this.handleMouseUp)

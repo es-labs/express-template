@@ -59,9 +59,8 @@ export const auth = async (req, res) => { // callback
       access_token = tokens.access_token
       refresh_token = tokens.refresh_token
     }
-    return res.redirect(OIDC_OPTIONS.CALLBACK + '#' + access_token + ';' + refresh_token + ';' + JSON.stringify(user_meta))
+    return res.redirect(`${OIDC_OPTIONS.CALLBACK}#${access_token};${refresh_token};${JSON.stringify(user_meta)}`)
   } catch (e) {
-    console.log(e)
     return AUTH_ERROR_URL ? res.redirect(AUTH_ERROR_URL) : res.status(401).json({ error: 'NOT Authenticated' })
   }
 }

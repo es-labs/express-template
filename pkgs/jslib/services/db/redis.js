@@ -36,8 +36,10 @@ export default class StoreRedis {
 
   open () {
     const redisOpts = this._REDIS_CONFIG.opts
-    if (this._REDIS_CONFIG.retry) redisOpts.retryStrategy = (times) => Math.min(times * this._REDIS_CONFIG.retry.step, this._REDIS_CONFIG.retry.max)
-    if (this._REDIS_CONFIG.reconnect) redisOpts.reconnectOnError = (err) => err.message.includes(this._REDIS_CONFIG.reconnect.targetError) ? true : false
+    if (this._REDIS_CONFIG.retry) redisOpts.retryStrategy =
+       (times) => Math.min(times * this._REDIS_CONFIG.retry.step, this._REDIS_CONFIG.retry.max)
+    if (this._REDIS_CONFIG.reconnect) redisOpts.reconnectOnError =
+      (err) => !!err.message.includes(this._REDIS_CONFIG.reconnect.targetError)
     this._redis = new Redis(redisOpts)
   }
 

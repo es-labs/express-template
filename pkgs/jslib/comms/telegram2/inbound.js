@@ -300,15 +300,15 @@ app.post("/webhook", (req, res) => {
     const update = req.body;
     const result = handleUpdate(update);
 
-    console.log("Update type :", result.updateType);
-    console.log("Parsed data :", JSON.stringify(result.data, null, 2));
+    // console.log("Update type :", result.updateType);
+    // console.log("Parsed data :", JSON.stringify(result.data, null, 2));
 
     // TODO: route to your business logic here, e.g.
     // if (result.updateType === "message") processMessage(result.data);
 
   } catch (err) {
-    console.error("Failed to process update:", err);
+    // TBD console.error("Failed to process update:", err);
   }
 });
 
-app.listen(3000, () => console.log("Webhook listening on :3000"));
+// app.listen(3000, () => console.log("Webhook listening on :3000"));

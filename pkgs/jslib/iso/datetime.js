@@ -69,7 +69,7 @@ export const getTzOffsetISO = (date) => {
   const pad = n => `${Math.floor(Math.abs(n))}`.padStart(2, '0'); // Pad a number to 2 digits
   if (!date) date = new Date();
   const tzOffset = -date.getTimezoneOffset();
-  return (tzOffset >= 0 ? '+' : '-') + pad(tzOffset / 60) + ':' + pad(tzOffset % 60);
+  return `${(tzOffset >= 0 ? '+' : '-') + pad(tzOffset / 60)}:${pad(tzOffset % 60)}`;
 };
 
 /**
@@ -80,7 +80,7 @@ export const getTzOffsetISO = (date) => {
 export const getYmdhmsUtc = (date) => {
   if (!date) date = new Date();
   const d = date.toISOString();
-  return d.substring(0,4) + d.substring(5,7) + d.substring(8,10) + '_' + d.substring(11,13) + d.substring(14,16) + d.substring(17,19) + 'Z';
+  return `${d.substring(0,4) + d.substring(5,7) + d.substring(8,10)}_${d.substring(11,13)}${d.substring(14,16)}${d.substring(17,19)}Z`;
 }
 
 /**

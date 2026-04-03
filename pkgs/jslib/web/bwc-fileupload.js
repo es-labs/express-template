@@ -37,7 +37,6 @@ class BwcFileupload extends HTMLElement {
     this.innerHTML = html
     this.files = null
 
-    // console.log('attrs', this.attributes)
     if (!this.hasAttribute('value')) this.setAttribute('value', '')
 
     if (this.hasAttribute('input-class')) this.querySelector('input[type=text]').setAttribute('class', this.getAttribute('input-class'))
@@ -61,7 +60,6 @@ class BwcFileupload extends HTMLElement {
     switch (name) {
       case 'value':
         if (el) el.value = newVal
-        // console.log('bwc-fileupload', newVal)
         // this.dispatchEvent(new CustomEvent('input', { detail: newVal }))
         break
       default: break
@@ -78,7 +76,7 @@ class BwcFileupload extends HTMLElement {
 
   change(e) {
     this.files = e.target.files
-    this.value = (this.files && this.files.length) ? Array.from(this.files).map(f => f.name).join(',') : ''
+    this.value = (this.files?.length) ? Array.from(this.files).map(f => f.name).join(',') : ''
     this.dispatchEvent(new CustomEvent('input', { detail: this.files }))
     this.dispatchEvent(new CustomEvent('change', { detail: this.files }))
   }

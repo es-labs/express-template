@@ -17,7 +17,7 @@ const idleTimer = { // logout user if idle
 
   check() {
     this._idleSecondsCounter++
-    for (let timeout of this.timeouts) {
+    for (const timeout of this.timeouts) {
       // console.log('check2', this._idleSecondsCounter, timeout.time)
       if (this._idleSecondsCounter >= timeout.time) {
         if (timeout.stop) this.stop()

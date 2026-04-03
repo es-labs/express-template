@@ -198,10 +198,6 @@ template.innerHTML = /*html*/`
 `
 
 class BwcT4tForm extends HTMLElement {
-  constructor() {
-    super()
-  }
-
   #config = [] // from table config property passed in
   #record = {} // from record property passed in
   #xcols = {} // extended column information - info on input element, event, etc...
@@ -256,7 +252,7 @@ class BwcT4tForm extends HTMLElement {
 
     const inputAttrs = c?.ui?.attrs // set col specific attributes for the input
     if (inputAttrs) {
-      for (let key in inputAttrs) {
+      for (const key in inputAttrs) {
         el.setAttribute(key, inputAttrs[key])
       }
     }
@@ -275,7 +271,7 @@ class BwcT4tForm extends HTMLElement {
         const selectString = (this.mode === 'add') ? c.default || '' : this.#record[k] || ''
         const selected = !selectString ? [] : (c?.ui?.attrs?.multiple) ? selectString.split(',') : [selectString]
         const options = c?.ui?.options
-        for (let option of options) {
+        for (const option of options) {
           const optEl = document.createElement('option')
           optEl.value = option.key
           optEl.innerText = option.text
@@ -287,7 +283,7 @@ class BwcT4tForm extends HTMLElement {
       } else { // other input
         if (elementTag === 'bwc-combobox') {
           // console.log('bwc-combobox', this.#record)
-          el.setAttribute('listid', 'list-'+k)
+          el.setAttribute('listid', `list-${k}`)
           el.setAttribute('object-key', 'key')
           el.setAttribute('object-text', 'text')
           if (c?.ui?.attrs?.multiple) el.setAttribute('multiple', '')
@@ -325,7 +321,7 @@ class BwcT4tForm extends HTMLElement {
             let parentVal = null
             if (c?.options?.parentCol) {
               const col = this.#xcols[c?.options?.parentCol]
-              if (col && col.el) parentVal = col.el.value
+              if (col?.el) parentVal = col.el.value
             }
             const res = await autocomplete(e.target.value, k, this.#record, parentVal)
             el.items = res
@@ -336,7 +332,7 @@ class BwcT4tForm extends HTMLElement {
             if (childColName) {
               const col = this.#xcols[childColName]
               const childColObj = this.#config.cols[childColName]
-              if (col && col.el) {
+              if (col?.el) {
                 if (childColObj?.ui?.attrs?.multiple) { // multiple
                   col.el.tags = []
                 } else {
@@ -345,7 +341,7 @@ class BwcT4tForm extends HTMLElement {
                 }
               }
             }
-            console.log('t4t combobox onselect', e.detail)
+            // console.log('t4t combobox onselect', e.detail)
           }
         } else { // input, textarea
           if (this.mode === 'add') { // set the value
@@ -366,14 +362,14 @@ class BwcT4tForm extends HTMLElement {
     if (className) el.className = className // set classes
 
     // Bulma Specific Note (TODO tmprove this): if className has 'select' - it is bulma need to set is-multiple here if is multi select
-    if (node?.className && node.className.includes('select')) {
+    if (node?.className?.includes('select')) {
       if (c?.ui?.attrs?.multiple) {
         el.classList.add('is-multiple')
       }
     }
 
     if (attrs) {
-      for (let key in attrs) {
+      for (const key in attrs) {
         el.setAttribute(key, attrs[key])
       }
     }
@@ -394,7 +390,7 @@ class BwcT4tForm extends HTMLElement {
       el.innerHTML = ''
       const { cols, auto, pk, required, multiKey } = this.#config
       // console.log('this.#record', this.#record)
-      for (let col in cols) {
+      for (const col in cols) {
         if (!auto.includes(col)) {
           const c = cols[col]
           // console.log('nonauto', c, this.mode)
@@ -423,7 +419,7 @@ class BwcT4tForm extends HTMLElement {
         e.preventDefault() // e.stopPropagation()
 
         // check validity
-        for (let col in this.#xcols) {
+        for (const col in this.#xcols) {
           if (this.#xcols[col].el) {
             if (this.#xcols[col]?.el?.checkValidity) {
               const valid = this.#xcols[col].el.checkValidity()
@@ -435,14 +431,14 @@ class BwcT4tForm extends HTMLElement {
 
         // console.log(this.#record)
         if (!error) {
-          for (let col in this.#xcols) {
+          for (const col in this.#xcols) {
             // console.log('this.#xcols', this.#xcols[col].el.tagName)
             const inputEl = this.#xcols[col].el
             if (inputEl) {
               if (inputEl.tagName.toLowerCase() === 'select') {
                 // select options, [string] - done, [{ key, text }] - next
                 const selected = []
-                for (let opt of inputEl.selectedOptions) {
+                for (const opt of inputEl.selectedOptions) {
                   selected.push(opt.value)
                 }
                 this.#record[col] = selected.join(',')
@@ -488,7 +484,7 @@ class BwcT4tForm extends HTMLElement {
         this.dispatchEvent(new CustomEvent('cancel'))
       }
     } catch (e) {
-      console.log('bwc-t4t-form', e)
+      // console.log('bwc-t4t-form', e)
     }
   }
 }

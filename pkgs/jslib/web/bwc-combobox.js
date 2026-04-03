@@ -143,13 +143,13 @@ class BwcCombobox extends HTMLElement {
         // single
         if (!found) { // not found
           if (this.#selected) {
-            console.log('onBlur - single select - not found and this.#selected truthy')
+            // console.log('onBlur - single select - not found and this.#selected truthy')
             this.#selected = null
             this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }))
           }
         } else {
           if (!this.#selected) {
-            console.log('onBlur - single select - found and this.#selected falsy')
+            // console.log('onBlur - single select - found and this.#selected falsy')
             this.#selected = found
             this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }))
           }
@@ -180,11 +180,11 @@ class BwcCombobox extends HTMLElement {
         break
       }
       case 'required': {
-        el && el.setAttribute('required', '')
+        el?.setAttribute('required', '')
         break
       }
       case 'disabled': {
-        el && el.setAttribute('disabled', '')
+        el?.setAttribute('disabled', '')
         break
       }
       case 'input-class': {
@@ -268,7 +268,7 @@ class BwcCombobox extends HTMLElement {
     if (this._tagLimitReached()) this.#elInput.setAttribute('disabled', '')
   }
   _updateTags() {
-    let tags = [...this.#elTags.children]
+    const tags = [...this.#elTags.children]
     this.#tags = tags.map(tag => this._isStringType() ? tag.innerText : ({ [this.#key]: tag.value, [this.#text]: tag.innerText }))
     // console.log('_updateTags', this.#tags)
   }
@@ -291,7 +291,7 @@ class BwcCombobox extends HTMLElement {
       this.#selected = found
     }
     if (!this._matchItems(prevItem, this.#selected) && !this.#multiple) {
-      console.log('_onInput - selected && provItem not match this.#selected')
+      // console.log('_onInput - selected && provItem not match this.#selected')
       if (!this.#selected && this.allowCustomTag) {
         this.#selected = this._makeItemFromValue()
       }
@@ -304,7 +304,7 @@ class BwcCombobox extends HTMLElement {
     if (!this.#elTags) return
     this.#elTags.innerHTML = ''
     this.#tags = []
-    _tags.forEach(tag => this._addTag(tag))
+    _tags.forEach(tag => { this._addTag(tag) })
     this.dispatchEvent(new CustomEvent('select', { detail: this.#tags }))
   }
 

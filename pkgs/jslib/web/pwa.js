@@ -19,7 +19,7 @@ export const webpushSubscribe = async (publicKey) => {
   })
   subscription = JSON.stringify(subscription)
 
-  console.log('subscription', subscription)
+  // console.log('subscription', subscription)
   return subscription
 }
 
@@ -57,7 +57,7 @@ const urlBase64ToUint8Array = (base64String) => {
 }
 
 const handleSwMessage = async (e) => {
-  console.log('handleSwMessage', e)
+  // console.log('handleSwMessage', e)
   //NOSONAR if (e && e.data && e.data.msg === 'pushsubscriptionchange') { }
 }
 

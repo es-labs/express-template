@@ -2,7 +2,7 @@
 // NOTE: if --forcedExit --detectOpenHandles in JEST test, will cause error
 // TODO: automated testing for websockets
 import WebSocket, { WebSocketServer } from 'ws'
-import https from 'https'
+import https from 'node:https'
 
 // NOSONAR
 // function heartbeat() {
@@ -47,14 +47,13 @@ export default class Wss {
             ws.send(message) // echo back message...
           }
         } catch (e) {
-          console.log(e.toString())
+          // TBD console.log(e.toString())
         }
       }  
     }
-    return Wss._instance
   }
   static getInstance() {
-    return this._instance
+    return Wss._instance
   }
   setOnClientMessage(onClientMessageFn) {
     this._onClientMessage = onClientMessageFn
@@ -104,7 +103,7 @@ export default class Wss {
         //   });
         // });
 
-        console.log('WS API listening on port ' + this._port)
+        // TBD console.log('WS API listening on port ' + this._port)
         if (this._wss) {
           this._wss.on('connection', (ws) => {
             // console.log('ws client connected')
@@ -116,20 +115,23 @@ export default class Wss {
           })
           setInterval(() => { // set keep-alive
             // console.log('WS Clients: ', this._wss.clients.size)
-            this._wss && this._wss.clients.forEach((ws) => {
-              if (!ws.isAlive) return ws.terminate() // force close
+            this._wss?.clients.forEach((ws) => {
+              if (!ws.isAlive) {
+                ws.terminate() // force close
+                return
+              }
               ws.isAlive = false
-              return ws.ping(() => {}) // NOSONAR
+              ws.ping(() => {}) // NOSONAR
             })
           }, this._keepAliveMs)
         }
       } else {
-        console.log('NO WS Service To Open')
+        // TBD console.log('NO WS Service To Open')
       }
     } catch (e) {
       err = e.toString()
     }
-    console.log('WS Open ' + (err ? err : 'Done'))
+    // TBD console.log('WS Open ' + (err ? err : 'Done'))
     return this
   }
   
@@ -142,8 +144,8 @@ export default class Wss {
         this._wss = null //delete wss
       }
     } catch (e) {
-      console.error(e.toString())
+      // TBD console.error(e.toString())
     }
-    console.log('WS API CLOSE OK')
+    // TBD console.log('WS API CLOSE OK')
   } 
 }

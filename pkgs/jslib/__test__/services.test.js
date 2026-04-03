@@ -18,7 +18,7 @@ if (RUN_TEST) {
 
   describe('Test Services', () => {
     it.skip('Test Knex', async () => {
-      let knex = sqldb.get();
+      const knex = sqldb.get();
       const rv = (await knex('users').where({ username: 'ais-one' }).first()).githubId;
       assert.strictEqual(rv, 4284574);
     });

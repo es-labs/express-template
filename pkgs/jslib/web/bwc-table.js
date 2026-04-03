@@ -220,11 +220,6 @@ class Table extends HTMLElement {
   #navbarHeight = 56 // #table-navbar
   #filterHeight = 0 // #filters
 
-  constructor() {
-    super()
-    // this.input = this.input.bind(this)
-  }
-
   _setHeights () {
     // console.log(this.#navbarHeight, this.#filterHeight)
     const el = this.querySelector('#filters')
@@ -248,9 +243,6 @@ class Table extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log('connected callback')
-
-    // console.log(this.value, this.required, typeof this.required)
     this.appendChild(template.content.cloneNode(true))
 
     // this.querySelector('input').addEventListener('input', this.input)
@@ -373,7 +365,6 @@ class Table extends HTMLElement {
 
   get pageSize () { return this.#pageSize }
   set pageSize (val) {
-    console.log('set pageSize', this.total , this.pageSize)
     this.#pageSize = val
     this._renderPages()
   } // DONE ELSEWHERE emit event
@@ -560,13 +551,12 @@ class Table extends HTMLElement {
   
   _render() {
     // console.log('bwc-table render fired')
-    try {
-      const el = this.querySelector('#table-wrapper')
-      if (!el) return
-      //<tfoot><tr><th><abbr title="Position">Pos</abbr></th>
+    const el = this.querySelector('#table-wrapper')
+    if (!el) return
+    //<tfoot><tr><th><abbr title="Position">Pos</abbr></th>
 
-      let table = el.querySelector('table')
-      if (table) {
+    let table = el.querySelector('table')
+    if (table) {
         // const cNode = table.cloneNode(false)
         // table.parentNode.replaceChild(cNode, table)
         // table.innerHTML = ''
@@ -575,20 +565,20 @@ class Table extends HTMLElement {
           parent.firstChild.remove()
         }
         parent.remove()
-      }
+    }
 
-      if (this.#columns && typeof this.#columns === 'object') {
+    if (this.#columns && typeof this.#columns === 'object') {
         // console.log('render thead')
         table = document.createElement('table')
         table.setAttribute('id', 'table')
         el.appendChild(table)
         const thead = document.createElement('thead')
         thead.onclick = (e) => {
-          let target = e.target
+          const target = e.target
           if (this.#checkboxes && !target.cellIndex) { // checkbox clicked - target.type === 'checkbox' // e.stopPropagation()?
             this.#checkedRows = [] //  clear first
             const tbody = this.querySelector('table tbody')
-            if (tbody && tbody.children) {
+            if (tbody?.children) {
               for (let i = 0; i < tbody.children.length; i++) {
                 const tr = tbody.children[i]
                 const td = tr.firstChild
@@ -746,9 +736,6 @@ class Table extends HTMLElement {
             }
           }      
         }
-      }
-    } catch (e) {
-      console.log(e)
     }
   }
 }

@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 const DEFAULT_ENCODING = 'base64' // 'binary'
 
 export const encryptText = (alg, key, iv, text, encoding = DEFAULT_ENCODING) => {

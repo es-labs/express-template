@@ -155,12 +155,12 @@ app.post('/api/oss/sign', async (req, res) => {
         return res.status(400).json({ error: `Unknown type: "${type}"` });
     }
   } catch (err) {
-    console.error('[OSS sign error]', err);
+    // TBD console.error('[OSS sign error]', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.listen(3000, () => console.log('OSS sign server running on http://localhost:3000'));
+// app.listen(3000, () => console.log('OSS sign server running on http://localhost:3000'));
 export default app;
 
 /*

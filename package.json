@@ -27,13 +27,10 @@
     "npm": ">=11"
   },
   "scripts": {
-    "app": "node --trace-warnings index.js",
-    "app:watch": "node --trace-warnings --watch --watch-preserve-output --watch-path=./apps index.js",
-    "build:lib": "npm i @es-labs/jslib@latest",
     "git:hash": "git rev-parse --verify --short HEAD",
     "git:branch": "git rev-parse --abbrev-ref HEAD",
-    "lint": "biome lint common",
-    "lint:fix": "biome lint --only=useConst --write --unsafe common",
+    "lint": "biome lint pkgs",
+    "lint:fix": "biome lint --only=useNodejsImportProtocol --write --unsafe pkgs",
     "format": "biome format --write .",
     "check": "biome check --write .",
     "check:apps": "biome check --write apps",

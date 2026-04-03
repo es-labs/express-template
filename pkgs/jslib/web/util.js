@@ -54,7 +54,7 @@ const debounce = (fn, delay) => {
 */
 const throttle = (fn, wait) => {
   let time = Date.now()
-  return function () {
+  return () => {
     if (time + wait - Date.now() < 0) {
       fn()
       time = Date.now()
@@ -95,7 +95,7 @@ const jsonToCsv = (items) => {
  */
 const objectToQueryString = (obj) =>
   Object.keys(obj)
-    .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]))
+    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`)
     .join('&')
 
 const rebaseString = (str, from, to) => Buffer.from(str, from).toString(to) // base64, utf8
@@ -114,7 +114,7 @@ const rebaseString = (str, from, to) => Buffer.from(str, from).toString(to) // b
 const traverseJson = (json, fn, parent = null, key = null) => {
   if (typeof json === 'object') {
     if (Array.isArray(json)) {
-      json.forEach((item, index) => traverseJson(item, fn, json, index))
+      json.forEach((item, index) => { traverseJson(item, fn, json, index) })
     } else if (json.constructor === Object) {
       for (const k in json) traverseJson(json[k], fn, json, k)
     }

@@ -6,12 +6,10 @@
 //
 // Usage (filter out console.log): LogFilter(['log'])
 
-const LogFilter = (function () {
-  return function (list) {
-    if (list && list.length) {
+const LogFilter = (() => (list) => {
+    if (list?.length) {
       list.forEach(item => {
-        console[item] = function () { }
+        console[item] = () => { }
       })
     }
-  }
-})()
+  })()

@@ -130,7 +130,7 @@ async function fetchWithRetry(url, options = {}) {
 
 /** Exponential backoff with optional jitter */
 function calcDelay({ attempt, baseDelay, maxDelay, backoffFactor, jitter }) {
-  const exponential = baseDelay * Math.pow(backoffFactor, attempt);
+  const exponential = baseDelay * (backoffFactor ** attempt);
   const capped = Math.min(exponential, maxDelay);
   return jitter
     ? capped * (0.5 + Math.random() * 0.5) // jitter: 50%–100% of capped
@@ -171,9 +171,9 @@ function sleep(ms, signal) {
 function parseRetryAfter(header) {
   if (!header) return null;
   const seconds = parseInt(header, 10);
-  if (!isNaN(seconds)) return seconds * 1000;
+  if (!Number.isNaN(seconds)) return seconds * 1000;
   const date = new Date(header).getTime();
-  if (!isNaN(date)) return Math.max(0, date - Date.now());
+  if (!Number.isNaN(date)) return Math.max(0, date - Date.now());
   return null;
 }
 

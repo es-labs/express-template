@@ -89,7 +89,7 @@ class S3Uploader {
     };
 
     // 2. Upload parts with concurrency control
-    let partNumber = 1;
+    const partNumber = 1;
     const completedParts = [];
     const queue = [...chunks.entries()]; // [[index, blob], ...]
 

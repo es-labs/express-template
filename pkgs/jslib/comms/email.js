@@ -1,11 +1,11 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 const { SENDGRID_KEY, SENDGRID_SENDER_NAME, SENDGRID_SENDER_EMAIL, SENDGRID_TEMPLATE_ID, SENDGRID_URL = 'https://api.sendgrid.com/v3/mail/send' } = process.env
 
 // generate random hash to prevent duplicate emails
-const generateRandomHash = () => {
-  return crypto.createHash('sha256').update(new Date().toString()).digest('hex').slice(0, 15)
-}
+const generateRandomHash = () => crypto
+  .createHash('sha256').update(new Date().toString()).digest('hex').slice(0, 15)
+
 
 /**
  * Hit SendGrid API to send email
@@ -15,22 +15,17 @@ const generateRandomHash = () => {
  * @param {Object} body needed parameters to send email
  */
 const sendMail = async (body) => {
-  try {
-    const headers = {
-      Authorization: `Bearer ${SENDGRID_KEY}`,
-      'Content-Type': 'application/json'
-    }
-
-    const response = await fetch(SENDGRID_URL, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body)
-    })
-
-    return response
-  } catch (error) {
-    throw error
+  const headers = {
+    Authorization: `Bearer ${SENDGRID_KEY}`,
+    'Content-Type': 'application/json'
   }
+
+  const response = await fetch(SENDGRID_URL, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body)
+  })
+  return response
 }
 
 /**
@@ -43,38 +38,33 @@ const sendMail = async (body) => {
  * @example sendDynamicEmail('user@mail.com', 'Test Email', '<p>Hello world!</p>')
  */
 export const sendEmail = async (to, subject, content) => {
-  try {
-    if (!SENDGRID_KEY) throw new Error('SENDGRID_KEY is not defined')
-    if (!SENDGRID_SENDER_NAME) throw new Error('SENDGRID_SENDER_NAME is not defined')
-    if (!SENDGRID_SENDER_EMAIL) throw new Error('SENDGRID_SENDER_EMAIL is not defined')
+  if (!SENDGRID_KEY) throw new Error('SENDGRID_KEY is not defined')
+  if (!SENDGRID_SENDER_NAME) throw new Error('SENDGRID_SENDER_NAME is not defined')
+  if (!SENDGRID_SENDER_EMAIL) throw new Error('SENDGRID_SENDER_EMAIL is not defined')
 
-    // generate random hash to prevent duplicate emails
-    const hash = generateRandomHash()
+  // generate random hash to prevent duplicate emails
+  const hash = generateRandomHash()
 
-    // request body
-    const body = {
-      personalizations: [{ to: [{ email: to }] }],
-      from: {
-        name: SENDGRID_SENDER_NAME,
-        email: SENDGRID_SENDER_EMAIL
-      },
-      subject,
-      content: [
-        {
-          type: 'text/html',
-          value: content
-        }
-      ],
-      headers: {
-        'X-Entity-Ref-ID': hash
+  // request body
+  const body = {
+    personalizations: [{ to: [{ email: to }] }],
+    from: {
+      name: SENDGRID_SENDER_NAME,
+      email: SENDGRID_SENDER_EMAIL
+    },
+    subject,
+    content: [
+      {
+        type: 'text/html',
+        value: content
       }
+    ],
+    headers: {
+      'X-Entity-Ref-ID': hash
     }
-
-    const response = await sendMail(body)
-    return response
-  } catch (error) {
-    throw error
   }
+  const response = await sendMail(body)
+  return response
 }
 
 /**
@@ -85,39 +75,35 @@ export const sendEmail = async (to, subject, content) => {
  * @example sendDynamicEmail('user@mail.com', 'Test Email', '<p>Hello world!</p>')
  */
 export const sendDynamicEmail = async (to, subject, content) => {
-  try {
-    if (!SENDGRID_KEY) throw new Error('SENDGRID_KEY is not defined')
-    if (!SENDGRID_SENDER_NAME) throw new Error('SENDGRID_SENDER_NAME is not defined')
-    if (!SENDGRID_SENDER_EMAIL) throw new Error('SENDGRID_SENDER_EMAIL is not defined')
-    if (!SENDGRID_TEMPLATE_ID) throw new Error('SENDGRID_TEMPLATE_ID is not defined')
+  if (!SENDGRID_KEY) throw new Error('SENDGRID_KEY is not defined')
+  if (!SENDGRID_SENDER_NAME) throw new Error('SENDGRID_SENDER_NAME is not defined')
+  if (!SENDGRID_SENDER_EMAIL) throw new Error('SENDGRID_SENDER_EMAIL is not defined')
+  if (!SENDGRID_TEMPLATE_ID) throw new Error('SENDGRID_TEMPLATE_ID is not defined')
 
-    // generate random hash to prevent duplicate emails
-    const hash = generateRandomHash()
+  // generate random hash to prevent duplicate emails
+  const hash = generateRandomHash()
 
-    // request body
-    const body = {
-      personalizations: [
-        {
-          to: [{ email: to }],
-          dynamic_template_data: {
-            subject: subject,
-            content: content
-          }
+  // request body
+  const body = {
+    personalizations: [
+      {
+        to: [{ email: to }],
+        dynamic_template_data: {
+          subject: subject,
+          content: content
         }
-      ],
-      from: {
-        name: SENDGRID_SENDER_NAME,
-        email: SENDGRID_SENDER_EMAIL
-      },
-      template_id: SENDGRID_TEMPLATE_ID,
-      headers: {
-        'X-Entity-Ref-ID': hash
       }
+    ],
+    from: {
+      name: SENDGRID_SENDER_NAME,
+      email: SENDGRID_SENDER_EMAIL
+    },
+    template_id: SENDGRID_TEMPLATE_ID,
+    headers: {
+      'X-Entity-Ref-ID': hash
     }
-
-    const response = await sendMail(body)
-    return response
-  } catch (error) {
-    throw error
   }
+
+  const response = await sendMail(body)
+  return response
 }

@@ -55,7 +55,7 @@ export const auth = async (req, res) => {
       if (authenticated) {
         const tokens = await createToken(user)
         setTokensToHeader(res, tokens)
-        return res.redirect(TO + '#' + tokens.access_token + ';' + tokens.refresh_token + ';' + JSON.stringify(tokens.user_meta)) // use url fragment...
+        return res.redirect(`${TO}#${tokens.access_token};${tokens.refresh_token};${JSON.stringify(tokens.user_meta)}`) // use url fragment...
       } else {
         return AUTH_ERROR_URL ? res.redirect(AUTH_ERROR_URL) : res.status(401).json({ error: 'NOT Authenticated' })
       }
@@ -63,7 +63,7 @@ export const auth = async (req, res) => {
     //   return AUTH_ERROR_URL ? res.redirect(AUTH_ERROR_URL) : res.status(500).json({ error: e.toString() })
     }
   } catch (e) {
-    console.log('SAML callback error', e)
+    // console.log('SAML callback error', e)
     res.json({
       message: e.toString(),
       note: 'Currently it always triggers invalid document signature fix is on the way'

@@ -65,7 +65,7 @@ const listObjects = async ({ prefix = '', maxKeys = 10 } = {}) => {
       objects: result.objects
     }
   } catch (e) {
-    console.log('ali - listObjects', e)
+    // console.log('ali - listObjects', e)
     return { status: 500, statusMessage: e.toString() }
   }
 }
@@ -84,7 +84,7 @@ const putObject = async (key, payload) => {
     const { status, statusMessage } = result.res
     return { status, statusMessage }
   } catch (e) {
-    console.log('ali - putObject', e)
+    // console.log('ali - putObject', e)
     return { status: 500, statusMessage: e.toString() }
   }
 }
@@ -109,7 +109,7 @@ const getObject = async (key) => {
       buffer: result?.content
     }
   } catch (e) {
-    console.log('ali - getObject', e)
+    // console.log('ali - getObject', e)
     return { status: 500, statusMessage: e.toString() }
   }
 }
@@ -131,7 +131,7 @@ const deleteObjects = async (keys) => {
       deleted: result.deleted
     }
   } catch (e) {
-    console.log('ali - deleteObjects', e)
+    // console.log('ali - deleteObjects', e)
     return { status: 500, statusMessage: e.toString() }
   }
 }
@@ -145,7 +145,7 @@ const deleteObjects = async (keys) => {
  */
 const getSignedUrl = async (method, expires, key, headers = null, additional = null) => {
   const signedUrl = await store.signatureUrlV4(method, expires, headers, key, additional)
-  console.log(signedUrl)
+  // console.log(signedUrl)
   return signedUrl
 }
 
@@ -169,14 +169,14 @@ const getUploadURL = async (directory, filename, contentType, action = 'write', 
 
     // write / new file action
     if (action === 'write') {
-      let arr = filename.split('.')
+      const arr = filename.split('.')
 
       arr[0] = crypto
         .createHash('sha256')
-        .update(arr[0] + new Date().getTime())
+        .update(arr[0] + Date.now())
         .digest('hex')
 
-      let newFilename = arr.join('.')
+      const newFilename = arr.join('.')
 
       const fullPath = directory ? `${directory}/${newFilename}` : newFilename
 

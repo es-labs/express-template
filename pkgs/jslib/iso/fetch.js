@@ -33,7 +33,7 @@ class Fetch {
     let urlSearch = ''
     try {
       urlSearch = (url.lastIndexOf('?') !== -1) ? url.split('?').pop() : '' // handle /abc/def?aa=1&bb=2
-      if (urlSearch) urlSearch = '?' + urlSearch // prepend ?
+      if (urlSearch) urlSearch = `?${urlSearch}` // prepend ?
       const { origin = '', pathname = '', search = '' } = new URL(url) // http://example.com:3001/abc/ees?aa=1&bb=2
       urlOrigin = origin
       urlPath = pathname
@@ -59,7 +59,7 @@ class Fetch {
   
       let qs = (query && typeof query === 'object') // null is also an object
         ? '?' +
-          Object.keys(query).map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(query[key])).join('&')
+          Object.keys(query).map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`).join('&')
         : (query || '')
       qs = qs ? qs + urlSearch.substring(1) // remove the question mark
         : urlSearch
@@ -95,21 +95,18 @@ class Fetch {
       if (rv0.status >= 200 && rv0.status < 400) return rv0
       else if (rv0.status === 401) { // no longer needed urlPath !== '/api/auth/refresh'
         if (rv0.data.message === 'Token Expired Error' && this.options.refreshUrl) {
-          try {
-            const rv1 = await this.http('POST', urlOrigin + this.options.refreshUrl, { refresh_token: this.tokens.refresh }) // rv1 JSON already processed
-            // status code should be < 400 here
-            this.tokens.access = rv1.data.access_token
-            this.tokens.refresh = rv1.data.refresh_token
-            if (options.credentials !== 'include') { // include === HTTPONLY_TOKEN
-              if (this.tokens.access) options.headers.Authorization = `Bearer ${this.tokens.access}`
-            }
-            const rv2 = await fetch(urlFull + qs, options)
-            const txt2 = await rv2.text()
-            rv2.data = txt2.length ? JSON.parse(txt2) : {}
-            return rv2
-          } catch (e) {
-            throw e
+          // just throw if error
+          const rv1 = await this.http('POST', urlOrigin + this.options.refreshUrl, { refresh_token: this.tokens.refresh }) // rv1 JSON already processed
+          // status code should be < 400 here
+          this.tokens.access = rv1.data.access_token
+          this.tokens.refresh = rv1.data.refresh_token
+          if (options.credentials !== 'include') { // include === HTTPONLY_TOKEN
+            if (this.tokens.access) options.headers.Authorization = `Bearer ${this.tokens.access}`
           }
+          const rv2 = await fetch(urlFull + qs, options)
+          const txt2 = await rv2.text()
+          rv2.data = txt2.length ? JSON.parse(txt2) : {}
+          return rv2
         }
       }
       throw rv0 // error

@@ -1,8 +1,8 @@
 // telegram-sender.js
 import FormData from "form-data";
 import fetch from "node-fetch";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
 const BASE_URL = (token) => `https://api.telegram.org/bot${token}`;
 

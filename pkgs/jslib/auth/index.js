@@ -60,8 +60,8 @@ const setup = (tokenService, userService) => {
 // may need to restart browser, TODO set Max-Age, ALTERNATE use res.cookie, Signed?
 const httpOnlyCookie = () => `HttpOnly;SameSite=${COOKIE_SAMESITE};`
   + (COOKIE_SECURE ? 'Secure;':'')
-  + (COOKIE_MAXAGE ? 'MaxAge='+COOKIE_MAXAGE+';':'')
-  + (COOKIE_DOMAIN ? 'domain='+COOKIE_DOMAIN+';':'')
+  + (COOKIE_MAXAGE ? `MaxAge=${COOKIE_MAXAGE};`:'')
+  + (COOKIE_DOMAIN ? `domain=${COOKIE_DOMAIN};`:'')
 
 //NOSONAR algorithm
 // expiresIn
@@ -125,8 +125,8 @@ const setTokensToHeader = (res, {access_token, refresh_token}) => {
   const _access_token = `Bearer ${access_token}`
   if (COOKIE_HTTPONLY) {
     res.setHeader('Set-Cookie', [
-      `Authorization=${_access_token};Path=/;`+ httpOnlyCookie(),
-      `refresh_token=${refresh_token};Path=${AUTH_REFRESH_URL};`+ httpOnlyCookie() // send only if path contains refresh
+      `Authorization=${_access_token};Path=/;${httpOnlyCookie()}`,
+      `refresh_token=${refresh_token};Path=${AUTH_REFRESH_URL};${httpOnlyCookie()}` // send only if path contains refresh
     ])
   } else {
     res.setHeader('Authorization', `${_access_token}`)
@@ -135,17 +135,16 @@ const setTokensToHeader = (res, {access_token, refresh_token}) => {
 }
 
 const authUser = async (req, res, next) => {
-  // console.log('auth express', req.baseUrl, req.path, req.cookies, req.signedCookies)
   let access_token = null
   try {
-    let tmp = req.cookies?.Authorization || req.header('Authorization') || req.query?.Authorization
+    const tmp = req.cookies?.Authorization || req.header('Authorization') || req.query?.Authorization
     access_token = tmp.split(' ')[1]
   } catch (e) {
     return res.status(401).json({ message: 'Token Format Error' })
   }
   if (access_token) {
     try {
-      let access_result = jwt.verify(access_token, getSecret('verify', 'access'), { algorithm: [JWT_ALG] }) // and options
+      const access_result = jwt.verify(access_token, getSecret('verify', 'access'), { algorithm: [JWT_ALG] }) // and options
       if (access_result) {
         req.decoded = access_result
         return next()
@@ -156,7 +155,6 @@ const authUser = async (req, res, next) => {
       if (e.name === 'TokenExpiredError') {
         return res.status(401).json({ message: 'Token Expired Error' })
       } else {
-        console.log('auth err', e.name)
         return res.status(401).json({ message: 'Token Error' })
       }
     }
@@ -170,7 +168,7 @@ const authRefresh = async (req, res) => { // get refresh token
     const refresh_token = req.cookies?.refresh_token || req.header('refresh_token') || req.query?.refresh_token // check refresh token & user - always stateful          
     const refresh_result = jwt.verify(refresh_token, getSecret('verify', 'refresh'), { algorithm: [JWT_ALG] }) // throw if expired or invalid
     const { id } = refresh_result
-    let refreshToken = await getRefreshToken(id)
+    const refreshToken = await getRefreshToken(id)
     if (String(refreshToken) === String(refresh_token)) { // ok... generate new access token & refresh token?
       const user = await findUser({ id })
       const tokens = await createToken(user) // 5 minute expire for login
@@ -180,7 +178,6 @@ const authRefresh = async (req, res) => { // get refresh token
       return res.status(401).json({ message: 'Refresh Token Error: Uncaught' })              
     }
   } catch (err) { // use err instead of e (fix no-catch-shadow issue)
-    console.log('authRefresh', err)
     return res.status(401).json({ message: 'Refresh Token Error' })
   }
 }
@@ -204,7 +201,6 @@ window.addEventListener('storage', this.syncLogout)
 //....
 syncLogout (event) {
   if (event.key === 'logout') {
-    console.log('logged out from storage!')
     Router.push('/login')
   }
 }

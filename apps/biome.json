@@ -1,21 +1,14 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.0/schema.json",
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
   "extends": ["../biome.json"],
   "javascript": {
-    "globals": [
-      "process",
-      "__dirname",
-      "__filename",
-      "require",
-      "module",
-      "exports",
-      "Buffer"
-    ]
+    "globals": ["process", "__dirname", "__filename", "require", "module", "exports", "Buffer"]
   },
   "linter": {
     "rules": {
       "suspicious": {
-        "noConsoleLog": "error"
+        "noConsole": "error"
       },
       "security": {
         "noGlobalEval": "error"

@@ -7,23 +7,28 @@ export default class StoreKnex {
   }
 
   async open() {
-    if (!this._KNEXFILE) console.log('KNEXFILE property empty or undefined - knex not started')
-    else {
+    if (!this._KNEXFILE) {
+      // TBD console.log('KNEXFILE property empty or undefined - knex not started')
+    } else {
       try {
         this._knex = Knex(this._KNEXFILE)
         // sqlite, may need to use another statement with other sql dbs
         await this._knex.raw('select 1+1 as result')
-        .then(() => console.log('knex CONNECTED'))
-        .catch(err => { console.log('DB error: ' + err.toString()) })
+        .then(() => {
+          // TBD console.log('knex CONNECTED')
+        })
+        .catch(err => { 
+          // TBD console.log('DB error: ' + err.toString()) 
+        })
       } catch (e) {
-        console.log('knex CONNECT ERROR', e.toString())
+        // TBD console.log('knex CONNECT ERROR', e.toString())
       }
     }
   }
   get () { return this._knex }
   async close () {
     if (this._knex) await this._knex.destroy()
-    console.log('knex closed')
+    // TBD console.log('knex closed')
   }
 }
 

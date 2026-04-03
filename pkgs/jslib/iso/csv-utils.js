@@ -1,4 +1,3 @@
-'use strict'
 // RFC 4180 CSV parser and generator
 // https://stackoverflow.com/a/41563966
 // https://www.convertcsv.com/json-to-csv.htm
@@ -121,7 +120,7 @@ const csvToJson = ({ _text, delimCol = DELIM_COL, ignoreColumnMismatch = false})
   const headers = arr.shift() // 1st row is the headers
   return arr.map((row) => {
     const rv = {}
-    if (headers.length != row.length && !ignoreColumnMismatch) throw new Error(`Mismatch headers(${headers.length}) != columns (${row.length})`)
+    if (headers.length !== row.length && !ignoreColumnMismatch) throw new Error(`Mismatch headers(${headers.length}) != columns (${row.length})`)
     headers.forEach((_, index) => {
       rv[headers[index]] = row[index]
     })

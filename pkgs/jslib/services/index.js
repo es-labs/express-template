@@ -30,19 +30,19 @@ const start = async (
       }
     })
   } catch (e) {
-    console.log(e)
+    // TBD console.log(e)
   }
 }
 
 const stop = async () => {
-  // console.log('services - stop - begin')
+  // TBD console.log('services - stop - begin')
   try {
     const promises = servicesConfig.map(svc => services[svc.name].close())
     await Promise.allSettled(promises)
   } catch (e) {
-    console.log(e.toString())
+    // TBD console.log(e.toString())
   }
-  // console.log('services - stop - end')
+  // TBD console.log('services - stop - end')
 }
 
 const get = (service) => services[service]?.get() || null;

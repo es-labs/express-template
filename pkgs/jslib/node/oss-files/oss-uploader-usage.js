@@ -17,13 +17,13 @@ async function uploadFile(file) {
     const result = await uploader.upload(file, {
       key: `uploads/${Date.now()}-${file.name}`,
       onProgress: (pct) => {
-        console.log(`${pct}%`);
+        // TBD console.log(`${pct}%`);
         document.getElementById('progress').value = pct;
       },
     });
-    console.log('Done:', result.location);
+    // TBD console.log('Done:', result.location);
   } catch (err) {
-    console.error('Upload failed:', err.message);
+    // TBD console.error('Upload failed:', err.message);
   }
 }
 
@@ -35,16 +35,18 @@ async function uploadWithCancel(file) {
   try {
     const result = await uploader.upload(file, {
       key: `uploads/${file.name}`,
-      onProgress: (pct) => console.log(`${pct}%`),
+      onProgress: (pct) => {
+        // TBD console.log(`${pct}%`)
+      },
       signal: controller.signal,
     });
-    console.log('Uploaded to:', result.location);
+    // TBD console.log('Uploaded to:', result.location);
   } catch (err) {
     if (err.name === 'AbortError') {
-      console.log('Upload cancelled');
+      // TBD console.log('Upload cancelled');
       // The client already called /api/oss/sign with type=abort to clean up OSS
     } else {
-      console.error(err);
+      // TBD console.error(err);
     }
   }
 }

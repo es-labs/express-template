@@ -69,5 +69,10 @@ Scenario 4: Open Source Project
 
 ## linting auto fix
 
+// fix console.log / console.error TBDs... use pino
+
+useArrowFunction - safe
+useConst - safe
+useOptionalChain
 useTemplate
-useConst
+useNodejsImportProtocol

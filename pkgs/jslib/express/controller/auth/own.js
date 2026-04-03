@@ -1,8 +1,8 @@
 // own authentication
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-import * as otplib from 'otplib';
-// import { authenticator } from 'otplib/authenticator';
+// import * as otplib from 'otplib';
+import { authenticator } from 'otplib';
 
 import { getSecret, createToken, setTokensToHeader, authFns } from '../../../auth/index.js'
 const {
@@ -20,7 +20,7 @@ const logout = async (req, res) => {
   let id = null
   try {
     let access_token = null
-    let tmp = req.cookies?.Authorization || req.header('Authorization') || req.query?.Authorization
+    const tmp = req.cookies?.Authorization || req.header('Authorization') || req.query?.Authorization
     access_token = tmp.split(' ')[1]
     const result = jwt.decode(access_token)
     id = result.id
@@ -67,7 +67,7 @@ const login = async (req, res) => {
     setTokensToHeader(res, tokens)
     return res.status(200).json(tokens)
   } catch (e) {
-    console.log('login err', e.toString())
+    // console.log('login err', e.toString())
   }
   return res.status(500).json()  
 }
@@ -78,8 +78,7 @@ const otp = async (req, res) => { // need to be authentication, body { id: '', p
     const user = await authFns.findUser({ id })
     if (user) {
       const gaKey = user[AUTH_USER_FIELD_GAKEY]
-      // if (USE_OTP !== 'TEST' ? otplib.authenticator.check(pin, gaKey) : String(pin) === '111111') { // NOTE: expiry will be determined by authenticator itself
-      if (USE_OTP !== 'TEST' ? authenticator.check(pin, gaKey) : String(pin) === '111111') { // NOTE: expiry will be determined by authenticator itself
+      if (USE_OTP !== 'TEST' ? authenticator.verify({ token: pin, secret: gaKey}) : String(pin) === '111111') { // NOTE: expiry will be determined by authenticator itself
         const tokens = await createToken(user)
         setTokensToHeader(res, tokens)
         return res.status(200).json(tokens)
@@ -87,7 +86,9 @@ const otp = async (req, res) => { // need to be authentication, body { id: '', p
         return res.status(401).json({ message: 'Error token wrong pin' })
       }
     }
-  } catch (e) { console.log('otp err', e.toString()) }
+  } catch (e) {
+    // console.log('otp err', e.toString())
+  }
   return res.status(401).json({ message: 'Error token revoked' })
 }
 

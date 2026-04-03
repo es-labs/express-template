@@ -66,13 +66,12 @@ class WebCam extends HTMLElement {
     this.capture = this.capture.bind(this) // bind callback function
     // captures: []
 
-    this.slotNode = {
-      ['button-snap']: this.shadowRoot.querySelector('#snap'),
-      ['button-unsnap']: this.shadowRoot.querySelector('#unsnap')
+    this.slotNode = { // TBD change ['button-snap'] to 'button-snap'
+      'button-snap': this.shadowRoot.querySelector('#snap'),
+      'button-unsnap': this.shadowRoot.querySelector('#unsnap')
     }
 
     const slots = this.shadowRoot.querySelectorAll('slot')
-    // console.log(slots)
     const slotMap = {}
     slots.forEach((slot) => {
       slotMap[slot.name] = slot
@@ -88,7 +87,6 @@ class WebCam extends HTMLElement {
         }
       })
     })
-    console.log(slotMap)
   }
 
   static get observedAttributes() {
@@ -106,10 +104,6 @@ class WebCam extends HTMLElement {
 
   // added to the DOM
   connectedCallback() {
-    console.log('connected')
-
-    console.log('width', this.getAttribute('width'))
-    console.log('height', this.getAttribute('height'))
     this.width = this.getAttribute('width') || 320
     this.height = this.getAttribute('height') || 240
 
@@ -117,13 +111,11 @@ class WebCam extends HTMLElement {
     this.slotNode['button-unsnap'].addEventListener('click', this.capture)
 
     const containerEl = this.shadowRoot.querySelector('.container')
-    containerEl.style.width = this.width + 'px'
-    containerEl.style.height = this.height + 'px'
-    // console.log('containerEl', containerEl)
+    containerEl.style.width = `${this.width}px`
+    containerEl.style.height = `${this.height}px`
 
     const videoEl = this.shadowRoot.querySelector('#video')
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      // console.log('xxxx', window.URL.createObjectURL)
+    if (navigator.mediaDevices?.getUserMedia) {
       navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         try {
           videoEl.srcObject = stream
@@ -149,7 +141,6 @@ class WebCam extends HTMLElement {
   }
 
   capture() {
-    console.log('capture event')
     const videoEl = this.shadowRoot.querySelector('#video')
     if (this.captureMode) {
       const scale = 1
