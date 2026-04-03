@@ -60,55 +60,61 @@ Use `apps/app-sample` as an example on how to create a new service/application.
 
 ---
 
+### SPA Setup & Run - development environment
 
-[docs/install-backend.md]()
+See [docs/install-backend.md]() - for the sample Express App 
 
-[docs/install-frontend.md]()
+See [docs/install-frontend.md]() - for the sample Vue SPA
 
-## CI/CD & Cloud Deployment
+See [docs/install-jslib] - for instructions on the shared library
 
-### Deployment Using Github Actions
-
-- .github/workflows/deploy-cr.yml **TODO**
-  - selectable inputs
-    - git repo branch / tag
-    - container repo tag
-
-Build image and deploy to a container registry
+## CI/CD & Cloud Deployment Using Github Actions
 
 **NOTE** secrets will not be in repo for CI/CD, those should be put in VAULT
 
-Current Github Secrets
+### Deploying To A Container Registry
 
-- CR_USERNAME: container registry login username (for deployment)
-- CR_PASSWORD: container registry login password (for deployment)
+Build image and deploy to a container registry
 
-Current Github Variables
-
-- CR_HOST: container registry host (for deployment)
-- CR_NS: container registry namespace (for deployment)
-- CR_IMAGENAME: The image name. If not specified, the repository name will be used
+- Reference Workflow
+  - [https://github.com/es-labs/express-template/blob/main/.github/workflows/deploy-cr.yml]
+- selectable inputs
+  - git repo branch / tag
+  - container image tag
+  - path to dockerfile
+  - environment (development, staging, production)
+- Github Secrets
+  - CR_USERNAME: container registry login username (for deployment)
+  - CR_PASSWORD: container registry login password (for deployment)
+- Github Variables
+  - CR_HOST: container registry host (for deployment)
+  - CR_NS: container registry namespace (for deployment)
+  - CR_IMAGENAME: The image name. If not specified, the repository name will be used
 
 ### pkgs/jslib
 
-NPM_AUTH_TOKEN
+Publish a package to NPM
 
-### webs
+- Reference Workflow
+  - [https://github.com/es-labs/express-template/blob/main/.github/workflows/deploy-npm.yml]
+- Github Secrets
+  - NPM_AUTH_TOKEN
+- Selectable Inputs
+  - git repo branch / tag
+  - project to publish (currently only jslib)
 
-ACCESS_KEY_ID
-ACCESS_KEY_SECRET
+### Deploying To An Object Store
 
+Build VueJS project and deploy to object storage
 
-CR_USERNAME
-CR_PASSWORD
-vars.CR_HOST
-vars.CR_NS
-vars.CR_IMAGENAME
-
-
----
-
-## References
-
-- https://softwareengineering.stackexchange.com/questions/338597/folder-by-type-or-folder-by-feature
-- https://kentcdodds.com/blog/how-i-structure-express-apps
+- Reference Workflow
+  - [https://github.com/es-labs/express-template/blob/main/.github/workflows/deploy-bucket.yml]
+- Selectable Inputs
+  - Cloud Provider (oss, s3)
+  - git repo branch / tag
+  - application name
+  - bucket name
+  - environment (development, staging, production)
+- Github Secrets
+  - ACCESS_KEY_ID
+  - ACCESS_KEY_SECRET

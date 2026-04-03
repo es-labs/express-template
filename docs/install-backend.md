@@ -5,19 +5,15 @@
 git clone https://github.com/es-labs/express-template.git
 cd express-template
 npm i
-# Note your custom development folder is `<project root>/apps/app-sample`
-
-cd apps/app-sample # go back up
-npm run local # see ./package.json scripts
-# For Windows OS: npm run local:win
-
+cd apps/app-sample
+npm run start
 # OR to run eslint checks - linux
-NODE_ENV=development npm run lint
+npm run lint
 ```
 
-Local development sample sqlite DB `apps/common/dev.sqlite3` already created and populated
+Local development sample sqlite DB `apps/app-sample/dev.sqlite3` already created and populated
 
-If need to **migrate** and **seed**, refer to `dbdeploy` package in `tools` workspace of [https://github.com/es-labs/jscommon]()
+If need to **migrate** and **seed**, refer to `dbdeploy` package in `tools` workspace of [https://github.com/es-labs/express-template]()
 
 **Visit the following URLs**
 
@@ -49,13 +45,9 @@ npm run test
 For running using docker/podman
 
 ```bash
-docker build -t express-template --target production --build-arg ARG_NODE_ENV=dev --build-arg ARG_API_PORT=3000 .
+docker build -t express-template --target production --build-arg ARG_NODE_ENV=devevelopment --build-arg ARG_API_PORT=3000 .
 docker run -p 3000:3000 express-template
 ```
-
-### Vite SPA Setup & Run - development environment
-
-See [https://github.com/es-labs/vue-antd-template]() for a SPA frontend template that can be used with projects based on this template
 
 ---
 
