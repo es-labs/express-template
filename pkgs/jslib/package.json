@@ -1,0 +1,59 @@
+{
+  "name": "@es-labs/jslib",
+  "version": "0.0.2",
+  "author": "Aaron Gong",
+  "license": "MIT",
+  "description": "Shareable JS library using ES modules",
+  "keywords": [
+    "javscript",
+    "module"
+  ],
+  "homepage": "https://github.com/es-labs/express-template#readme",
+  "bugs": {
+    "url": "https://github.com/es-labs/express-template/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/es-labs/express-template.git"
+  },
+  "type": "module",
+  "exports": {
+    "./auth": "./auth/index.js",
+    "./auth/*": "./auth/*.js",
+    "./comms/*": "./comms/*.js",
+    "./express/controller/auth/*": "./express/controller/auth/*.js",
+    "./express/*": "./express/*.js",
+    "./iso/*": "./iso/*.js",
+    "./services": "./services/index.js",
+    "./services/*": "./services/*.js",
+    "./utils/*": "./utils/*.js",
+    "./web/*": "./web/*.js",
+    "./*": "./*.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test-reporter=spec --experimental-test-coverage --test **/__tests__/*.test.js",
+    "cover": "node --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info --test __tests__/**/*.spec.js",
+    "git:hash": "git rev-parse --verify --short HEAD",
+    "git:branch": "git rev-parse --abbrev-ref HEAD",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint --fix --no-fix-warnings --no-report-warnings .",
+    "patch:jslib": "npm version patch",
+    "pub:jslib": "npm publish --access public",
+    "update-commit-hash": "git rev-parse --verify --short HEAD > commit-hash"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1019.0",
+    "@node-saml/node-saml": "^5.1.0",
+    "ali-oss": "^6.23.0",
+    "bcryptjs": "^3.0.3",
+    "ioredis": "^5.10.1",
+    "jsonwebtoken": "^9.0.3",
+    "keyv": "^5.6.0",
+    "knex": "^3.2.7",
+    "multer": "^2.1.1",
+    "otplib": "^13.4.0",
+    "web-push": "^3.6.7",
+    "ws": "^8.20.0"
+  }
+}

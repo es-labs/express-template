@@ -1,0 +1,19 @@
+{
+  "name": "@tools/dbdeploy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "knex": "^3.2.7",
+    "mysql": "^2.18.1",
+    "pg": "^8.20.0",
+    "sqlite3": "^5.1.7"
+  }
+}

@@ -58,6 +58,7 @@
   },
   "workspaces": [
     "apps/*",
-    "common"
+    "common",
+    "pkgs/*"
   ]
 }

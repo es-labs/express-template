@@ -1,3 +1,13 @@
+## folder structure
+
+apps
+common
+docs
+pkgs
+scripts
+webs
+
+
 ## TBD
 js-template
 
