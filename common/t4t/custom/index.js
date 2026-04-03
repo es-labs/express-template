@@ -11,17 +11,17 @@ const upload = async (req, res) => {
   if (!table.import) throw new Error('Forbidden - Upload')
   const csv = req.file.buffer.toString('utf-8')
   const output = []
-  let errors = []
+  const errors = []
   let keys = []
   let line = 0
   let columnsError = false
   csvParse.parse(csv)
     .on('error', (e) => console.error(e.message))
     .on('readable', function () {
-        let record
-        while ( (record = this.read()) ) {
-          line++
-          if (line === 1) {
+      let record = this.read()
+      while (record) {
+        line++
+        if (line === 1) {
             // check headers match...
             const headers = 'code,name,states'
             if (headers !== record.join(',')) {
@@ -30,8 +30,7 @@ const upload = async (req, res) => {
               break;
             }
             keys = [...record]
-            continue // ignore first line
-          } else {
+        } else {
             if (!columnsError) {
               if (record.length === keys.length) { // ok
                 if (record.join('')) {
@@ -44,13 +43,14 @@ const upload = async (req, res) => {
                 errors.push(`${line},Column Count Mismatch`)
               }
             }
-          }
         }
+        record = this.read()
+      }
     })
     .on('end', async () => {
-        let line = 0
-        const writes = []
-        for (let row of output) {
+      let line = 0
+      const writes = []
+      for (const row of output) {
           line++
           try {
             const obj = {}
@@ -67,10 +67,10 @@ const upload = async (req, res) => {
               writes.push(svc.get(table.conn)('state').insert(data))
             }
           } catch (e) {
-            errors.push(`${line},`+'Caught exception: ' + e.toString())
+            errors.push(`${line},Caught exception: ${e.toString()}`)
           }
-        }
-        try {
+      }
+      try {
           if (table.audit) {
             const audit = setAuditData(req, 'UPLOAD', '', { output })
             await svc.get(table.conn)('audit_logs').insert(audit)
@@ -79,10 +79,10 @@ const upload = async (req, res) => {
           rv.forEach((result, index) => {
             if (result.status !== 'fulfilled') errors.push(`${index + 1},${result.reason}`)
           })
-        } catch (e) {
-          errors.push('-2,General write error: ' + e.toString())
-        }
-        return res.status(200).json({ errorCount: errors.length, errors })
+      } catch (e) {
+        errors.push(`-2,General write error: ${e.toString()}`)
+      }
+      return res.status(200).json({ errorCount: errors.length, errors })
     })
 }
 

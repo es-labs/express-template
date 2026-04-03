@@ -107,7 +107,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
-      name: production   # ← configure required reviewers here in GitHub Settings
+      # ← configure required reviewers here in GitHub Settings
+      name: production
 
     steps:
       - name: Approval gate

@@ -65,3 +65,9 @@ Scenario 4: Open Source Project
 
 - use biome for formatting and linting
 - git guardian (use native Github for now)
+
+
+## linting auto fix
+
+useTemplate
+useConst

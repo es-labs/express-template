@@ -10,7 +10,12 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "off",
+        "noUnusedFunctionParameters": "off",
+        "useParseIntRadix": "off"
+      }
     }
   },
   "assist": {

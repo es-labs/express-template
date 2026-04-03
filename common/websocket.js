@@ -120,7 +120,7 @@ export default function wsLoader(server) {
   // ─── Manual upgrade handler ──────────────────────────────────────────────────
   server.on('upgrade', async (req, socket, head) => {
     // Reject non-WebSocket upgrades immediately
-    if (req.headers['upgrade']?.toLowerCase() !== 'websocket') {
+    if (req.headers.upgrade?.toLowerCase() !== 'websocket') {
       return rejectSocket(socket, 400, 'Bad Request');
     }
 

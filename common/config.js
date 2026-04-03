@@ -5,8 +5,9 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'; // default to deve
 const envFileName = `.env.${process.env.NODE_ENV}`;
 const envFilePath = path.resolve(process.cwd(), envFileName);
 
+loadEnvFile(envFilePath);
+
 try {
-  loadEnvFile(envFilePath);
   console.log(`Loaded environment file: ${envFileName}`);
 } catch (error) {
   // Handle the case where the file might not exist (e.g. in production when using system env vars)

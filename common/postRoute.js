@@ -21,7 +21,7 @@ const postRoute = (app, express) => {
   }
 
   WEB_STATIC = JSON.parse(WEB_STATIC || null)
-  const hasWebStatic = WEB_STATIC && WEB_STATIC.length
+  const hasWebStatic = WEB_STATIC?.length
   if (hasWebStatic) {
     app.use(history()) // causes problems when using postman - set header accept application/json in postman
     WEB_STATIC.forEach(item => {

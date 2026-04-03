@@ -1,4 +1,4 @@
-import { statfs } from 'fs/promises';
+import { statfs } from 'node:fs/promises';
 
 const WARN_THRESHOLD  = 0.80;   // 80% used → degraded
 const FATAL_THRESHOLD = 0.95;   // 95% used → unhealthy

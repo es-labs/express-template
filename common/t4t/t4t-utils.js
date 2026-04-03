@@ -48,7 +48,7 @@ export const isInvalidInput = (col, val, key = null) => {
 export const processJson = async (req, res, next) => {
   if (req.files) { // it is formdata
     let obj = {}
-    for (let key in req.body) {
+    for (const key in req.body) {
       const part = req.body[key]
       obj = JSON.parse(part)
     }
@@ -71,14 +71,14 @@ export const roleOperationMatch = (role, operation, col = null) => {
 }
 
 export const formUniqueKey = (table, args) => {
-  if (table.pk) return { [table.name + '.' + table.pk] : args } // return for pk
+  if (table.pk) return { [`${table.name}.${table.pk}`] : args } // return for pk
   const where = {} // return for multiKey
   const val_a = args.split('|')
   if (val_a.length !== table.multiKey.length) return null // error numbers do not match
   for (let i=0; i<val_a.length; i++) {
     if (!val_a[i]) return null
     const key = table.multiKey[i]
-    where[table.name + '.' + key] = 
+    where[`${table.name}.${key}`] = 
       (['integer', 'decimal'].includes(table.cols[key].type)) ? Number(val_a[i]) :
       (['datetime', 'date', 'time'].includes(table.cols[key].type)) ? new Date(val_a[i]) :
       val_a[i]
@@ -105,7 +105,7 @@ export const mapRelation = (key, col) => {
 // for reads
 // map a key value of a row from DB read...  to desired output for that key (db field)
 export const kvDb2Col = (_row, _joinCols, _tableCols) => {
-  for (let k in _row) {
+  for (const k in _row) {
     if (_tableCols[k]) {
       if (_tableCols[k].hide === 'omit') delete _row[k]
       else if (_tableCols[k].hide === 'blank') _row[k] = ''

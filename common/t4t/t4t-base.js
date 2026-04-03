@@ -14,7 +14,7 @@ const upload = async (req, res) => {
   if (!table.import) throw new Error('Forbidden - Upload')
   const csv = req.file.buffer.toString('utf-8')
   const output = []
-  let errors = []
+  const errors = []
   let keys = []
   let line = 0
   let columnsError = false // flag as true
@@ -22,12 +22,12 @@ const upload = async (req, res) => {
   csvParse.parse(csv)
     .on('error', (e) => console.error(e.message))
     .on('readable', function () {
-      let record
-      while ( (record = this.read()) ) {
+      let record = this.read()
+      while ( record ) {
         line++
         if (line === 1) {
           keys = [...record]
-          keys.forEach(key => keyMap[key] = true)
+          keys.forEach(key => { keyMap[key] = true })
           for (const k in table.cols) {
             if (
               table.cols[k].required && !keyMap[k] // required column not present
@@ -53,12 +53,13 @@ const upload = async (req, res) => {
             errors.push(`${line},Column Count Mismatch`)
           }
         }
+        record = this.read()
       }
     })
     .on('end', async () => {
       let _line = 0
       const writes = []
-      for (let row of output) {
+      for (const row of output) {
         _line++
         try {
           const obj = {}
@@ -72,7 +73,7 @@ const upload = async (req, res) => {
           }
           writes.push(svc.get(table.conn)(table.name).insert(obj))
         } catch (e) {
-          errors.push(`L2-${_line},`+'Caught exception: ' + e.toString())
+          errors.push(`L2-${_line},Caught exception: ${e.toString()}`)
         }
       }
       try {
@@ -83,7 +84,7 @@ const upload = async (req, res) => {
           })
         }
       } catch (e) {
-        errors.push('-2,General write error: ' + e.toString())
+        errors.push(`-2,General write error: ${e.toString()}`)
       }
       try {
         if (table.audit) {
@@ -110,7 +111,7 @@ const find = async (req, res) => {
     sorter = req.table.defaultSort
   }
   if (page < 1) page = 1
-  let rv = { results: [], total: 0 }
+  const rv = { results: [], total: 0 }
   let rows
   let query = svc.get(table.conn)(table.name)
 
@@ -122,11 +123,11 @@ const find = async (req, res) => {
   // TODO handle filters for joins...
   let prevFilter = {}
   const joinCols = {}
-  if (filters && filters.length) for (let filter of filters) {
+  if (filters?.length) for (const filter of filters) {
     const key = filter.col
     const op = filter.op
     const value = op === 'like' ? `%${filter.val}%` : filter.val
-    let _key = key
+    const _key = key
     if (prevFilter.andOr || prevFilter.andOr === 'and') query = query.andWhere(_key, op, value)
     else query = query.orWhere(_key, op, value)
     prevFilter = filter
@@ -135,22 +136,22 @@ const find = async (req, res) => {
     rows = await query.clone().orderBy(sorter)
     rv.total = rows.length
   } else {
-    let total = await query.clone().count()
+    const total = await query.clone().count()
     rv.total = Object.values(total[0])[0]
     const maxPage = Math.ceil(rv.total / limit)
     if (page > maxPage) page = maxPage
 
-    for (let key in table.cols) {
+    for (const key in table.cols) {
       // if (table.cols[key]?.link?.display === 'fields') { // .type === 'link'
       //   table.cols[key]?.link?.cfields.split(',').map()
       // }
       const rel = mapRelation(key, table.cols[key])
       if (rel) { // if has relation and is key-value
         const { table2, table2Id, table2Text, table1Id } = rel
-        query = query.leftOuterJoin(table2, table.name + '.' + table1Id, '=', table2 + '.' + table2Id) // handles joins...
-        const joinCol = table1Id + '_' + table2Text
+        query = query.leftOuterJoin(table2, `${table.name}.${table1Id}`, '=', `${table2}.${table2Id}`) // handles joins...
+        const joinCol = `${table1Id}_${table2Text}`
         joinCols[table1Id] = joinCol
-        columns = [...columns, table2 + '.' + table2Text + ' as ' + joinCols[table1Id]] // add a join column
+        columns = [...columns, `${table2}.${table2Text} as ${joinCols[table1Id]}`] // add a join column
       }
     }
     rows = await query.clone().column(...columns).orderBy(sorter).limit(limit).offset((page > 0 ? page - 1 : 0) * limit)
@@ -166,7 +167,7 @@ const find = async (req, res) => {
         row.__key = row[table.pk]
       } else {
         const val = []
-        for (let k of table.multiKey) val.push(row[k])
+        for (const k of table.multiKey) val.push(row[k])
         row.__key = val.join('|')
       }
       return row
@@ -184,15 +185,15 @@ const findOne = async (req, res) => {
   if (table.select) columns = table.select.split(',') // custom columns... TODO need to add table name?
   let query = svc.get(table.conn)(table.name).where(where)  
   const joinCols = {}
-  for (let key in table.cols) {
+  for (const key in table.cols) {
     const col = table.cols[key]
     const rel = mapRelation(key, table.cols[key])
     if (rel) { // if has relation and is key-value
       const { table2, table2Id, table2Text, table1Id } = rel
-      query = query.leftOuterJoin(table2, table.name + '.' + table1Id, '=', table2 + '.' + table2Id) // handles joins...
-      const joinCol = table1Id + '_' + table2Text
+      query = query.leftOuterJoin(table2, `${table.name}.${table1Id}`, '=', `${table2}.${table2Id}`) // handles joins...
+      const joinCol = `${table1Id}_${table2Text}`
       joinCols[table1Id] = joinCol
-      columns = [...columns, table2 + '.' + table2Text + ' as ' + joinCol] // add a join colomn
+      columns = [...columns, `${table2}.${table2Text} as ${joinCol}`] // add a join colomn
     }
   }
   let rv = await query.column(...columns).first()
@@ -215,7 +216,7 @@ const remove = async (req, res) => {
       await svc.get(table.conn)(table.name).whereIn(keyCol, ids).delete().transacting(trx)
     } else {
       const keys = ids.map(id => {
-        let id_a = id.split('|')
+        const id_a = id.split('|')
         const multiKey = {}
         for (let i=0; i<id_a.length; i++) {
           const keyName = table.multiKey[i]
@@ -295,7 +296,7 @@ const update = async (req, res) => {
 const create = async (req, res) => {
   if (!req.table.create) throw new Error('Forbidden - Create')
   const { table, body } = req
-  for (let key in table.cols) {
+  for (const key in table.cols) {
     const col = table.cols[key]
     if (!col.creator) delete body[key]
     else if (col.add !== true) delete body[key]

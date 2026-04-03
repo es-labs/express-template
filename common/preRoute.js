@@ -5,9 +5,9 @@ import cors from 'cors'
 import pathToRegexp from 'path-to-regexp'
 import cookieParser from 'cookie-parser'
 
-import http from "http";
-import https from "https";
-import express from "express";
+import http from 'node:http'
+import https from 'node:https'
+import express from 'express'
 
 import * as services from '@es-labs/jslib/services';
 import * as authService from '@es-labs/jslib/auth';
@@ -20,7 +20,7 @@ const preRoute = () => {
   const DEFAULT_STACK_TRACE_LIMIT = 3 // default limit error stack trace to 3 level
   const DEFAULT_SHUTFOWN_TIMEOUT_MS = NODE_ENV === 'production' ? 30000 : 3000
   const {
-    GRACEFUL_EXIT = NODE_ENV === 'development' ? false : true,
+    GRACEFUL_EXIT = NODE_ENV !== 'development',
     STACK_TRACE_LIMIT = DEFAULT_STACK_TRACE_LIMIT,
     SHUTDOWN_TIMEOUT_MS = DEFAULT_SHUTFOWN_TIMEOUT_MS
    } = process.env
@@ -50,7 +50,7 @@ const preRoute = () => {
   }
 
   if (GRACEFUL_EXIT) {
-    ['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach(signal => process.on(signal, gracefulShutdown)); // SIGKILL cannot be caught
+    ['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach(signal => { process.on(signal, gracefulShutdown) }); // SIGKILL cannot be caught
     process.on('uncaughtException', (err, origin) => console.log(`Uncaught Exception - error: ${err} origin: ${origin}` && process.exit(1)));
     process.on('unhandledRejection', (reason, promise) => console.log(`Unhandled Rejection - promise: ${promise} reason: ${reason}` && process.exit(1)));
   }
@@ -68,7 +68,7 @@ const preRoute = () => {
   server.on('upgrade', (req, socket, head) => {
     // Let the WS server handle it — do nothing here if services.start sets up WS internally
     // This prevents Express middleware from touching upgrade requests
-    if (req.headers['upgrade']?.toLowerCase() !== 'websocket') {
+    if (req.headers.upgrade?.toLowerCase() !== 'websocket') {
       socket.destroy();
     }
   });

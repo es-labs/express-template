@@ -1,6 +1,6 @@
 import express from "express";
 // const path = require('path')
-import fs from "fs";
+import fs from "node:fs";
 import yaml from "js-yaml";
 import multer from "multer";
 import * as svc from "@es-labs/jslib/services";
@@ -66,7 +66,7 @@ const generateTable = async (req, res, next) => { // TODO get config info from a
   const tableKey = req.params.table // 'books' // its the table name also
 
   // const docPath = path.resolve(new URL(".", import.meta.url).pathname, `./tables/${tableKey}.yaml`)
-  const docPath = TABLE_CONFIGS_FOLDER_PATH + `${tableKey}.yaml`
+  const docPath = `${TABLE_CONFIGS_FOLDER_PATH}${tableKey}.yaml`
   const doc = yaml.load(fs.readFileSync(docPath, 'utf8'))
   req.table = JSON.parse(JSON.stringify(doc))
 
@@ -99,7 +99,7 @@ const generateTable = async (req, res, next) => { // TODO get config info from a
 
   // can return for autocomplete... req.path
   const cols = req.table.cols
-  for (let key in cols) {
+  for (const key in cols) {
     const col = cols[key]
     if (col.auto) {
       if (col.auto === 'pk') {
@@ -135,7 +135,7 @@ const routes = (options) => {
   })
   .post('/autocomplete/:table', authUser, generateTable, async (req, res) => {
     const { table } = req
-    let { key, text, search, parentTableColName, parentTableColVal, limit = 20 } = req.body
+    const { key, text, search, parentTableColName, parentTableColVal, limit = 20 } = req.body
     // TBD use key to parentTable Col
 
     const query = svc.get(table.conn)(table.name).where(key, 'like', `%${search}%`).orWhere(text, 'like', `%${search}%`)
