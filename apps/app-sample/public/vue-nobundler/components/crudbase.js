@@ -44,7 +44,7 @@ export default defineComponent({
     tableName: { type: String, required: true },
     commands: { type: String, default: 'reload,filter,add,del,import,export' },
     pageSize: { type: Number, default: 10 },
-    pageSizeList: { type: Array, default: function() { return [5, 10, 15] } },
+    pageSizeList: { type: Array, default: () => [5, 10, 15] },
     signedUrl: { type: Boolean, default: false }
   },
   setup (props) {
@@ -132,10 +132,10 @@ export default defineComponent({
       // console.log('doUpload', e.target.files)
       try {
         const { files } = e.target
-        if (files && files.length) {
+        if (files?.length) {
           const rv = await t4t.upload(files[0])
           console.log(rv)
-          if (rv.data.errorCount) alert('Error: ' + JSON.stringify(rv.data.errors))
+          if (rv.data.errorCount) alert(`Error: ${JSON.stringify(rv.data.errors)}`)
           else alert('Upload OK')
           await refreshTable()
         }
@@ -180,7 +180,7 @@ export default defineComponent({
         } else if (e.detail.cmd === 'export') {
           // TODO const _filters = keycol.value ? [...filters, { col: keycol.value, op: '=', val: keyval.value, andOr: 'and' }] : filters
           const data = await t4t.download(filters, sorter)
-          if (data) downloadData(data.csv, props.tableName + '.csv', 'text/csv;charset=utf-8;')
+          if (data) downloadData(data.csv, `${props.tableName}.csv`, 'text/csv;charset=utf-8;')
         } else if (e.detail.cmd === 'goback') {
           router.back()
         }

@@ -3,7 +3,7 @@ let clients = []
 
 function sendEventsToAll(data) {
   // console.log('Send SSE', clients, data)
-  clients.forEach(client => client.res.write(`data: ${JSON.stringify(data)}`))
+  clients.forEach(client => { client.res.write(`data: ${JSON.stringify(data)}`) })
 }
 
 export default express.Router({caseSensitive: true})

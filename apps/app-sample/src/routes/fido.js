@@ -57,7 +57,7 @@ const f2l = new Fido2Lib({
 let testInfo = { }
 
 // TODO make below scalable
-let registerChallenge = '33EHav-jZ1v9qwH783aU-j0ARx6r5o-YHh-wd7C6jPbd7Wh6ytbIZosIIACehwf9-s6hXhySHO-HHUjEwZS29w' //  base64url
+const registerChallenge = '33EHav-jZ1v9qwH783aU-j0ARx6r5o-YHh-wd7C6jPbd7Wh6ytbIZosIIACehwf9-s6hXhySHO-HHUjEwZS29w' //  base64url
 let validateChallenge = '' // ab
 
 export default express.Router()
@@ -68,8 +68,8 @@ export default express.Router()
     registrationOptions.challenge = registerChallenge
     registrationOptions.user = {
       id: userId,
-      name: 'name-' + userId, // if use email...
-      displayName: 'displayName-' + userId,
+      name: `name-${userId}`, // if use email...
+      displayName: `displayName-${userId}`,
     }
     res.json(registrationOptions)  
   })

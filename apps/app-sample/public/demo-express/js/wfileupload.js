@@ -17,7 +17,7 @@ async function process() {
   if (result.ok) {
     self.postMessage("Files Uploaded Succesfully")
   } else {
-    const msg = "Files Uploaded Error: " + result.message && result.message.includes('MulterError:') ? result.message.split("\n", 1) : 'Unknown' // TODO move text transform to backend API instead?
+    const msg = `Files Uploaded Error: ${result.message}` && result.message.includes('MulterError:') ? result.message.split("\n", 1) : 'Unknown' // TODO move text transform to backend API instead?
     self.postMessage(msg)
   }
   p = true
@@ -44,9 +44,11 @@ async function process() {
   // }
 }
 
-self.onmessage = function (e) {
+self.onmessage = (e) => {
   // self.postMessage('Data Len: ' + e.data.files.length)
-  for (var j = 0; j < e.data.files.length; j++) files.push(e.data.files[j])
+  for (let j = 0; j < e.data.files.length; j++) {
+    files.push(e.data.files[j])
+  }
   if (p) {
     process()
   }

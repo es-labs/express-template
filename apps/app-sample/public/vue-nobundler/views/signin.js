@@ -105,7 +105,7 @@ export default {
     }
 
     const oauthLogin = () => {
-      const url = window.location.href + '/index.html#sometoken'
+      const url = `${window.location.href}/index.html#sometoken`
       window.location.replace(url)
     }
 

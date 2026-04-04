@@ -46,7 +46,7 @@ function clearCaches(e) {
         cacheNames.forEach((cacheName) => {
           if (!(cacheName === CACHE_NAME_STATIC || cacheName === CACHE_NAME_DYNAMIC)) {
             console.log('sw delete cache = ', cacheName)
-            return caches.delete(cacheName)
+            caches.delete(cacheName)
           }
         })
       })

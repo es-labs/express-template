@@ -1,16 +1,16 @@
 // TBD import config
 import express from "express";
-import { describe, it, before, after, beforeEach } from "node:test";
-import assert from "node:assert";
-import request from "supertest";
-import newCategory from "../mock-data/new-category.json";
-import path from "path";
+// import { describe, it, before, after, beforeEach } from "node:test";
+// import assert from "node:assert";
+// import request from "supertest";
+// import newCategory from "../mock-data/new-category.json";
+// import path from "path";
 
 const app = express()
-let services
-let createdCategoryId
-let authObj = {}
-let endpointUrl
+// let services
+// let createdCategoryId
+const authObj = {}
+// let endpointUrl
 
 /*
 // beforeAll

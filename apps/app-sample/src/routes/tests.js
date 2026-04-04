@@ -1,6 +1,6 @@
-import path from "path";
-import fs from "fs";
-import { spawn } from "child_process";
+import path from "node:path";
+import fs from "node:fs";
+import { spawn } from "node:child_process";
 import express from "express";
 import PdfKit from "pdfkit";
 import * as services from "@es-labs/jslib/services";
@@ -57,7 +57,7 @@ export default express.Router()
     while (count <= chunks) {
       // console.log('streaming', count)
       await sleep(1000) // eslint-disable-line
-      res.write(JSON.stringify({ type: "stream", chunk: count++ })+'\n')
+      res.write(`${JSON.stringify({ type: "stream", chunk: count++ })}\n`)
     }  
     res.end()
   })

@@ -48,7 +48,7 @@ export default {
         key: 'id',
         filter: false,
         render: ({val, key, row, idx}) => {
-          const cell = val + ' is ' + (row['age'] > 5 ? '>5' : '<=5')
+          const cell = `${val} is ${row.age > 5 ? '>5' : '<=5'}`
           const output =
             // do not include row as there can be too much data
             // `<a class='button' onclick='this.dispatchEvent(new CustomEvent("testevent", { detail: ${JSON.stringify({ val, key, row, idx })} }))'>${val}</a>` // too much data if row included
@@ -71,8 +71,8 @@ export default {
     ])
     for (let i=1; i<=15; i++) {
       columns.push({
-        label: 'label' + i,
-        key: 'key' + i,
+        label: `label${i}`,
+        key: `key${i}`,
         width: 120
         // overflow: hidden;
         // text-overflow: ellipsis;
@@ -84,11 +84,11 @@ export default {
     for (let i=1; i<=30; i++) {
       const data = {
         id: i,
-        name: 'name' + i,
+        name: `name${i}`,
         age: i
       }
       for (let j=1; j<=15; j++) {
-        data['key' + j] = `r${i}-c${j}`
+        data[`key${j}`] = `r${i}-c${j}`
       }
       itemList.push(data)
     }
@@ -128,8 +128,8 @@ export default {
     const testevent = (e) => {
       console.log('testevent', e.detail, e.target)
       const { key, val, idx } = e.detail
-      console.log('ev2', table.items[idx]['age'])
-      table.items[idx]['age'] += 1
+      console.log('ev2', table.items[idx].age)
+      table.items[idx].age += 1
       setItems()
     }
     

@@ -32,10 +32,10 @@ export async function readGoogle (filename) {
       //     })
       // })
     } else {
-      alert('readGoogle() gcp-sign error: ' + (rv.error || 'Some Error'))
+      alert(`readGoogle() gcp-sign error: ${rv.error || 'Some Error'}`)
     }
   } catch (e) {
-    alert('ERROR: readGoogle() :' + e.toString())
+    alert(`ERROR: readGoogle() :${e.toString()}`)
   }
 }
 
@@ -51,7 +51,7 @@ export async function deleteGoogle (filename) {
     console.log(res2)
     alert(`Google Delete: ${res2.ok ? 'OK' : 'FAIL'}`) 
   } catch (e) {
-    alert('Google Delete: ' + e.toString())
+    alert(`Google Delete: ${e.toString()}`)
   }
 }
 
@@ -66,9 +66,9 @@ export async function uploadGoogle (files) {
     const res = await fetch(`/api/app-sample/tests/gcp-sign`, { method: 'POST', headers, body: JSON.stringify({ filename, action: 'write' }) })
     const rv = await res.json()
     const res2 = await fetch(rv.url, { method: 'PUT', body: files[0],  headers: { 'Content-Type': 'application/octet-stream' } })
-    alert('Google Upload: ' + (res2.ok) ? 'OK' : 'FAIL')
+    alert(`Google Upload: ${res2.ok ? 'OK' : 'FAIL'}`)
   } catch (e) {
-    alert('Google Upload: ' + e.toString())
+    alert(`Google Upload: ${e.toString()}`)
   }
 }
 

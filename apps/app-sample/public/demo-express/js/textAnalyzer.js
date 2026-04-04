@@ -34,13 +34,13 @@ function countLines(str) {
 }
 
 function findMostRepeatedWord(str){
-  let words = {};
-  let result = {
+  const words = {};
+  const result = {
     mostRepeatedWord: "",
     mostRepeatedWordCount: 0
   };
   
-  str.match(/\w+/g).forEach(function(w){ 
+  str.match(/\w+/g).forEach((w)=> { 
     words[w]=(words[w]||0)+1 });
   
   for (var w in words) {

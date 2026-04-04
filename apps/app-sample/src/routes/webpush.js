@@ -1,4 +1,3 @@
-'use strict'
 import express from "express";
 import { 
   // authUser,
@@ -33,7 +32,7 @@ export default express.Router()
     const user = await authFns.findUser({ id })
     let rv = null
 
-    if (user && user.pnToken) {
+    if (user?.pnToken) {
       const options = {
         TTL: 60,
         // headers: {
@@ -43,7 +42,7 @@ export default express.Router()
       } 
       const subscription = JSON.parse(user.pnToken)
       // console.log(id, mode, subscription, data, options)
-      rv = await webpush.send(subscription, 'FROM Backend: ' + data, options)
+      rv = await webpush.send(subscription, `FROM Backend: ${JSON.stringify(data)}`, options)
       res.json({ status: 'sent', mode, rv })
     } else {
       res.status(404).json({ status: 'no user or token'})

@@ -117,10 +117,10 @@ export default {
       console.log('doUpload', e.target.files)
       try {
         const { files } = e.target
-        if (files && files.length) {
+        if (files?.length) {
           const rv = await t4t.upload(files[0])
           console.log(rv)
-          if (rv.data.errorCount) alert('Error: ' + JSON.stringify(rv.data.errors))
+          if (rv.data.errorCount) alert(`Error: ${JSON.stringify(rv.data.errors)}`)
           else alert('Upload OK')
           await refreshTable()
         }
@@ -167,7 +167,7 @@ export default {
         } else if (e.detail.cmd === 'export') {
           // TODO const _filters = keycol.value ? [...filters, { col: keycol.value, op: '=', val: keyval.value, andOr: 'and' }] : filters
           const data = await t4t.download(filters, sorter)
-          if (data) downloadData(data.csv, tableName + '.csv', 'text/csv;charset=utf-8;')
+          if (data) downloadData(data.csv, `${tableName}.csv`, 'text/csv;charset=utf-8;')
         }
       } catch (e) {        
         console.log('error cmd', e.toString())

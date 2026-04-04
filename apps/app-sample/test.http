@@ -10,7 +10,9 @@ GET http://127.0.0.1:3000/health/ready
 # GET http://127.0.0.1:3000/api/healthcheck
 # GET http://127.0.0.1:3000/api/unknown
 GET http://127.0.0.1:3000/api/app-sample/healthcheck
-# GET http://127.0.0.1:3000/api/app-sample/check-db
+
+### test db
+GET http://127.0.0.1:3000/api/app-sample/check-db
 
 ### HTTP Testing
 
