@@ -191,7 +191,7 @@ const onSubmit = async () => {
       try {
         const body = toRaw(formState)
         console.log('submit!', body)
-        const { data } = await http.post(VITE_API_URL + '/api/healthcheck', body)
+        const { data } = await http.post(`${VITE_API_URL}/api/healthcheck`, body)
         console.log(data)
         submitResult.value = JSON.stringify(data)
       } catch (e) {
@@ -222,7 +222,7 @@ const onSubmit1 = async () => {
             number: form1.number
           })
         )
-        const { data } = await http.post(VITE_API_URL + '/api/custom-app/uploads/file-and-json', form)
+        const { data } = await http.post(`${VITE_API_URL}/api/custom-app/uploads/file-and-json`, form)
         console.log(data)
       } catch (e) {
         console.log('onSubmit1 Error', e.toString())

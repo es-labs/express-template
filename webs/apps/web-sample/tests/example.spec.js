@@ -27,7 +27,7 @@ test.describe('New Todo', () => {
     // await expect(page.url()).toEqual(BASE_URL)
 
     await page.waitForURL('**/dashboard') // need timeout
-    await expect(page.url()).toEqual(BASE_URL + `dashboard`)
+    await expect(page.url()).toEqual(`${BASE_URL}dashboard`)
 
     // console.log(page.url())
     // await page.waitForTimeout(2000)

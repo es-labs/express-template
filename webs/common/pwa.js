@@ -14,7 +14,7 @@
 // const { MODE } = import.meta.env
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', async function () {
+  window.addEventListener('load', async () => {
     console.log('SW loading')
 
     const params = '' // '?params=' + encodeURIComponent(JSON.stringify({ a: 1, b: Date.now() })) // TODO some problem with vite (development) if passing in params like this...

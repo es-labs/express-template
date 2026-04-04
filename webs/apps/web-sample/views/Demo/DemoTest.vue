@@ -17,22 +17,28 @@
     </div>
 
     <p>
-      <button @click="router.push('/dun-no-what-is-this')">Go an unknown route</button>
+      <button type="button" @click="router.push('/dun-no-what-is-this')">Go an unknown route</button>
     </p>
     <p>
       <span>Count is: {{ count }}</span>
-      <button @click="count++">increment</button>
+      <button type="button" @click="count++">increment</button>
     </p>
-    <p><span>Mock Service Worder Test</span> <button @click="callMsw">Call MSW Endpoint</button></p>
-    <p><button @click="(e) => testApi('healthcheck')">Test API</button> <button @click="(e) => testApi('health-auth')">Test API Auth</button></p>
+    <p>
+      <span>Mock Service Worder Test</span>
+      <button type="button" @click="callMsw">Call MSW Endpoint</button>
+    </p>
+    <p>
+      <button type="button" @click="(e) => testApi('healthcheck')">Test API</button>
+      <button type="button" @click="(e) => testApi('health-auth')">Test API Auth</button>
+    </p>
     <p>Non-Reactive Data: {{ nonReactiveData }}</p>
     <p>Reactive Data: {{ reactiveData }}</p>
-    <p>Vuex Store: {{ store.user }} <button @click="(e) => store.updateUser({ id: 'AnewId' })">Change Name</button></p>
+    <p>Vuex Store: {{ store.user }} <button type="button" @click="(e) => store.updateUser({ id: 'AnewId' })">Change Name</button></p>
     <h2>Test Reactivity In Object</h2>
     <p>
       Click to see increment. Also check console.log if onUpdated is called
-      <button @click="() => testObjectRef.a++">Test Object Ref = {{ testObjectRef.a }}</button>
-      <button @click="() => testObjectReactive.a.xx++">Test Object Reactive = {{ testObjectReactive.a.xx }}</button>
+      <button type="button" @click="() => testObjectRef.a++">Test Object Ref = {{ testObjectRef.a }}</button>
+      <button type="button" @click="() => testObjectReactive.a.xx++">Test Object Reactive = {{ testObjectReactive.a.xx }}</button>
     </p>
     <ul>
       <li v-for="n in 10" :key="n">{{ n }}</li>
@@ -141,7 +147,7 @@ onUnmounted(() => console.log('demomain unmounted!'))
 
 const testApi = async (test) => {
   try {
-    const { data } = await http.get('/api/' + test)
+    const { data } = await http.get(`/api/${test}`)
     console.log('testApi', data)
   } catch (e) {
     console.log('testApi err', e)
@@ -151,7 +157,7 @@ const testApi = async (test) => {
 const callMsw = async (test) => {
   try {
     const { data } = await http.get('/api/msw/test')
-    alert('MSA returned: ' + data.message.toString())
+    alert(`MSA returned: ${data.message.toString()}`)
   } catch (e) {
     console.log('callMsw err', e)
   }

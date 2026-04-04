@@ -16,6 +16,6 @@
     }
   },
   "files": {
-    "includes": ["*/src/**/*.js", "*/src/**/*.ts"]
+    "includes": ["**/*.js", "**/*.ts"]
   }
 }

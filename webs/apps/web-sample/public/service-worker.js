@@ -59,7 +59,7 @@ function clearCaches(e) {
         cacheNames.forEach((cacheName) => {
           if (!(cacheName === CACHE_NAME_STATIC || cacheName === CACHE_NAME_DYNAMIC)) {
             console.log('sw delete cache = ', cacheName)
-            return caches.delete(cacheName)
+            caches.delete(cacheName)
           }
         })
       })
@@ -117,12 +117,10 @@ self.addEventListener('activate', clearCaches)
 // Cache then network - resources that update frequently (but get resources quickly to screen first)
 function cacheThenNetwork(e) {
   e.respondWith(
-    caches.open(CACHE_NAME_DYNAMIC).then(function (cache) {
-      return fetch(e.request).then(function (res) {
+    caches.open(CACHE_NAME_DYNAMIC).then((cache) => fetch(e.request).then((res) => {
         cache.put(e.request, res.clone())
         return res
-      })
-    })
+      }))
     // arrow function version
     // .then(cache => fetch(e.request)
     //   .then(res => {
@@ -147,9 +145,7 @@ function cacheThenNetwork(e) {
 // Network first / Network fall back to cache - resources that update frequently
 function networkCacheFallback(e) {
   e.respondWith(
-    fetch(e.request).catch(function () {
-      return caches.match(e.request)
-    })
+    fetch(e.request).catch(() => caches.match(e.request))
   )
 }
 
@@ -158,14 +154,8 @@ function cacheNetworkFallback(e) {
   e.respondWith(
     caches
       .match(e.request)
-      .then(function (res) {
-        return res || fetch(e.request)
-        // .then(function(response) {
-        //   if (response.status === 404) return caches.match('views/404.html')
-        //   return response
-        // })
-      })
-      .catch(function () {
+      .then((res) => res || fetch(e.request))
+      .catch(() => {
         // If both fail, show a generic fallback:
         return caches.match('/offline.html')
         // However, in reality you'd have many different
@@ -179,9 +169,7 @@ function cacheNetworkFallback(e) {
 function cacheOnly(e) {
   e.respondWith(
     // caches.match(e.request) // ALL
-    caches.open(CACHE_NAME_STATIC).then(function (cache) {
-      return cache.match(e.request)
-    }) // .then(res => res) // named cache
+    caches.open(CACHE_NAME_STATIC).then((cache) => cache.match(e.request)) // .then(res => res) // named cache
   )
 }
 

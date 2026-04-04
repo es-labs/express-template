@@ -272,7 +272,7 @@ export default {
           if (table.formFiles[col].length) {
             jsonData[col] = ''
             for (const file of table.formFiles[col]) {
-              jsonData[col] = jsonData[col] ? jsonData[col] + ',' + file.name : file.name
+              jsonData[col] = jsonData[col] ? `${jsonData[col]},${file.name}` : file.name
               formData.append(col, file, file.name)
             }
           } else { // TBD clearing file
@@ -346,7 +346,7 @@ export default {
         for (const [index, filter] of filters.entries()) { // convert filter data here...
           const attrsType  = table.config.cols[filter?.col]?.ui?.attrs?.type
           if (attrsType === 'datetime-local') {
-            filters[index].val += ':00' + getTzOffsetISO() // convert to UTC
+            filters[index].val += `:00${getTzOffsetISO()}` // convert to UTC
           }
         }
         const { filterKeys, filterVals } = props // child table filter...
@@ -362,7 +362,7 @@ export default {
         table.data = results.map(result => mapRecord(result)) // format the results...
         table.pagination.total = total
       } catch (e) {
-        alert('Error find' + e.toString())
+        alert(`Error find${e.toString()}`)
       }
       table.loading = false
     }
@@ -407,7 +407,7 @@ export default {
                         const keys_a = col.link.keys.split(',')
                         for (const linkKey of keys_a) {
                           console.log('linkKey', linkKey, record)
-                          if (fvals) fvals += ',' + record[linkKey]
+                          if (fvals) fvals += `,${record[linkKey]}`
                           else fvals = record[linkKey]
                         }
                         // console.log(col.link.ctable, col.link.ckeys, fvals)
@@ -476,7 +476,7 @@ export default {
         const { data } = await t4tFe.upload(file)
         if (data.errorCount > 0) {
           notification.open({ message, duration, description: 'Errors - downloading...' })
-          downloadData(data.errors.join('\n'), getYmdhmsUtc() + '-import-errors-' + props.tableName + '.csv')
+          downloadData(data.errors.join('\n'), `${getYmdhmsUtc()}-import-errors-${props.tableName}.csv`)
         } else {
           notification.open({ message, duration, description: data?.message || 'Success' })
         }
@@ -504,7 +504,7 @@ export default {
       const duration = 3
       try {
         const data = await t4tFe.download(filters, sorter)
-        downloadData(data.csv, (new Date()).toISOString() + '-' + props.tableName + '.csv')
+        downloadData(data.csv, `${(new Date()).toISOString()}-${props.tableName}.csv`)
         notification.open({ message, duration, description: 'Success' })
       } catch (e) {
         notification.open({ message, duration, description: 'Failed' })
@@ -540,7 +540,7 @@ export default {
         const file = table.formData[col]
         const path = table.config.cols[col]?.ui?.url
         // console.log(path, file)
-        return path + file + ''
+        return `${path + file}`
       },
       table,
       handleTableChange,

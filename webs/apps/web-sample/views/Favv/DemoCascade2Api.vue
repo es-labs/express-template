@@ -50,7 +50,7 @@ const formState = reactive({
 
 onMounted(async () => {
   try {
-    const { data } = await http.get(VITE_API_URL + '/api/custom-app/cascade/continents')
+    const { data } = await http.get(`${VITE_API_URL}/api/custom-app/cascade/continents`)
     formState.continentsList = [...data]
   } catch (e) {
     console.log(e.toString())
@@ -69,7 +69,7 @@ const onCheckAllChange = (e) => {
 
 const blurSelect = async () => {
   // get the countries from continent
-  const { data } = await http.get(VITE_API_URL + '/api/custom-app/cascade/countries?continents=' + formState.continents.join(','))
+  const { data } = await http.get(`${VITE_API_URL}/api/custom-app/cascade/countries?continents=${formState.continents.join(',')}`)
   formState.countriesEastList = data.countriesEastList // update from filteered masterlist in db
   formState.countriesWestList = data.countriesWestList // update from filteered masterlist in db
   formState.countriesWest = formState.countriesWestList.filter((x) => formState.countriesWest.includes(x)) // intersection
@@ -78,7 +78,7 @@ const blurSelect = async () => {
 }
 
 const blurSelect2 = async () => {
-  const { data } = await http.get(VITE_API_URL + '/api/custom-app/cascade/states?countries=' + formState.countriesWest.join(','))
+  const { data } = await http.get(`${VITE_API_URL}/api/custom-app/cascade/states?countries=${formState.countriesWest.join(',')}`)
   formState.westCountryStatesList = data // update from filteered masterlist in db
   formState.westCountryStates = formState.westCountryStatesList.filter((x) => formState.westCountryStates.includes(x)) // intersection
 }

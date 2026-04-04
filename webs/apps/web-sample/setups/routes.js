@@ -42,6 +42,6 @@ export const SECURE_ROUTES = [
   { path: '/demo-view/fill/:param', name: 'Fill Param', component: async () => import('../views/Demo/Filler.vue'), hidden: true },
   { path: '/test', name: 'Fill No ID', component: async () => import('../views/Demo/Filler.vue') },
   ...Array.from(Array(15), (x, i) => {
-    return { path: '/test/' + i, name: 'Fill ID ' + i, component: async () => import('../views/Demo/Filler.vue'), props: { testId: i } }
+    return { path: `/test/${i}`, name: `Fill ID ${i}`, component: async () => import('../views/Demo/Filler.vue'), props: { testId: i } }
   }),
 ]

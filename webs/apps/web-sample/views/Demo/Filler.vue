@@ -3,7 +3,7 @@
     <h1>Filler Test Page</h1>
     <p>Props Id {{ testId }}</p>
     <p>Route Param: {{ routeParam }}</p>
-    <a-button v-if="!routeParam" @click="$router.push($route.path + '/111')">Set Param</a-button>
+    <a-button v-if="!routeParam" @click="$router.push(`${$route.path}/111`)">Set Param</a-button>
     <a-button v-else @click="$router.back()">Back</a-button>
     <hr />
     <p>Show a long list to test scrolling</p>

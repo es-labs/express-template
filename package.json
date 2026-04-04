@@ -1,7 +1,7 @@
 {
   "name": "express-template",
   "description": "express template",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "private": true,
   "type": "module",
   "author": "aaronjxz@gmail.com",
@@ -29,8 +29,8 @@
   "scripts": {
     "git:hash": "git rev-parse --verify --short HEAD",
     "git:branch": "git rev-parse --abbrev-ref HEAD",
-    "lint": "biome lint pkgs",
-    "lint:fix": "biome lint --only=useNodejsImportProtocol --write --unsafe pkgs",
+    "lint": "biome lint webs",
+    "lint:fix": "biome lint --only=useTemplate --write --unsafe webs",
     "format": "biome format --write .",
     "check": "biome check --write .",
     "check:apps": "biome check --write apps",
