@@ -123,7 +123,7 @@ TBD - To Redo
 +- apps/
 |  +- vue-sample/
 |  |  +- components/
-|  |  +- envs/ : dotenv files here
+|  |  +- envs/ : .env files here
 |  |  +- layouts/ : your layouts here
 |  |  +- mocks/ : for msw
 |  |  +- public/ : web public html folder

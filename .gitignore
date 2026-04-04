@@ -2,6 +2,9 @@
 node_modules
 package-lock.json
 
+# distributables
+dist
+
 # tests
 coverage
 

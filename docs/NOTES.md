@@ -79,6 +79,7 @@ useNodejsImportProtocol
 noConsole (set to warn first, convert using logger, then set back to error)
 
 # WIP
+@es-labs/jslib
 @common/iso/sleep.js
 @common/node/services/index
 - JSON in env, refactor to use something else
