@@ -28,6 +28,6 @@
     }
   },
   "files": {
-    "includes": ["**/*.js", "src/**/*.ts", "**/*.vue", "src/**/*.css"]
+    "includes": ["**/*.js", "**/*.ts", "**/*.vue", "**/*.css"]
   }
 }
