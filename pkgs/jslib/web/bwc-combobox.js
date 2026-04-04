@@ -57,265 +57,316 @@ const autoComplete = (e) => {
 ]
 */
 
-const template = document.createElement('template')
-template.innerHTML = /*html*/`
+const template = document.createElement('template');
+template.innerHTML = /*html*/ `
 <input type="text" list="json-datalist" placeholder="search..." autocomplete="off">
 <span class="icon is-small is-left clear-btn" style="pointer-events: all; cursor:pointer;">
   <i class="fas fa-times"></i>
 </span>
 <datalist id="json-datalist"></datalist>
-`
+`;
 
 class BwcCombobox extends HTMLElement {
   // local properties
-  #items = [] // list of items
-  #tags = [] // multi-select
-  #selected = null // single-select
-  #key = '' // must have both, other wise string is assumed?
-  #text = ''
+  #items = []; // list of items
+  #tags = []; // multi-select
+  #selected = null; // single-select
+  #key = ''; // must have both, other wise string is assumed?
+  #text = '';
 
-  #elTags = null // div.tags element
-  #elInput = null // input element
-  #elList = null // datalist element
-  #elClearBtn = null // clear button
+  #elTags = null; // div.tags element
+  #elInput = null; // input element
+  #elList = null; // datalist element
+  #elClearBtn = null; // clear button
 
-  #multiple = false // hold readonly attributes
-  #repeat = false // for multiselect, tag can be added multiple times
-  #allowCustomTag = false // can add new items
-  #tagLimit = 0 // unlimited tags
+  #multiple = false; // hold readonly attributes
+  #repeat = false; // for multiselect, tag can be added multiple times
+  #allowCustomTag = false; // can add new items
+  #tagLimit = 0; // unlimited tags
 
   constructor() {
-    super()
-    this._onInput = this._onInput.bind(this)
+    super();
+    this._onInput = this._onInput.bind(this);
   }
 
   connectedCallback() {
-    this.appendChild(template.content.cloneNode(true))
+    this.appendChild(template.content.cloneNode(true));
 
-    this.#elInput = this.querySelector('input')
-    this.#elList = this.querySelector('datalist')
-    this.#elClearBtn = this.querySelector('.clear-btn')
-    
-    this.#elList.id = this.listid // console.log('listid', this.listid)
-    this.#elInput.setAttribute('list', this.listid)
-    this.#elInput.addEventListener('input', this._onInput)
+    this.#elInput = this.querySelector('input');
+    this.#elList = this.querySelector('datalist');
+    this.#elClearBtn = this.querySelector('.clear-btn');
 
-    this.#allowCustomTag = this.hasAttribute('allow-custom-tag')
-    this.#multiple = this.hasAttribute('multiple')
-    this.#repeat = this.hasAttribute('repeat')
+    this.#elList.id = this.listid; // console.log('listid', this.listid)
+    this.#elInput.setAttribute('list', this.listid);
+    this.#elInput.addEventListener('input', this._onInput);
 
-    if (this.hasAttribute('tag-limit')) this.#tagLimit = Number(this.getAttribute('tag-limit'))
-    if (this.hasAttribute('object-key')) this.#key = this.getAttribute('object-key')
-    if (this.hasAttribute('object-text')) this.#text = this.getAttribute('object-text')
+    this.#allowCustomTag = this.hasAttribute('allow-custom-tag');
+    this.#multiple = this.hasAttribute('multiple');
+    this.#repeat = this.hasAttribute('repeat');
 
-    if (this.#multiple) { // if multiple... use tags
-      this.#elTags = document.createElement('div')
-      this.#elTags.className = 'tags'
+    if (this.hasAttribute('tag-limit')) this.#tagLimit = Number(this.getAttribute('tag-limit'));
+    if (this.hasAttribute('object-key')) this.#key = this.getAttribute('object-key');
+    if (this.hasAttribute('object-text')) this.#text = this.getAttribute('object-text');
+
+    if (this.#multiple) {
+      // if multiple... use tags
+      this.#elTags = document.createElement('div');
+      this.#elTags.className = 'tags';
       // this.prepend(this.#elTags)
-      this.append(this.#elTags)
+      this.append(this.#elTags);
     }
 
-    this.#elClearBtn.onclick = (e) => {
-      this.#elInput.value = ''
+    this.#elClearBtn.onclick = e => {
+      this.#elInput.value = '';
       if (!this.#multiple) {
         // console.log('clear button click')
-        this.#selected = null
-        this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }))
+        this.#selected = null;
+        this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }));
       }
-    }
-    this.#elInput.onblur = (e) => {
+    };
+    this.#elInput.onblur = e => {
       // console.log('onblur', e)
-      const found = this.items.find(item => this._itemMatchInput(item))
+      const found = this.items.find(item => this._itemMatchInput(item));
       if (this.#multiple) {
         // multiple
-        if (!found) { // not found
-          if (this.#allowCustomTag) { // can add new
-            this._addTag(this._makeItemFromValue())
-            this.dispatchEvent(new CustomEvent('select', { detail: this.#tags }))
+        if (!found) {
+          // not found
+          if (this.#allowCustomTag) {
+            // can add new
+            this._addTag(this._makeItemFromValue());
+            this.dispatchEvent(new CustomEvent('select', { detail: this.#tags }));
           }
         } else {
           // if repeatable? set tags list if not there already
-          this._addTag(found)
-          this.dispatchEvent(new CustomEvent('select', { detail: this.#tags }))
+          this._addTag(found);
+          this.dispatchEvent(new CustomEvent('select', { detail: this.#tags }));
         }
-        this.value = ''
+        this.value = '';
       } else {
         // single
-        if (!found) { // not found
+        if (!found) {
+          // not found
           if (this.#selected) {
             // console.log('onBlur - single select - not found and this.#selected truthy')
-            this.#selected = null
-            this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }))
+            this.#selected = null;
+            this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }));
           }
         } else {
           if (!this.#selected) {
             // console.log('onBlur - single select - found and this.#selected falsy')
-            this.#selected = found
-            this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }))
+            this.#selected = found;
+            this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }));
           }
         }
       }
-    }
+    };
 
     // console.log('combo box connected', this.required, this.disabled, this.inputClass)
-    this.#elInput.value = this.value
-    this.#elInput.className = this.inputClass || 'input' // default to bulma - // if (this.hasAttribute('input-class')) el.setAttribute('class', this.getAttribute('input-class'))
-    this.required ? this.#elInput.setAttribute('required', '') : this.#elInput.removeAttribute('required')
-    this.disabled ? this.#elInput.setAttribute('disabled', '') : this.#elInput.removeAttribute('disabled')
-    this._setList(this.items)
+    this.#elInput.value = this.value;
+    this.#elInput.className = this.inputClass || 'input'; // default to bulma - // if (this.hasAttribute('input-class')) el.setAttribute('class', this.getAttribute('input-class'))
+    this.required ? this.#elInput.setAttribute('required', '') : this.#elInput.removeAttribute('required');
+    this.disabled ? this.#elInput.setAttribute('disabled', '') : this.#elInput.removeAttribute('disabled');
+    this._setList(this.items);
 
-    this.dispatchEvent(new CustomEvent('load'))
+    this.dispatchEvent(new CustomEvent('load'));
   }
 
   disconnectedCallback() {
-    this.#elInput.removeEventListener('input', this._onInput)
+    this.#elInput.removeEventListener('input', this._onInput);
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
-    const el = this.#elInput
+    const el = this.#elInput;
     switch (name) {
       case 'value': {
-        if (el) el.value = newVal // v-model affects this
-        this.dispatchEvent(new CustomEvent('input', { detail: newVal }))
-        break
+        if (el) el.value = newVal; // v-model affects this
+        this.dispatchEvent(new CustomEvent('input', { detail: newVal }));
+        break;
       }
       case 'required': {
-        el?.setAttribute('required', '')
-        break
+        el?.setAttribute('required', '');
+        break;
       }
       case 'disabled': {
-        el?.setAttribute('disabled', '')
-        break
+        el?.setAttribute('disabled', '');
+        break;
       }
       case 'input-class': {
-        if (el) el.className = newVal
-        break
+        if (el) el.className = newVal;
+        break;
       }
       default:
-        break
+        break;
     }
   }
 
   static get observedAttributes() {
-    return ['value', 'required', 'listid', 'disabled', 'input-class']
+    return ['value', 'required', 'listid', 'disabled', 'input-class'];
   }
 
-  get value() { return this.getAttribute('value') }
-  set value(val) { this.setAttribute('value', val) }
+  get value() {
+    return this.getAttribute('value');
+  }
+  set value(val) {
+    this.setAttribute('value', val);
+  }
 
-  get required() { return this.hasAttribute('required') }
-  set required(val) { val ? this.setAttribute('required', '') : this.removeAttribute('required') }
+  get required() {
+    return this.hasAttribute('required');
+  }
+  set required(val) {
+    val ? this.setAttribute('required', '') : this.removeAttribute('required');
+  }
 
-  get listid() { return this.getAttribute('listid') }
-  set listid(val) { this.setAttribute('listid', val) }
+  get listid() {
+    return this.getAttribute('listid');
+  }
+  set listid(val) {
+    this.setAttribute('listid', val);
+  }
 
-  get disabled() { return this.hasAttribute('disabled') }
-  set disabled(val) { val ? this.setAttribute('disabled', '') : this.removeAttribute('disabled') }
+  get disabled() {
+    return this.hasAttribute('disabled');
+  }
+  set disabled(val) {
+    val ? this.setAttribute('disabled', '') : this.removeAttribute('disabled');
+  }
 
-  get inputClass() { return this.getAttribute('input-class') }
-  set inputClass(val) { this.setAttribute('input-class', val) }
+  get inputClass() {
+    return this.getAttribute('input-class');
+  }
+  set inputClass(val) {
+    this.setAttribute('input-class', val);
+  }
 
   // properties
-  get items() { return this.#items }
+  get items() {
+    return this.#items;
+  }
   set items(val) {
     // console.log('set items', val.length)
-    this.#items = val
-    this._setList(val)
+    this.#items = val;
+    this._setList(val);
   }
 
   // multi-select
-  get tags() { return this.#tags }
-  set tags(val) { this._setTags(val) } // this.#tags will be set in _setTags()
+  get tags() {
+    return this.#tags;
+  }
+  set tags(val) {
+    this._setTags(val);
+  } // this.#tags will be set in _setTags()
 
   // single-select
-  get selected() { return this.#selected }
-  set selected(val) { this.#selected = val } // TODO set it correctly
+  get selected() {
+    return this.#selected;
+  }
+  set selected(val) {
+    this.#selected = val;
+  } // TODO set it correctly
 
-  _isStringType() { // is list item and selected values string ?
-    return !(this.#key && this.#text) // console.log('_isStringType', !(this.#key && this.#text))
+  _isStringType() {
+    // is list item and selected values string ?
+    return !(this.#key && this.#text); // console.log('_isStringType', !(this.#key && this.#text))
   }
-  _itemMatchInput(item) { // item match to text input
-    return this._isStringType() ? item === this.value : item[this.#key] === this.value || item[this.#text] === this.value
+  _itemMatchInput(item) {
+    // item match to text input
+    return this._isStringType()
+      ? item === this.value
+      : item[this.#key] === this.value || item[this.#text] === this.value;
   }
-  _matchItems(item1, item2) { //  item match to another item
-    if (item1 === null && item2 === null) return true
-    else if (item1 === null) return false
-    else if (item2 === null) return false
-    return this._isStringType() ? item1 === item2 : item1[this.#key] === item2[this.#key] || item1[this.#text] === item2[this.#text]
+  _matchItems(item1, item2) {
+    //  item match to another item
+    if (item1 === null && item2 === null) return true;
+    else if (item1 === null) return false;
+    else if (item2 === null) return false;
+    return this._isStringType()
+      ? item1 === item2
+      : item1[this.#key] === item2[this.#key] || item1[this.#text] === item2[this.#text];
   }
-  _makeItemFromValue () {
+  _makeItemFromValue() {
     // TODO if all spaces only... return? trim white spaces?
-    return this._isStringType() ? this.value : { [this.#key]: this.value, [this.#text]: this.value }    
+    return this._isStringType() ? this.value : { [this.#key]: this.value, [this.#text]: this.value };
   }
 
   _tagLimitReached() {
-    return this.#tagLimit && this.#elTags.children.length >= this.#tagLimit
+    return this.#tagLimit && this.#elTags.children.length >= this.#tagLimit;
   }
   _addTag(item) {
-    if (this._tagLimitReached()) return
-    const itemExists = this.#tags.find(tag => this._isStringType() ? tag === item : (tag[this.#key] === item[this.#key] && tag[this.#text] === item[this.#text]))
-    if (!this.#repeat && itemExists) return // duplicates not allowed
-    const span = document.createElement('span')
-    span.className = 'tag is-black'
-    span.innerText = this._isStringType() ? item : item[this.#text]
-    span.value = this._isStringType() ? item : item[this.#key]
-    span.onclick = (e) => { // e.target.innerText, e.target.value
-      this._removeTag(span)
-      this.dispatchEvent(new CustomEvent('select', { detail: this.#tags }))
-    }
-    this.#elTags.appendChild(span)
-    this._updateTags()
-    if (this._tagLimitReached()) this.#elInput.setAttribute('disabled', '')
+    if (this._tagLimitReached()) return;
+    const itemExists = this.#tags.find(tag =>
+      this._isStringType() ? tag === item : tag[this.#key] === item[this.#key] && tag[this.#text] === item[this.#text],
+    );
+    if (!this.#repeat && itemExists) return; // duplicates not allowed
+    const span = document.createElement('span');
+    span.className = 'tag is-black';
+    span.innerText = this._isStringType() ? item : item[this.#text];
+    span.value = this._isStringType() ? item : item[this.#key];
+    span.onclick = e => {
+      // e.target.innerText, e.target.value
+      this._removeTag(span);
+      this.dispatchEvent(new CustomEvent('select', { detail: this.#tags }));
+    };
+    this.#elTags.appendChild(span);
+    this._updateTags();
+    if (this._tagLimitReached()) this.#elInput.setAttribute('disabled', '');
   }
   _updateTags() {
-    const tags = [...this.#elTags.children]
-    this.#tags = tags.map(tag => this._isStringType() ? tag.innerText : ({ [this.#key]: tag.value, [this.#text]: tag.innerText }))
+    const tags = [...this.#elTags.children];
+    this.#tags = tags.map(tag =>
+      this._isStringType() ? tag.innerText : { [this.#key]: tag.value, [this.#text]: tag.innerText },
+    );
     // console.log('_updateTags', this.#tags)
   }
   _removeTag(span) {
-    this.#elTags.removeChild(span)
-    this._updateTags()
-    if (!this._tagLimitReached() && !this.disabled) this.#elInput.removeAttribute('disabled')    
+    this.#elTags.removeChild(span);
+    this._updateTags();
+    if (!this._tagLimitReached() && !this.disabled) this.#elInput.removeAttribute('disabled');
   }
 
-  _onInput(e) { // whether clicked or typed
+  _onInput(e) {
+    // whether clicked or typed
     // console.log('_onInput', e.target.value, this.items.length)
-    const prevItem = this.#selected
-    this.value = this.#elInput.value
+    const prevItem = this.#selected;
+    this.value = this.#elInput.value;
 
-    const found = this.items.find(item => this._itemMatchInput(item))
-    if (!found) { // not found
-      this.#selected = null
-      this.dispatchEvent(new CustomEvent('search', { detail: this.value }))
+    const found = this.items.find(item => this._itemMatchInput(item));
+    if (!found) {
+      // not found
+      this.#selected = null;
+      this.dispatchEvent(new CustomEvent('search', { detail: this.value }));
     } else {
-      this.#selected = found
+      this.#selected = found;
     }
     if (!this._matchItems(prevItem, this.#selected) && !this.#multiple) {
       // console.log('_onInput - selected && provItem not match this.#selected')
       if (!this.#selected && this.allowCustomTag) {
-        this.#selected = this._makeItemFromValue()
+        this.#selected = this._makeItemFromValue();
       }
-      this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }))
+      this.dispatchEvent(new CustomEvent('select', { detail: this.#selected }));
     }
   }
 
   _setTags(_tags) {
     // console.log('_setTags', _tags, this.#elTags)
-    if (!this.#elTags) return
-    this.#elTags.innerHTML = ''
-    this.#tags = []
-    _tags.forEach(tag => { this._addTag(tag) })
-    this.dispatchEvent(new CustomEvent('select', { detail: this.#tags }))
+    if (!this.#elTags) return;
+    this.#elTags.innerHTML = '';
+    this.#tags = [];
+    _tags.forEach(tag => {
+      this._addTag(tag);
+    });
+    this.dispatchEvent(new CustomEvent('select', { detail: this.#tags }));
   }
 
-  _setList(_items) { // set list items
+  _setList(_items) {
+    // set list items
     // console.log('items', _items, this.value)
-    const dd = this.#elList
-    if (!dd) return
-    while(dd.firstChild) {
-      dd.removeChild(dd.lastChild)
+    const dd = this.#elList;
+    if (!dd) return;
+    while (dd.firstChild) {
+      dd.removeChild(dd.lastChild);
     }
-    if (typeof _items !== 'object') return
+    if (typeof _items !== 'object') return;
 
     // EVENT TEST START
     // dd.style.pointerEvents = 'all'
@@ -323,10 +374,10 @@ class BwcCombobox extends HTMLElement {
     // dd.onclick = (e) => console.log('whwhwhwh22a')
     // dd.onmousedown = (e) => console.log('whwhwhwh22b')
     // EVENT TEST END
-    _items.forEach((item) => {
-      const li = document.createElement('option')
-      li.innerHTML = typeof item === 'string' ? item : item[this.#key]
-      li.value = typeof item === 'string' ? item : item[this.#text]
+    _items.forEach(item => {
+      const li = document.createElement('option');
+      li.innerHTML = typeof item === 'string' ? item : item[this.#key];
+      li.value = typeof item === 'string' ? item : item[this.#text];
       // EVENT TEST START
       // li.style.pointerEvents = 'all'
       // li.style.cursor = 'pointer'
@@ -335,9 +386,9 @@ class BwcCombobox extends HTMLElement {
       // li.addEventListener('click', (e) => console.log('whwhwhwh'), true)
       // li.onmousedown // useless on a datalist with listid...
       // EVENT TEST END
-      dd.appendChild(li)
-    })
+      dd.appendChild(li);
+    });
   }
 }
 
-customElements.define('bwc-combobox', BwcCombobox)
+customElements.define('bwc-combobox', BwcCombobox);

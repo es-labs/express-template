@@ -1,6 +1,6 @@
 /**
  * wait asynchronously for ms milliseconds
  * @param {number} ms - milliseconds to sleep
- * @returns 
+ * @returns
  */
-export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));

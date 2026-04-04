@@ -1,4 +1,4 @@
-const template = /*html*/`
+const template = /*html*/ `
 <section ref="topRef" class="hero is-primary is-fullheight">
   <div class="hero-body">
     <div class="container">
@@ -19,8 +19,8 @@ const template = /*html*/`
     </div>
   </div>
 </section>
-`
+`;
 
 export default {
-  template
-}
+  template,
+};

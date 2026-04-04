@@ -1,9 +1,9 @@
-import express from "express";
-import { randomUUID } from "node:crypto";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
+import express from 'express';
+import { randomUUID } from 'node:crypto';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
+import { z } from 'zod';
 
 const app = express();
 app.use(express.json());
@@ -14,59 +14,44 @@ const transports = new Map();
 // Factory: create a fresh McpServer with all tools registered
 function createMcpServer() {
   const server = new McpServer({
-    name: "my-remote-server",
-    version: "1.0.0",
+    name: 'my-remote-server',
+    version: '1.0.0',
   });
 
   // --- Tool: add ---
-  server.tool(
-    "add",
-    "Add two numbers",
-    { a: z.number(), b: z.number() },
-    async ({ a, b }) => ({
-      content: [{ type: "text", text: String(a + b) }],
-    })
-  );
+  server.tool('add', 'Add two numbers', { a: z.number(), b: z.number() }, async ({ a, b }) => ({
+    content: [{ type: 'text', text: String(a + b) }],
+  }));
 
   // --- Tool: greet ---
-  server.tool(
-    "greet",
-    "Return a greeting",
-    { name: z.string() },
-    async ({ name }) => ({
-      content: [{ type: "text", text: `Hello, ${name}! 👋` }],
-    })
-  );
+  server.tool('greet', 'Return a greeting', { name: z.string() }, async ({ name }) => ({
+    content: [{ type: 'text', text: `Hello, ${name}! 👋` }],
+  }));
 
   // --- Tool: random ---
   server.tool(
-    "random",
-    "Return a random number between min and max",
+    'random',
+    'Return a random number between min and max',
     { min: z.number(), max: z.number() },
     async ({ min, max }) => ({
       content: [
         {
-          type: "text",
+          type: 'text',
           text: String(Math.floor(Math.random() * (max - min + 1)) + min),
         },
       ],
-    })
+    }),
   );
 
   // --- Resource ---
-  server.resource(
-    "server-info",
-    "info://server",
-    { mimeType: "text/plain" },
-    async () => ({
-      contents: [
-        {
-          uri: "info://server",
-          text: "My Remote MCP Server v1.0 — Streamable HTTP",
-        },
-      ],
-    })
-  );
+  server.resource('server-info', 'info://server', { mimeType: 'text/plain' }, async () => ({
+    contents: [
+      {
+        uri: 'info://server',
+        text: 'My Remote MCP Server v1.0 — Streamable HTTP',
+      },
+    ],
+  }));
 
   return server;
 }
@@ -74,8 +59,8 @@ function createMcpServer() {
 // ─── MCP Endpoint ──────────────────────────────────────────────────────────
 
 // POST /mcp — handle all client messages
-app.post("/mcp", async (req, res) => {
-  const sessionId = req.headers["mcp-session-id"];
+app.post('/mcp', async (req, res) => {
+  const sessionId = req.headers['mcp-session-id'];
   let transport;
 
   if (sessionId && transports.has(sessionId)) {
@@ -85,7 +70,7 @@ app.post("/mcp", async (req, res) => {
     // New session — create transport + server
     transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
-      onsessioninitialized: (id) => {
+      onsessioninitialized: id => {
         transports.set(id, transport);
         console.log(`[session] created: ${id}`);
       },
@@ -100,7 +85,7 @@ app.post("/mcp", async (req, res) => {
     const server = createMcpServer();
     await server.connect(transport);
   } else {
-    res.status(400).json({ error: "Missing or invalid session" });
+    res.status(400).json({ error: 'Missing or invalid session' });
     return;
   }
 
@@ -108,12 +93,12 @@ app.post("/mcp", async (req, res) => {
 });
 
 // GET /mcp — open SSE stream for server-to-client notifications
-app.get("/mcp", async (req, res) => {
-  const sessionId = req.headers["mcp-session-id"];
+app.get('/mcp', async (req, res) => {
+  const sessionId = req.headers['mcp-session-id'];
   const transport = transports.get(sessionId);
 
   if (!transport) {
-    res.status(404).json({ error: "Session not found" });
+    res.status(404).json({ error: 'Session not found' });
     return;
   }
 
@@ -121,12 +106,12 @@ app.get("/mcp", async (req, res) => {
 });
 
 // DELETE /mcp — terminate a session
-app.delete("/mcp", async (req, res) => {
-  const sessionId = req.headers["mcp-session-id"];
+app.delete('/mcp', async (req, res) => {
+  const sessionId = req.headers['mcp-session-id'];
   const transport = transports.get(sessionId);
 
   if (!transport) {
-    res.status(404).json({ error: "Session not found" });
+    res.status(404).json({ error: 'Session not found' });
     return;
   }
 

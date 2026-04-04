@@ -41,171 +41,190 @@ const autoComplete = (e) => {
 }
 
 */
-const template = document.createElement('template')
-template.innerHTML = /*html*/`
+const template = document.createElement('template');
+template.innerHTML = /*html*/ `
 <input type="text" list="json-datalist" placeholder="search..." autocomplete="off">
 <datalist id="json-datalist"></datalist>
-`
+`;
 
 class AutoComplete extends HTMLElement {
   // local properties
-  #items = [] // private
-  selectedItem = null // public
+  #items = []; // private
+  selectedItem = null; // public
 
   constructor() {
-    super()
-    this.inputFn = this.inputFn.bind(this)
+    super();
+    this.inputFn = this.inputFn.bind(this);
   }
 
   connectedCallback() {
-    this.appendChild(template.content.cloneNode(true))
+    this.appendChild(template.content.cloneNode(true));
 
     // console.log('listid', this.listid)
-    this.querySelector('datalist').id = this.listid
-    this.querySelector('input').setAttribute('list', this.listid)
+    this.querySelector('datalist').id = this.listid;
+    this.querySelector('input').setAttribute('list', this.listid);
 
-    const el = this.querySelector('input')
-    el.addEventListener('input', this.inputFn)
+    const el = this.querySelector('input');
+    el.addEventListener('input', this.inputFn);
 
-    el.onblur = (e) => {
+    el.onblur = e => {
       const found = this.items.find(item => {
-        return typeof item === 'string' ? item === this.value : item.key === this.value || item.text === this.value
-      })
-      if (!found) { // not found
+        return typeof item === 'string' ? item === this.value : item.key === this.value || item.text === this.value;
+      });
+      if (!found) {
+        // not found
         if (this.selectedItem) {
           // console.log('not found but is selected')
-          this.selectedItem = null
-          this.dispatchEvent(new CustomEvent('selected', { detail: this.selectedItem }))
+          this.selectedItem = null;
+          this.dispatchEvent(new CustomEvent('selected', { detail: this.selectedItem }));
         }
       } else {
         if (!this.selectedItem) {
           // console.log('found but not selected')
-          this.selectedItem = found
-          this.dispatchEvent(new CustomEvent('selected', { detail: this.selectedItem }))
+          this.selectedItem = found;
+          this.dispatchEvent(new CustomEvent('selected', { detail: this.selectedItem }));
         }
       }
-    }
+    };
     // console.log('setup stuff', this.required, this.disabled, this.inputClass)
-    el.value = this.value
-    el.className = this.inputClass || 'input' // default to bulma?
+    el.value = this.value;
+    el.className = this.inputClass || 'input'; // default to bulma?
 
-    if (this.required) el.setAttribute('required', '')
-    else el.removeAttribute('required')
-    if (this.disabled) el.setAttribute('disabled', '')
-    else el.removeAttribute('disabled')
+    if (this.required) el.setAttribute('required', '');
+    else el.removeAttribute('required');
+    if (this.disabled) el.setAttribute('disabled', '');
+    else el.removeAttribute('disabled');
 
-    this.setList(this.items)
+    this.setList(this.items);
   }
 
   disconnectedCallback() {
-    const el = this.querySelector('input')
-    el.removeEventListener('input', this.inputFn)
+    const el = this.querySelector('input');
+    el.removeEventListener('input', this.inputFn);
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
-    const el = this.querySelector('input')
+    const el = this.querySelector('input');
     switch (name) {
       case 'value': {
-        if (el) el.value = newVal
-        this.dispatchEvent(new CustomEvent('input', { detail: newVal }))
-        break
+        if (el) el.value = newVal;
+        this.dispatchEvent(new CustomEvent('input', { detail: newVal }));
+        break;
       }
       case 'required': {
-        if (el) el.setAttribute('required', '')
-        break
+        if (el) el.setAttribute('required', '');
+        break;
       }
       case 'disabled': {
-        if (el) el.setAttribute('disabled', '')
-        break
+        if (el) el.setAttribute('disabled', '');
+        break;
       }
       case 'input-class': {
-        if (el) el.className = newVal
-        break
+        if (el) el.className = newVal;
+        break;
       }
       default:
-        break
+        break;
     }
   }
 
   static get observedAttributes() {
-    return ['value', 'required', 'listid', 'disabled', 'input-class']
+    return ['value', 'required', 'listid', 'disabled', 'input-class'];
   }
 
-  get value() { return this.getAttribute('value') }
-  set value(val) { this.setAttribute('value', val) }
+  get value() {
+    return this.getAttribute('value');
+  }
+  set value(val) {
+    this.setAttribute('value', val);
+  }
 
-  get required() { return this.hasAttribute('required') }
+  get required() {
+    return this.hasAttribute('required');
+  }
   set required(val) {
     if (val) {
-      this.setAttribute('required', '')
+      this.setAttribute('required', '');
     } else {
-      this.removeAttribute('required')
+      this.removeAttribute('required');
     }
   }
 
-  get listid() { return this.getAttribute('listid') }
-  set listid(val) { this.setAttribute('listid', val) }
+  get listid() {
+    return this.getAttribute('listid');
+  }
+  set listid(val) {
+    this.setAttribute('listid', val);
+  }
 
-  get disabled() { return this.hasAttribute('disabled') }
+  get disabled() {
+    return this.hasAttribute('disabled');
+  }
   set disabled(val) {
     if (val) {
-      this.setAttribute('disabled', '')
+      this.setAttribute('disabled', '');
     } else {
-      this.removeAttribute('disabled')
+      this.removeAttribute('disabled');
     }
   }
 
-  get inputClass() { return this.getAttribute('input-class') }
-  set inputClass(val) { this.setAttribute('input-class', val) }
+  get inputClass() {
+    return this.getAttribute('input-class');
+  }
+  set inputClass(val) {
+    this.setAttribute('input-class', val);
+  }
 
   // properties
   get items() {
-    return this.#items
+    return this.#items;
   }
   set items(val) {
     // console.log('set items', val.length)
-    this.#items = val
-    this.setList(val)
+    this.#items = val;
+    this.setList(val);
   }
 
-  inputFn(e) { // whether clicked or typed
+  inputFn(e) {
+    // whether clicked or typed
     // console.log('inputFn', e.target.value, this.items.length)
-    const el = this.querySelector('input')
-    const prevItem = this.selectedItem
-    this.value = el.value
+    const el = this.querySelector('input');
+    const prevItem = this.selectedItem;
+    this.value = el.value;
 
     const found = this.items.find(item => {
-      return typeof item === 'string' ? item === this.value : item.key === this.value || item.text === this.value
-    })
-    if (!found) { // not found
+      return typeof item === 'string' ? item === this.value : item.key === this.value || item.text === this.value;
+    });
+    if (!found) {
+      // not found
       // console.log('emit search')
-      this.selectedItem = null
-      this.dispatchEvent(new CustomEvent('search', { detail: this.value }))
+      this.selectedItem = null;
+      this.dispatchEvent(new CustomEvent('search', { detail: this.value }));
     } else {
-      this.selectedItem = found
+      this.selectedItem = found;
     }
     // console.log('emit selected?', prevItem !== this.selectedItem, this.selectedItem)
     if (prevItem !== this.selectedItem) {
-      this.dispatchEvent(new CustomEvent('selected', { detail: this.selectedItem }))
+      this.dispatchEvent(new CustomEvent('selected', { detail: this.selectedItem }));
     }
   }
 
   setList(_items) {
     // console.log('items', _items, this.value)
-    const dd = this.querySelector('datalist')
-    if (!dd) return
-    while(dd.firstChild) {
-      dd.removeChild(dd.lastChild)
+    const dd = this.querySelector('datalist');
+    if (!dd) return;
+    while (dd.firstChild) {
+      dd.removeChild(dd.lastChild);
     }
-    if (typeof _items !== 'object') return
+    if (typeof _items !== 'object') return;
 
-    _items.forEach((item) => {
-      const li = document.createElement('option')
-      li.innerHTML = typeof item === 'string' ? item : item.key
-      li.value = typeof item === 'string' ? item : item.text
-      dd.appendChild(li)
-    })
+    _items.forEach(item => {
+      const li = document.createElement('option');
+      li.innerHTML = typeof item === 'string' ? item : item.key;
+      li.value = typeof item === 'string' ? item : item.text;
+      dd.appendChild(li);
+    });
   }
 }
 
-customElements.define('bwc-autocomplete', AutoComplete)
+customElements.define('bwc-autocomplete', AutoComplete);

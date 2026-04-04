@@ -7,7 +7,7 @@ import OSSUploader from './oss-uploader-client.js';
 
 const uploader = new OSSUploader({
   signEndpoint: '/api/oss/sign',
-  chunkSize: 10 * 1024 * 1024,  // 10MB
+  chunkSize: 10 * 1024 * 1024, // 10MB
   maxConcurrent: 3,
 });
 
@@ -16,7 +16,7 @@ async function uploadFile(file) {
   try {
     const result = await uploader.upload(file, {
       key: `uploads/${Date.now()}-${file.name}`,
-      onProgress: (pct) => {
+      onProgress: pct => {
         // TBD console.log(`${pct}%`);
         document.getElementById('progress').value = pct;
       },
@@ -35,7 +35,7 @@ async function uploadWithCancel(file) {
   try {
     const result = await uploader.upload(file, {
       key: `uploads/${file.name}`,
-      onProgress: (pct) => {
+      onProgress: pct => {
         // TBD console.log(`${pct}%`)
       },
       signal: controller.signal,
@@ -51,11 +51,10 @@ async function uploadWithCancel(file) {
   }
 }
 
-document.getElementById('fileInput').addEventListener('change', (e) => {
+document.getElementById('fileInput').addEventListener('change', e => {
   if (e.target.files[0]) uploadWithCancel(e.target.files[0]);
 });
 document.getElementById('cancelBtn').addEventListener('click', () => controller?.abort());
-
 
 // ─── 2. React component ───────────────────────────────────────────────────────
 /*
@@ -112,7 +111,6 @@ export function OSSFileUpload() {
   );
 }
 */
-
 
 /*
   Minimal HTML (vanilla):

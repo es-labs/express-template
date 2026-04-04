@@ -7,7 +7,7 @@
   <p class="test-bg"><a href="../index.html">Back To Demo</a></p>
 </div>
 */
-const template = /*html*/`
+const template = /*html*/ `
 <section ref="topRef" class="hero is-primary is-fullheight">
   <div class="hero-body">
     <div class="container">
@@ -50,64 +50,64 @@ const template = /*html*/`
     </div>
   </div>
 </section>
-`
+`;
 
-const styles = /*html*/`
+const styles = /*html*/ `
 .test-bg {
   background-color: darkblue !important;
 }
-`
+`;
 
-const { onMounted, ref } = Vue
-const { useRouter } = VueRouter
+const { onMounted, ref } = Vue;
+const { useRouter } = VueRouter;
 
-import { statex } from '../store.js'
+import { statex } from '../store.js';
 
 export default {
   template,
   setup() {
-    const email = ref('1111')
-    const password = ref('1111')
-    const router = useRouter()
+    const email = ref('1111');
+    const password = ref('1111');
+    const router = useRouter();
 
-    const topRef = ref(null)
-    const recaptchaSiteKey = ref('6LcjlzkUAAAAAOwP26tCRCivcYyAu3hQ7AlMPLh3')
+    const topRef = ref(null);
+    const recaptchaSiteKey = ref('6LcjlzkUAAAAAOwP26tCRCivcYyAu3hQ7AlMPLh3');
 
     onMounted(async () => {
       // console.log(topRef)
       // TODO loading spinner...
-      console.log('SignIn mounted!')
+      console.log('SignIn mounted!');
       if (window.location.hash) {
-        alert('Test OAuth callback Success! Remember to remove hash from front of token', window.location.hash) // token-refresh_token, - character is seperator
+        alert('Test OAuth callback Success! Remember to remove hash from front of token', window.location.hash); // token-refresh_token, - character is seperator
       }
 
       // set google recaptcha callbacks
       // https://www.google.com/recaptcha/about/
-      const recaptchaEl = document.querySelector('.g-recaptcha')
+      const recaptchaEl = document.querySelector('.g-recaptcha');
       if (recaptchaEl) {
-        window.onRecaptchaSuccess = (token) => console.log('recaptcha token', token) // use this to enable button
-        window.onRecaptchaExpired = () => console.log('recaptcha expired')
-        window.onRecaptchaError = (e) => console.log('recaptcha error', e)
-        recaptchaEl.setAttribute('data-callback', 'onRecaptchaSuccess')
-        recaptchaEl.setAttribute('data-expired-callback', 'onRecaptchaExpired')
-        recaptchaEl.setAttribute('data-error-callback', 'onRecaptchaError')  
+        window.onRecaptchaSuccess = token => console.log('recaptcha token', token); // use this to enable button
+        window.onRecaptchaExpired = () => console.log('recaptcha expired');
+        window.onRecaptchaError = e => console.log('recaptcha error', e);
+        recaptchaEl.setAttribute('data-callback', 'onRecaptchaSuccess');
+        recaptchaEl.setAttribute('data-expired-callback', 'onRecaptchaExpired');
+        recaptchaEl.setAttribute('data-error-callback', 'onRecaptchaError');
       }
 
       // thank you Arjay for this! https://plnkr.co/edit/tjhkcfNO15aTNhsU
-      const style = document.createElement('style')
-      style.innerHTML = styles
-      topRef.value.prepend(style)
-    })
+      const style = document.createElement('style');
+      style.innerHTML = styles;
+      topRef.value.prepend(style);
+    });
 
     const login = () => {
-      statex.user = email.value
-      router.push('/dashboard')
-    }
+      statex.user = email.value;
+      router.push('/dashboard');
+    };
 
     const oauthLogin = () => {
-      const url = `${window.location.href}/index.html#sometoken`
-      window.location.replace(url)
-    }
+      const url = `${window.location.href}/index.html#sometoken`;
+      window.location.replace(url);
+    };
 
     return {
       topRef,
@@ -115,7 +115,7 @@ export default {
       password,
       recaptchaSiteKey,
       login,
-      oauthLogin
-    }
-  }
-}
+      oauthLogin,
+    };
+  },
+};

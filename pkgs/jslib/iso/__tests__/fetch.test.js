@@ -13,9 +13,19 @@ function createFetchMock() {
   };
 
   fn.calls = calls;
-  fn.mockResolvedValueOnce = (value) => { responses.push(value); return fn; };
-  fn.mockResolvedValue = (value) => { responses.length = 0; responses.push(value); return fn; };
-  fn.mockClear = () => { calls.length = 0; responses.length = 0; };
+  fn.mockResolvedValueOnce = value => {
+    responses.push(value);
+    return fn;
+  };
+  fn.mockResolvedValue = value => {
+    responses.length = 0;
+    responses.push(value);
+    return fn;
+  };
+  fn.mockClear = () => {
+    calls.length = 0;
+    responses.length = 0;
+  };
   return fn;
 }
 
@@ -64,7 +74,7 @@ describe.skip('fetch.js', () => {
         urlOrigin: 'http://localhost',
         urlPath: '/api/test',
         urlFull: 'http://localhost/api/test',
-        urlSearch: ''
+        urlSearch: '',
       });
     });
 
@@ -74,7 +84,7 @@ describe.skip('fetch.js', () => {
         urlOrigin: 'http://localhost',
         urlPath: '/api/test',
         urlFull: 'http://localhost/api/test',
-        urlSearch: '?key=value'
+        urlSearch: '?key=value',
       });
     });
 
@@ -105,7 +115,7 @@ describe.skip('fetch.js', () => {
     it('should make a successful GET request', async () => {
       fetchMock.mockResolvedValueOnce({
         status: 200,
-        text: () => Promise.resolve('{"data": "test"}')
+        text: () => Promise.resolve('{"data": "test"}'),
       });
 
       const result = await fetchInstance.http('GET', 'http://localhost/api/test');
@@ -119,7 +129,7 @@ describe.skip('fetch.js', () => {
     it('should handle query parameters', async () => {
       fetchMock.mockResolvedValueOnce({
         status: 200,
-        text: () => Promise.resolve('')
+        text: () => Promise.resolve(''),
       });
 
       await fetchInstance.http('GET', 'http://localhost/api/test', null, { key: 'value' });
@@ -129,7 +139,7 @@ describe.skip('fetch.js', () => {
     it('should handle POST with JSON body', async () => {
       fetchMock.mockResolvedValueOnce({
         status: 201,
-        text: () => Promise.resolve('')
+        text: () => Promise.resolve(''),
       });
 
       await fetchInstance.http('POST', 'http://localhost/api/test', { name: 'test' });
@@ -142,9 +152,11 @@ describe.skip('fetch.js', () => {
     it('should handle POST with URL-encoded body', async () => {
       fetchMock.mockResolvedValueOnce({
         status: 201,
-        text: () => Promise.resolve('')
+        text: () => Promise.resolve(''),
       });
-      await fetchInstance.http('POST', 'http://localhost/api/test', { name: 'test' }, null, { 'Content-Type': 'application/x-www-form-urlencoded' });
+      await fetchInstance.http('POST', 'http://localhost/api/test', { name: 'test' }, null, {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      });
       assert.strictEqual(fetchMock.calls[0][0], 'http://localhost/api/test');
       assert.strictEqual(fetchMock.calls[0][1].method, 'POST');
       assert.strictEqual(fetchMock.calls[0][1].body.toString(), 'name=test');
@@ -155,7 +167,9 @@ describe.skip('fetch.js', () => {
       fetchMock.mockResolvedValueOnce({ status: 201, text: () => Promise.resolve('') });
 
       const binaryData = new Uint8Array(Buffer.from('Hello', 'utf-8'));
-      await fetchInstance.http('POST', 'http://localhost/api/test', binaryData, null, { 'Content-Type': 'application/octet-stream' });
+      await fetchInstance.http('POST', 'http://localhost/api/test', binaryData, null, {
+        'Content-Type': 'application/octet-stream',
+      });
       assert.strictEqual(fetchMock.calls[0][0], 'http://localhost/api/test');
       assert.strictEqual(fetchMock.calls[0][1].method, 'POST');
       assert.strictEqual(fetchMock.calls[0][1].body.toString(), binaryData.toString());
@@ -175,15 +189,15 @@ describe.skip('fetch.js', () => {
     it('should handle 401 with token refresh', async () => {
       fetchMock.mockResolvedValueOnce({
         status: 401,
-        text: () => Promise.resolve('{"message": "Token Expired Error"}')
+        text: () => Promise.resolve('{"message": "Token Expired Error"}'),
       });
       fetchMock.mockResolvedValueOnce({
         status: 200,
-        text: () => Promise.resolve('{"access_token": "new_access", "refresh_token": "new_refresh"}')
+        text: () => Promise.resolve('{"access_token": "new_access", "refresh_token": "new_refresh"}'),
       });
       fetchMock.mockResolvedValueOnce({
         status: 200,
-        text: () => Promise.resolve('{"data": "success"}')
+        text: () => Promise.resolve('{"data": "success"}'),
       });
 
       fetchInstance.setOptions({ refreshUrl: '/refresh' });
@@ -199,37 +213,49 @@ describe.skip('fetch.js', () => {
 
     it('should throw when token refresh fails', { only: false }, async () => {
       fetchMock.mockResolvedValueOnce({
-        status: 401, text: () => Promise.resolve('{"message": "Token Expired Error"}')
+        status: 401,
+        text: () => Promise.resolve('{"message": "Token Expired Error"}'),
       });
       fetchMock.mockResolvedValueOnce({ status: 404, text: () => Promise.resolve('{"message": "error"}') });
       fetchInstance.setOptions({ refreshUrl: '/refresh' });
       fetchInstance.setTokens({ access: 'old_access', refresh: 'old_refresh' });
 
-      await assert.rejects(async () => {
-        await fetchInstance.http('GET', 'http://localhost/api/test');
-      }, (err) => {
-        assert.strictEqual(err.status, 404);
-        assert.deepStrictEqual(err.data, { message: 'error' });
-        return true;
-      });
+      await assert.rejects(
+        async () => {
+          await fetchInstance.http('GET', 'http://localhost/api/test');
+        },
+        err => {
+          assert.strictEqual(err.status, 404);
+          assert.deepStrictEqual(err.data, { message: 'error' });
+          return true;
+        },
+      );
       assert.strictEqual(fetchInstance.tokens.access, 'old_access');
       assert.strictEqual(fetchMock.calls.length, 2);
     });
 
     it('should throw on error status', async () => {
       fetchMock.mockResolvedValueOnce({ status: 404, text: () => Promise.resolve('') });
-      await assert.rejects(async () => { await fetchInstance.http('GET', 'http://localhost/api/test'); });
+      await assert.rejects(async () => {
+        await fetchInstance.http('GET', 'http://localhost/api/test');
+      });
     });
 
     it('should call forceLogoutFn on 401/403 without token error', async () => {
       let logoutCalled = false;
-      fetchInstance.setOptions({ forceLogoutFn: () => { logoutCalled = true; } });
+      fetchInstance.setOptions({
+        forceLogoutFn: () => {
+          logoutCalled = true;
+        },
+      });
       fetchMock.mockResolvedValueOnce({
         status: 401,
-        text: () => Promise.resolve('{"message": "Unauthorized"}')
+        text: () => Promise.resolve('{"message": "Unauthorized"}'),
       });
 
-      await assert.rejects(async () => { await fetchInstance.http('GET', 'http://localhost/api/test'); });
+      await assert.rejects(async () => {
+        await fetchInstance.http('GET', 'http://localhost/api/test');
+      });
       assert.strictEqual(logoutCalled, true);
     });
   });
@@ -238,7 +264,7 @@ describe.skip('fetch.js', () => {
     beforeEach(() => {
       fetchMock.mockResolvedValue({
         status: 200,
-        text: () => Promise.resolve('')
+        text: () => Promise.resolve(''),
       });
     });
 

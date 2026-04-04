@@ -31,7 +31,8 @@
     "git:branch": "git rev-parse --abbrev-ref HEAD",
     "lint": "biome lint apps",
     "lint:fix": "biome lint --only=useTemplate --write --unsafe apps",
-    "format": "biome format --write .",
+    "format": "biome format --write",
+    "format:fix": "biome format --write apps",
     "check": "biome check --write .",
     "check:apps": "biome check --write apps",
     "check:libs": "biome check --write libs",
@@ -53,7 +54,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
-    "@redocly/cli": "^2.25.3",
+    "@redocly/cli": "^2.25.4",
     "node-mocks-http": "^1.17.2",
     "start-server-and-test": "^3.0.0"
   },

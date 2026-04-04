@@ -6,31 +6,34 @@
 // res.statusMessage = 200
 // TDB signatureUrlV4 & usage
 
-import OSS from 'ali-oss'
+import OSS from 'ali-oss';
 
-const { OSS_AK_ID, OSS_AK_SECRET, OSS_REGION, OSS_BUCKET } = process.env
+const { OSS_AK_ID, OSS_AK_SECRET, OSS_REGION, OSS_BUCKET } = process.env;
 
-const store = (OSS_AK_ID && OSS_AK_SECRET && OSS_REGION) ? new OSS({
-  region: OSS_REGION,
-  accessKeyId: OSS_AK_ID,
-  accessKeySecret: OSS_AK_SECRET,
-  bucket: OSS_BUCKET,
-}) : null
+const store =
+  OSS_AK_ID && OSS_AK_SECRET && OSS_REGION
+    ? new OSS({
+        region: OSS_REGION,
+        accessKeyId: OSS_AK_ID,
+        accessKeySecret: OSS_AK_SECRET,
+        bucket: OSS_BUCKET,
+      })
+    : null;
 
 /**
  * get count of objects in a bucket.
  * @param {{ bucketName: string }}
- * @returns {{ status: Number, count: Number }} 
+ * @returns {{ status: Number, count: Number }}
  */
 const countBucketObjects = async (bucketName = null) => {
   try {
-    const result = await store.getBucketStat(bucketName)
-    return { status: 200, count: result?.stat?.ObjectCount }
+    const result = await store.getBucketStat(bucketName);
+    return { status: 200, count: result?.stat?.ObjectCount };
   } catch (e) {
     // status 404, code: NoSuchBucket
-    return { status: e.status, count: 0 }
+    return { status: e.status, count: 0 };
   }
-}
+};
 
 /**
  * A point on a two dimensional plane.
@@ -48,93 +51,93 @@ const countBucketObjects = async (bucketName = null) => {
 /**
  * get count of objects in a bucket.
  * @param {{ prefix: string, maxKeys: Number }}
- * @returns {{ status: Number, statusMessage: string, [objects]: ListV2Object[] }} 
+ * @returns {{ status: Number, statusMessage: string, [objects]: ListV2Object[] }}
  */
 const listObjects = async ({ prefix = '', maxKeys = 10 } = {}) => {
   // console.log(prefix, maxKeys)
   try {
     const result = await store.listV2({
       prefix,
-      'max-keys': maxKeys
-    })
+      'max-keys': maxKeys,
+    });
     // console.log(result.res)
-    const { status, statusMessage } = result.res
+    const { status, statusMessage } = result.res;
     return {
       status,
       statusMessage,
-      objects: result.objects
-    }
+      objects: result.objects,
+    };
   } catch (e) {
     // console.log('ali - listObjects', e)
-    return { status: 500, statusMessage: e.toString() }
+    return { status: 500, statusMessage: e.toString() };
   }
-}
+};
 
 /**
  * put object in a bucket.
  * @param {string} key - the object key - e.g. test/hello.txt
  * @param {string|Buffer|ReadableStream} payload - file data
- * @returns {{ status: Number, statusMessage: string }} 
+ * @returns {{ status: Number, statusMessage: string }}
  */
 const putObject = async (key, payload) => {
   // if (!store) return null
   try {
-    const result = await store.put(key, payload) // 
+    const result = await store.put(key, payload); //
     // console.log(result)
-    const { status, statusMessage } = result.res
-    return { status, statusMessage }
+    const { status, statusMessage } = result.res;
+    return { status, statusMessage };
   } catch (e) {
     // console.log('ali - putObject', e)
-    return { status: 500, statusMessage: e.toString() }
+    return { status: 500, statusMessage: e.toString() };
   }
-}
+};
 
 /**
  * get object.
  * @param {string} key - the object key - e.g. test/hello.txt
  * @param {string|Buffer|ReadableStream} payload - file data
- * @returns {{ status: Number, statusMessage: string, [buffer]: Buffer }} 
+ * @returns {{ status: Number, statusMessage: string, [buffer]: Buffer }}
  */
-const getObject = async (key) => {
+const getObject = async key => {
   // if (!store) return null
   try {
-    const result = await store.get(key)
+    const result = await store.get(key);
     // console.log(typeof result.content, result.content.toString('utf-8')) // content is Buffer object
     // console.log(Buffer.isBuffer(result.content))
     // console.log(result)
-    const { status, statusMessage} = result?.res || {}
+    const { status, statusMessage } = result?.res || {};
     return {
       status,
       statusMessage,
-      buffer: result?.content
-    }
+      buffer: result?.content,
+    };
   } catch (e) {
     // console.log('ali - getObject', e)
-    return { status: 500, statusMessage: e.toString() }
+    return { status: 500, statusMessage: e.toString() };
   }
-}
+};
 
 /**
  * get object.
  * @param {string[]} keys - the object keys - e.g. ['test/hello.txt','abc/d123.txt']
  * @returns {{ status: Number, statusMessage: string, [deleted]: { Key: string }[] }}
  */
-const deleteObjects = async (keys) => {
+const deleteObjects = async keys => {
   // if (!store) return null
   try {
-    const result = await store.deleteMulti(keys, {})
+    const result = await store.deleteMulti(keys, {});
     // console.log(result)
-    const { status, statusMessage } = result?.res || {}
+    const { status, statusMessage } = result?.res || {};
     return {
       status,
       statusMessage,
-      deleted: result.deleted
-    }
+      deleted: result.deleted,
+    };
   } catch (e) {
     // console.log('ali - deleteObjects', e)
-    return { status: 500, statusMessage: e.toString() }
+    return { status: 500, statusMessage: e.toString() };
   }
-}
+};
 
 // (method, expires[, request, objectName, additionalHeaders])
 /**
@@ -144,10 +147,10 @@ const deleteObjects = async (keys) => {
  * @param {string} key - the object key - e.g. test/hello.txt
  */
 const getSignedUrl = async (method, expires, key, headers = null, additional = null) => {
-  const signedUrl = await store.signatureUrlV4(method, expires, headers, key, additional)
+  const signedUrl = await store.signatureUrlV4(method, expires, headers, key, additional);
   // console.log(signedUrl)
-  return signedUrl
-}
+  return signedUrl;
+};
 
 /**
  * get a signed URL to write a file to OSS.
@@ -161,24 +164,24 @@ const getSignedUrl = async (method, expires, key, headers = null, additional = n
  */
 const getUploadURL = async (directory, filename, contentType, action = 'write', expiration = 7200, callbackConfig) => {
   if (!action || !filename) {
-    return { error: 'filename and action required' }
+    return { error: 'filename and action required' };
   }
 
   try {
-    let url
+    let url;
 
     // write / new file action
     if (action === 'write') {
-      const arr = filename.split('.')
+      const arr = filename.split('.');
 
       arr[0] = crypto
         .createHash('sha256')
         .update(arr[0] + Date.now())
-        .digest('hex')
+        .digest('hex');
 
-      const newFilename = arr.join('.')
+      const newFilename = arr.join('.');
 
-      const fullPath = directory ? `${directory}/${newFilename}` : newFilename
+      const fullPath = directory ? `${directory}/${newFilename}` : newFilename;
 
       url = await store.signatureUrl(fullPath, {
         expires: expiration,
@@ -186,19 +189,19 @@ const getUploadURL = async (directory, filename, contentType, action = 'write', 
         'Content-Type': contentType,
         callback: {
           url: callbackConfig?.callback_url,
-          body: JSON.stringify({...callbackConfig?.body, filename, filepath: fullPath}),
-          contentType: 'application/json'
-        }
-      })
+          body: JSON.stringify({ ...callbackConfig?.body, filename, filepath: fullPath }),
+          contentType: 'application/json',
+        },
+      });
     } else {
-      url = await store.signatureUrl(filename)
+      url = await store.signatureUrl(filename);
     }
 
-    return { url }
+    return { url };
   } catch (e) {
-    return { error: e.toString() }
+    return { error: e.toString() };
   }
-}
+};
 
 const test = async () => {
   // [bucket count]
@@ -230,7 +233,7 @@ const test = async () => {
   // const deleteRes = await deleteObjects(['ahello1.txt', 'ahello2.txt', 'ahello3.txt'])
   // console.log(deleteRes)
 
-  const url = await getSignedUrl('GET', 60, 'hello1.txt')
+  const url = await getSignedUrl('GET', 60, 'hello1.txt');
   /*
   // -------------------------------------------------
   //  PutObject
@@ -252,7 +255,7 @@ const test = async () => {
   );
   console.log(putObejctUrl);
   */
-}
+};
 
 // test()
 
@@ -267,12 +270,4 @@ const test = async () => {
 //   } while (nextContinuationToken)
 // }
 // listBucketInventory()
-export {
-  countBucketObjects,
-  listObjects,
-  putObject,
-  getObject,
-  deleteObjects,
-  getSignedUrl,
-  getUploadURL
-}
+export { countBucketObjects, listObjects, putObject, getObject, deleteObjects, getSignedUrl, getUploadURL };

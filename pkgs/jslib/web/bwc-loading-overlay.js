@@ -1,5 +1,5 @@
 // FRONTEND ONLY
-const template = document.createElement('template')
+const template = document.createElement('template');
 template.innerHTML = `
 <style>
   #overlay {
@@ -32,23 +32,23 @@ template.innerHTML = `
   }    
 </style>
 <div id="overlay"><div class="loader"></div></div>
-`
+`;
 class LoadingOverlay extends HTMLElement {
   constructor() {
-    super()
-    const shadowRoot = this.attachShadow({ mode: 'open' })
-    shadowRoot.appendChild(template.content.cloneNode(true))
+    super();
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
   static get observedAttributes() {
-    return ['show']
+    return ['show'];
   }
   get show() {
-    return this.hasAttribute('show')
+    return this.hasAttribute('show');
   }
   set show(value) {
-    value ? this.setAttribute('show', '') : this.removeAttribute('show')
+    value ? this.setAttribute('show', '') : this.removeAttribute('show');
   }
 }
 
-customElements.define('bwc-loading-overlay', LoadingOverlay)
+customElements.define('bwc-loading-overlay', LoadingOverlay);

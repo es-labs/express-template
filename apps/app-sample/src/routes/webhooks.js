@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 // const { authUser } = require('@es-labs/jslib/auth')
 
 // channel
@@ -16,8 +16,8 @@ import express from "express";
 // There will be no bots in contact list, so you need to search for it. Enter your bot's username
 // Clicking on it you make it as administrator./33126743/how-do-i-add-my-bot-to-a-channel
 
-
-export default express.Router()
+export default express
+  .Router()
   .get('/', (req, res) => res.send('Webhooks OK'))
   // body {
   //   msisdn: '6588888888',
@@ -31,8 +31,10 @@ export default express.Router()
   // }
   // TODO need to handle the Nexmo MO-SNS
   .post('/nexmo-mo-sms', async (req, res) => {
-    const { body, query, params} = req
+    const { body, query, params } = req;
     res.json({
-      body, query, params
-    })
-  })
+      body,
+      query,
+      params,
+    });
+  });

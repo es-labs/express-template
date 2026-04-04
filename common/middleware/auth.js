@@ -1,10 +1,9 @@
 const authIsAdmin = async (req, res, next) => {
   if (req.decoded.groups.includes('admin')) {
-    return next()
+    return next();
+  } else {
+    return res.status(401).json({ error: 'Not Allowed' });
   }
-  else {
-    return res.status(401).json({ error: 'Not Allowed' })
-  }
-}
+};
 
 export { authIsAdmin };

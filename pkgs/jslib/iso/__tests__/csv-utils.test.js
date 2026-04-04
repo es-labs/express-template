@@ -55,19 +55,13 @@ describe.skip('csv-utils.js', () => {
     });
 
     it('should throw on column mismatch unless ignoreColumnMismatch is true', () => {
-      const arr = [
-        { a: 1, b: 'foo' },
-        { a: 2 },
-      ];
+      const arr = [{ a: 1, b: 'foo' }, { a: 2 }];
       assert.throws(() => jsonToCsv(arr));
       assert.doesNotThrow(() => jsonToCsv(arr, ',', '\n', true));
     });
 
     it('should not add missing columns when ignoreColumnMismatch is true', () => {
-      const arr = [
-        { a: 1, b: 'foo' },
-        { a: 2 },
-      ];
+      const arr = [{ a: 1, b: 'foo' }, { a: 2 }];
       assert.strictEqual(jsonToCsv(arr, ',', '\n', true), 'a,b\n1,foo\n2\n');
     });
   });
@@ -78,7 +72,7 @@ describe.skip('csv-utils.js', () => {
       const result = csvToJson({ _text: csv });
       assert.deepStrictEqual(result, [
         { a: '1', b: 'foo' },
-        { a: '2', b: 'bar' }
+        { a: '2', b: 'bar' },
       ]);
     });
 
@@ -101,7 +95,11 @@ describe.skip('csv-utils.js', () => {
       const csv = 'a,b\n1,2\n3,4\n';
       const result = parseAndValidateCsv(csv);
       assert.strictEqual(result.valid, true);
-      assert.deepStrictEqual(result.rows, [['a', 'b'], ['1', '2'], ['3', '4']]);
+      assert.deepStrictEqual(result.rows, [
+        ['a', 'b'],
+        ['1', '2'],
+        ['3', '4'],
+      ]);
     });
 
     it('should detect unclosed quotes', () => {
@@ -122,7 +120,10 @@ describe.skip('csv-utils.js', () => {
       const csv = 'a,b\n1,"{ ""aa"": ""123"" }"\n';
       const result = parseAndValidateCsv(csv);
       assert.strictEqual(result.valid, true);
-      assert.deepStrictEqual(result.rows, [['a', 'b'], ['1', '{ "aa": "123" }']]);
+      assert.deepStrictEqual(result.rows, [
+        ['a', 'b'],
+        ['1', '{ "aa": "123" }'],
+      ]);
     });
   });
 });

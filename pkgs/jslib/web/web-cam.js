@@ -1,5 +1,5 @@
 // FRONTEND ONLY
-const template = document.createElement('template')
+const template = document.createElement('template');
 template.innerHTML = `
 <style>
 body {
@@ -55,80 +55,81 @@ body {
     <button class="button" id="unsnap">Start Camera</button>
   </slot>
 </div>
-`
+`;
 
 class WebCam extends HTMLElement {
   constructor() {
-    super()
-    const shadowRoot = this.attachShadow({ mode: 'open' })
-    shadowRoot.appendChild(template.content.cloneNode(true))
+    super();
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    shadowRoot.appendChild(template.content.cloneNode(true));
 
-    this.capture = this.capture.bind(this) // bind callback function
+    this.capture = this.capture.bind(this); // bind callback function
     // captures: []
 
-    this.slotNode = { // TBD change ['button-snap'] to 'button-snap'
+    this.slotNode = {
+      // TBD change ['button-snap'] to 'button-snap'
       'button-snap': this.shadowRoot.querySelector('#snap'),
-      'button-unsnap': this.shadowRoot.querySelector('#unsnap')
-    }
+      'button-unsnap': this.shadowRoot.querySelector('#unsnap'),
+    };
 
-    const slots = this.shadowRoot.querySelectorAll('slot')
-    const slotMap = {}
-    slots.forEach((slot) => {
-      slotMap[slot.name] = slot
-      slot.addEventListener('slotchange', (e) => {
+    const slots = this.shadowRoot.querySelectorAll('slot');
+    const slotMap = {};
+    slots.forEach(slot => {
+      slotMap[slot.name] = slot;
+      slot.addEventListener('slotchange', e => {
         if (this.slotNode[slot.name]) {
-          const nodes = slot.assignedNodes()
-          const btnNode = nodes[0]
-          this.slotNode[slot.name].removeEventListener('click', this.capture)
-          this.slotNode[slot.name] = btnNode
-          if (slot.name === 'button-snap') this.slotNode[slot.name].style.display = 'block'
-          if (slot.name === 'button-unsnap') this.slotNode[slot.name].style.display = 'none'
-          this.slotNode[slot.name].addEventListener('click', this.capture)
+          const nodes = slot.assignedNodes();
+          const btnNode = nodes[0];
+          this.slotNode[slot.name].removeEventListener('click', this.capture);
+          this.slotNode[slot.name] = btnNode;
+          if (slot.name === 'button-snap') this.slotNode[slot.name].style.display = 'block';
+          if (slot.name === 'button-unsnap') this.slotNode[slot.name].style.display = 'none';
+          this.slotNode[slot.name].addEventListener('click', this.capture);
         }
-      })
-    })
+      });
+    });
   }
 
   static get observedAttributes() {
-    return ['show']
+    return ['show'];
   }
 
   // getter and setter for property - show
   get show() {
-    return this.hasAttribute('show')
+    return this.hasAttribute('show');
   }
 
   set show(value) {
-    value ? this.setAttribute('show', '') : this.removeAttribute('show')
+    value ? this.setAttribute('show', '') : this.removeAttribute('show');
   }
 
   // added to the DOM
   connectedCallback() {
-    this.width = this.getAttribute('width') || 320
-    this.height = this.getAttribute('height') || 240
+    this.width = this.getAttribute('width') || 320;
+    this.height = this.getAttribute('height') || 240;
 
-    this.slotNode['button-snap'].addEventListener('click', this.capture)
-    this.slotNode['button-unsnap'].addEventListener('click', this.capture)
+    this.slotNode['button-snap'].addEventListener('click', this.capture);
+    this.slotNode['button-unsnap'].addEventListener('click', this.capture);
 
-    const containerEl = this.shadowRoot.querySelector('.container')
-    containerEl.style.width = `${this.width}px`
-    containerEl.style.height = `${this.height}px`
+    const containerEl = this.shadowRoot.querySelector('.container');
+    containerEl.style.width = `${this.width}px`;
+    containerEl.style.height = `${this.height}px`;
 
-    const videoEl = this.shadowRoot.querySelector('#video')
+    const videoEl = this.shadowRoot.querySelector('#video');
     if (navigator.mediaDevices?.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+      navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
         try {
-          videoEl.srcObject = stream
+          videoEl.srcObject = stream;
         } catch (e) {
-          videoEl.src = window.URL.createObjectURL(stream)
+          videoEl.src = window.URL.createObjectURL(stream);
         }
-        videoEl.play()
-      })
+        videoEl.play();
+      });
     }
-    videoEl.setAttribute('width', this.width)
-    videoEl.setAttribute('height', this.height)
+    videoEl.setAttribute('width', this.width);
+    videoEl.setAttribute('height', this.height);
 
-    this.captureMode = true
+    this.captureMode = true;
   }
 
   // attributeChangedCallback(name, oldVal, newVal) {} // attribute changed
@@ -136,38 +137,38 @@ class WebCam extends HTMLElement {
 
   // removed from the DOM
   disconnectedCallback() {
-    this.slotNode['button-snap'].removeEventListener('click', this.capture)
-    this.slotNode['button-unsnap'].removeEventListener('click', this.capture)
+    this.slotNode['button-snap'].removeEventListener('click', this.capture);
+    this.slotNode['button-unsnap'].removeEventListener('click', this.capture);
   }
 
   capture() {
-    const videoEl = this.shadowRoot.querySelector('#video')
+    const videoEl = this.shadowRoot.querySelector('#video');
     if (this.captureMode) {
-      const scale = 1
-      const canvas = document.createElement('canvas')
-      canvas.width = videoEl.clientWidth * scale
-      canvas.height = videoEl.clientHeight * scale
-      canvas.getContext('2d').drawImage(videoEl, 0, 0, canvas.width, canvas.height)
-      videoEl.pause()
+      const scale = 1;
+      const canvas = document.createElement('canvas');
+      canvas.width = videoEl.clientWidth * scale;
+      canvas.height = videoEl.clientHeight * scale;
+      canvas.getContext('2d').drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+      videoEl.pause();
 
       // console.log('videoEl', canvas.toDataURL('image/png'))
-      this.slotNode['button-snap'].style.display = 'none'
-      this.slotNode['button-unsnap'].style.display = 'block'
+      this.slotNode['button-snap'].style.display = 'none';
+      this.slotNode['button-unsnap'].style.display = 'block';
 
       const event = new CustomEvent('snap', {
-        detail: canvas.toDataURL('image/png')
-      })
-      this.dispatchEvent(event)
+        detail: canvas.toDataURL('image/png'),
+      });
+      this.dispatchEvent(event);
 
-      this.captureMode = false
+      this.captureMode = false;
     } else {
-      videoEl.play()
-      this.captureMode = true
-      this.slotNode['button-snap'].style.display = 'block'
-      this.slotNode['button-unsnap'].style.display = 'none'
+      videoEl.play();
+      this.captureMode = true;
+      this.slotNode['button-snap'].style.display = 'block';
+      this.slotNode['button-unsnap'].style.display = 'none';
       // set image data back to empty
     }
   }
 }
 
-customElements.define('vcxwc-web-cam', WebCam)
+customElements.define('vcxwc-web-cam', WebCam);

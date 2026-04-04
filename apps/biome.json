@@ -8,7 +8,7 @@
   "linter": {
     "rules": {
       "suspicious": {
-        "noConsole": "error"
+        "noConsole": "off"
       },
       "security": {
         "noGlobalEval": "error"

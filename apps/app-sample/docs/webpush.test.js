@@ -1,8 +1,8 @@
-import request from "supertest";
-import express from "express";
-import webpushRouter from "../routes/webpush";
-import { authFns } from "@es-labs/jslib/auth";
-import webpush from "@es-labs/jslib/comms/webpush";
+import request from 'supertest';
+import express from 'express';
+import webpushRouter from '../routes/webpush';
+import { authFns } from '@es-labs/jslib/auth';
+import webpush from '@es-labs/jslib/comms/webpush';
 
 jest.mock('@es-labs/jslib/auth');
 jest.mock('@es-labs/jslib/comms/webpush');

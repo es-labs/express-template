@@ -22,7 +22,7 @@
  *   ReadableStream that counts bytes as they are consumed by fetch.
  */
 
-const CHUNK_SIZE = 10 * 1024 * 1024;        // 10MB per part
+const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB per part
 const MULTIPART_THRESHOLD = 5 * 1024 * 1024; // Use multipart above 5MB
 
 class OSSUploader {
@@ -74,9 +74,15 @@ class OSSUploader {
       size: file.size,
     });
 
-    await this._putBlob(signedUrl, file, file.type, (loaded) => {
-      onProgress(Math.round((loaded / file.size) * 100));
-    }, signal);
+    await this._putBlob(
+      signedUrl,
+      file,
+      file.type,
+      loaded => {
+        onProgress(Math.round((loaded / file.size) * 100));
+      },
+      signal,
+    );
 
     onProgress(100);
     return { key, location };
@@ -123,7 +129,10 @@ class OSSUploader {
           signedUrl,
           chunk,
           file.type || 'application/octet-stream',
-          (loaded) => { partProgress[index] = loaded; reportProgress(); },
+          loaded => {
+            partProgress[index] = loaded;
+            reportProgress();
+          },
           signal,
           /* returnETag= */ true,
         );
@@ -212,7 +221,10 @@ class OSSUploader {
         try {
           while (true) {
             const { done, value } = await reader.read();
-            if (done) { controller.close(); break; }
+            if (done) {
+              controller.close();
+              break;
+            }
             uploadedBytes += value.byteLength;
             onProgress(uploadedBytes);
             controller.enqueue(value);

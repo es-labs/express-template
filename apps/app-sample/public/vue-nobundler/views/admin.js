@@ -1,4 +1,4 @@
-const template = /*html*/`
+const template = /*html*/ `
 <div>
   <h1>Admin</h1>
   <div class="dropdown"><!-- is-active -->
@@ -20,17 +20,16 @@ const template = /*html*/`
     </div>
   </div>
 </div>
-`
+`;
 
-const { onMounted } = Vue
+const { onMounted } = Vue;
 
 export default {
   template,
   setup() {
     onMounted(async () => {
-      console.log('Admin mounted!')
-    })
-    return {
-    }
-  }
-}
+      console.log('Admin mounted!');
+    });
+    return {};
+  },
+};

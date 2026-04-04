@@ -24,9 +24,7 @@ export function validate(target, schema) {
     const result = schema.safeParse(req[target]);
     if (!result.success) {
       // Zod v4: result.error.issues (renamed from .errors in v3)
-      const message = result.error.issues
-        .map(issue => `${issue.path.join('.')}: ${issue.message}`)
-        .join('; ');
+      const message = result.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join('; ');
       return next(new ValidationError(message));
     }
     req[target] = result.data;

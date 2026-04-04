@@ -1,7 +1,7 @@
-import * as mod from '/esm/upload-fe-testing.js'
+import * as mod from '/esm/upload-fe-testing.js';
 
-var files = []
-var p = true
+var files = [];
+var p = true;
 
 // function upload(blobOrFile) {
 //   var xhr = new XMLHttpRequest()
@@ -11,16 +11,19 @@ var p = true
 // }
 
 async function process() {
-  p = false
-  const result = await mod.uploadFiles(files)
-  console.log(result)
+  p = false;
+  const result = await mod.uploadFiles(files);
+  console.log(result);
   if (result.ok) {
-    self.postMessage("Files Uploaded Succesfully")
+    self.postMessage('Files Uploaded Succesfully');
   } else {
-    const msg = `Files Uploaded Error: ${result.message}` && result.message.includes('MulterError:') ? result.message.split("\n", 1) : 'Unknown' // TODO move text transform to backend API instead?
-    self.postMessage(msg)
+    const msg =
+      `Files Uploaded Error: ${result.message}` && result.message.includes('MulterError:')
+        ? result.message.split('\n', 1)
+        : 'Unknown'; // TODO move text transform to backend API instead?
+    self.postMessage(msg);
   }
-  p = true
+  p = true;
   // for (var j = 0; j < files.length; j++) {
   //   var blob = files[j]
   //   const BYTES_PER_CHUNK = 1024 * 1024
@@ -44,12 +47,12 @@ async function process() {
   // }
 }
 
-self.onmessage = (e) => {
+self.onmessage = e => {
   // self.postMessage('Data Len: ' + e.data.files.length)
   for (let j = 0; j < e.data.files.length; j++) {
-    files.push(e.data.files[j])
+    files.push(e.data.files[j]);
   }
   if (p) {
-    process()
+    process();
   }
-}
+};

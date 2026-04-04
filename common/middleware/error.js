@@ -1,5 +1,5 @@
 // middleware/errorHandler.js
-import { NotFoundError } from "../errors/AppError.js";
+import { NotFoundError } from '../errors/AppError.js';
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -18,9 +18,7 @@ function normalizeError(err) {
   }
 
   // Express v5 enforces valid status codes — map unknown ones safely
-  const status = Number.isInteger(err.status) && err.status >= 400 && err.status < 600
-    ? err.status
-    : 500;
+  const status = Number.isInteger(err.status) && err.status >= 400 && err.status < 600 ? err.status : 500;
 
   return {
     statusCode: status,
@@ -74,14 +72,14 @@ export const errorHandler = (err, req, res, next) => {
   };
 
   res.status(statusCode).json(body);
-}
+};
 
 /**
  * Catch-all 404 handler — place this after all your routes.
  */
 export const notFoundHandler = (req, res, next) => {
   next(new NotFoundError(req.path));
-}
+};
 
 // OBSOLOETE
 // export default (error, req, res, next) => {

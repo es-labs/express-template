@@ -1,4 +1,4 @@
-const template = /*html*/`
+const template = /*html*/ `
 <div>
   <h1>UI 1</h1>
   <p>Testing BWC UI </p>
@@ -59,130 +59,136 @@ const template = /*html*/`
   </div>
 
 </div>
-`
+`;
 
-const { onMounted, reactive, ref } = Vue
+const { onMounted, reactive, ref } = Vue;
 
 export default {
   template,
   setup() {
-    const mcRef = ref(null)
+    const mcRef = ref(null);
     const mc = reactive({
-      tags: []
-    })
+      tags: [],
+    });
     const ac = reactive({
       value: 'aa1',
       items: [], // ['aa9','aa5']
 
       multipleValue: ['aa1', 'aa2', 'aa1', 'aa3', 'aa4'], // this one becomes a string in v-mode... wrong way to set...
-      singleValue: 'aa5'
-    })
+      singleValue: 'aa5',
+    });
 
     const country = reactive({
       value: '',
-      items: []
-    })
+      items: [],
+    });
     const state = reactive({
       value: '',
       tags: [],
-      items: []
-    })
+      items: [],
+    });
 
-    const list = ['aa1', 'aa15', 'aa16', 'aa17', 'aa18', 'aa19', 'aa20', 'aa21', 'aa22', 'aa23', 'aa24', 'aa25']
+    const list = ['aa1', 'aa15', 'aa16', 'aa17', 'aa18', 'aa19', 'aa20', 'aa21', 'aa22', 'aa23', 'aa24', 'aa25'];
 
     const countryList = [
-      { key: 'ae',  text: 'United Arab Emirates'  },
-      { key: 'cn',  text: 'China'  },
-      { key: 'us',  text: 'United States'  },
-      { key: 'sg',  text: 'Singapore'  },
-    ]
+      { key: 'ae', text: 'United Arab Emirates' },
+      { key: 'cn', text: 'China' },
+      { key: 'us', text: 'United States' },
+      { key: 'sg', text: 'Singapore' },
+    ];
     const stateList = [
-      { key: 'ad',  text: 'Abu Dhabi', parentKey: 'ae' },
-      { key: 'db',  text: 'Dubai', parentKey: 'ae' },
-      { key: 'fj',  text: 'Fujian', parentKey: 'cn' },
-      { key: 'gd',  text: 'Guangdong', parentKey: 'cn' },
-      { key: 'gx',  text: 'Guangxi', parentKey: 'cn' },
-      { key: 'gz',  text: 'Guizhuo', parentKey: 'cn' },
-      { key: 'sx',  text: 'Shanxi', parentKey: 'cn' },
-      { key: 'sg',  text: 'Singapore City', parentKey: 'sg' },
-      { key: 'al',  text: 'Alabama', parentKey: 'us' },
-      { key: 'al',  text: 'Alaska', parentKey: 'us' },
-      { key: 'ny',  text: 'New York', parentKey: 'us' },
-      { key: 'ca',  text: 'California', parentKey: 'us' },
-    ]
-    const countryStateList = []
+      { key: 'ad', text: 'Abu Dhabi', parentKey: 'ae' },
+      { key: 'db', text: 'Dubai', parentKey: 'ae' },
+      { key: 'fj', text: 'Fujian', parentKey: 'cn' },
+      { key: 'gd', text: 'Guangdong', parentKey: 'cn' },
+      { key: 'gx', text: 'Guangxi', parentKey: 'cn' },
+      { key: 'gz', text: 'Guizhuo', parentKey: 'cn' },
+      { key: 'sx', text: 'Shanxi', parentKey: 'cn' },
+      { key: 'sg', text: 'Singapore City', parentKey: 'sg' },
+      { key: 'al', text: 'Alabama', parentKey: 'us' },
+      { key: 'al', text: 'Alaska', parentKey: 'us' },
+      { key: 'ny', text: 'New York', parentKey: 'us' },
+      { key: 'ca', text: 'California', parentKey: 'us' },
+    ];
+    const countryStateList = [];
 
-    const autoComplete = (e) => {
-      const result = []
-      const len = list.length < 8 ? list.length : 8
+    const autoComplete = e => {
+      const result = [];
+      const len = list.length < 8 ? list.length : 8;
       for (let i = 0; i < len; i++) {
         if (typeof list[i] === 'string') {
-          if (list[i].includes(e.detail)) result.push(list[i])
+          if (list[i].includes(e.detail)) result.push(list[i]);
         } else {
-          if (list[i].key.includes(e.detail) || list[i].text.includes(e.detail)) result.push(list[i])
+          if (list[i].key.includes(e.detail) || list[i].text.includes(e.detail)) result.push(list[i]);
         }
       }
-      ac.items = [...result]
-    }
+      ac.items = [...result];
+    };
 
-    const selected = (e) => {
-      console.log('selected event', e.detail)
-    }
+    const selected = e => {
+      console.log('selected event', e.detail);
+    };
 
-    const countrySearch = (e) => {
-      const result = []
-      const search = e.detail.toLowerCase()
+    const countrySearch = e => {
+      const result = [];
+      const search = e.detail.toLowerCase();
       for (let i = 0; i < countryList.length; i++) {
         if (typeof countryList[i] === 'string') {
-          if (countryList[i].toLowerCase().includes(search)) result.push(countryList[i])
+          if (countryList[i].toLowerCase().includes(search)) result.push(countryList[i]);
         } else {
-          if (countryList[i].key.toLowerCase().includes(search) || countryList[i].text.toLowerCase().includes(search)) result.push(countryList[i])
+          if (countryList[i].key.toLowerCase().includes(search) || countryList[i].text.toLowerCase().includes(search))
+            result.push(countryList[i]);
         }
       }
-      country.items = [...result]
-    }
-    const countrySelected = (e) => {
-      console.log('country selected event', e.detail, country.value)
+      country.items = [...result];
+    };
+    const countrySelected = e => {
+      console.log('country selected event', e.detail, country.value);
       // reset state
-      state.value = ''
-      state.items = []
-      state.tags = []
+      state.value = '';
+      state.items = [];
+      state.tags = [];
 
-      countryStateList.length = 0
+      countryStateList.length = 0;
       for (let i = 0; i < stateList.length; i++) {
-        if (typeof stateList[i] === 'string') { // can only work on objects
+        if (typeof stateList[i] === 'string') {
+          // can only work on objects
         } else {
-          if (e.detail && (stateList[i].parentKey === e.detail.key)) {
-            countryStateList.push(stateList[i])
+          if (e.detail && stateList[i].parentKey === e.detail.key) {
+            countryStateList.push(stateList[i]);
           }
         }
       }
-      console.log(countryStateList)
-    }
+      console.log(countryStateList);
+    };
 
-    const stateSearch = (e) => {
-      const result = []
-      const search = e.detail.toLowerCase()
+    const stateSearch = e => {
+      const result = [];
+      const search = e.detail.toLowerCase();
       for (let i = 0; i < countryStateList.length; i++) {
         if (typeof countryStateList[i] === 'string') {
-          if (countryStateList[i].toLowerCase().includes(search)) result.push(countryStateList[i])
+          if (countryStateList[i].toLowerCase().includes(search)) result.push(countryStateList[i]);
         } else {
-          if (countryStateList[i].key.toLowerCase().includes(search) || countryStateList[i].text.toLowerCase().includes(search)) result.push(countryStateList[i])
+          if (
+            countryStateList[i].key.toLowerCase().includes(search) ||
+            countryStateList[i].text.toLowerCase().includes(search)
+          )
+            result.push(countryStateList[i]);
         }
       }
-      state.items = [...result]
-    }
-    const stateSelected = (e) => {
-      console.log('state selected event', e.detail, state.value)
-    }
+      state.items = [...result];
+    };
+    const stateSelected = e => {
+      console.log('state selected event', e.detail, state.value);
+    };
 
     onMounted(async () => {
-      console.log('ui1 mounted!')
-      console.log('mcRef', mcRef)
+      console.log('ui1 mounted!');
+      console.log('mcRef', mcRef);
       // mc.tags = ['aa1', 'aa2', 'aa1', 'aa3', 'aa4']
-    })
+    });
 
-    const setMcTags = () => mc.tags = ['aa1', 'aa2', 'aa1', 'aa3', 'aa4']
+    const setMcTags = () => (mc.tags = ['aa1', 'aa2', 'aa1', 'aa3', 'aa4']);
 
     return {
       mcRef, // multiSelect
@@ -199,7 +205,7 @@ export default {
 
       state,
       stateSearch,
-      stateSelected
-    }
-  }
-}
+      stateSelected,
+    };
+  },
+};

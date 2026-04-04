@@ -39,9 +39,9 @@ app.use(express.json());
 
 // ─── OSS Client via S3-compatible endpoint ────────────────────────────────────
 
-const REGION = process.env.OSS_REGION;           // e.g. 'oss-ap-southeast-1'
+const REGION = process.env.OSS_REGION; // e.g. 'oss-ap-southeast-1'
 const BUCKET = process.env.OSS_BUCKET;
-const URL_TTL = 3600;                            // signed URL valid for 1 hour
+const URL_TTL = 3600; // signed URL valid for 1 hour
 
 if (!REGION || !BUCKET) {
   throw new Error('OSS_REGION and OSS_BUCKET env vars are required');
@@ -74,7 +74,6 @@ app.post('/api/oss/sign', async (req, res) => {
 
   try {
     switch (type) {
-
       // ── 1. Single PUT (≤5MB) ───────────────────────────────────────────────
       case 'single': {
         const cmd = new PutObjectCommand({
@@ -134,8 +133,7 @@ app.post('/api/oss/sign', async (req, res) => {
           },
         });
         const response = await ossClient.send(cmd);
-        const location = response.Location ||
-          `https://${BUCKET}.${REGION}.aliyuncs.com/${key}`;
+        const location = response.Location || `https://${BUCKET}.${REGION}.aliyuncs.com/${key}`;
         return res.json({ location });
       }
 

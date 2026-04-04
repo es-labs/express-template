@@ -38,7 +38,6 @@ describe('utils/aes.js', () => {
   });
 });
 
-
 /*
 const test_aes = (data = 'test data', password = 'pw', algorithm = 'aes256') => {
   const [iv, key] = [genIv(), genKey(algorithm, password)]

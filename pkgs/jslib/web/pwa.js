@@ -2,33 +2,33 @@
 // We use this function to subscribe to our push notifications
 // As soon as you run this code once, it shouldn't run again if the initial subscription went well
 // Except if you clear your storage
-export const webpushSubscribe = async (publicKey) => {
-  const registration = await navigator.serviceWorker.ready
+export const webpushSubscribe = async publicKey => {
+  const registration = await navigator.serviceWorker.ready;
   // NOSONAR
   // alternate = navigator.serviceWorker.getRegistration()
   // let subscription = await registration.pushManager.getSubscription()
   // if (subscription) return subscription
 
   // this is an annoying part of the process we have to turn our public key into a Uint8Array
-  const Uint8ArrayPublicKey = urlBase64ToUint8Array(publicKey)
+  const Uint8ArrayPublicKey = urlBase64ToUint8Array(publicKey);
 
   // registering a new subscription to our service worker's Push manager
   let subscription = await registration.pushManager.subscribe({
     userVisibleOnly: true, // chrome only supports user visible for now
-    applicationServerKey: Uint8ArrayPublicKey
-  })
-  subscription = JSON.stringify(subscription)
+    applicationServerKey: Uint8ArrayPublicKey,
+  });
+  subscription = JSON.stringify(subscription);
 
   // console.log('subscription', subscription)
-  return subscription
-}
+  return subscription;
+};
 
 // Let's create an unsubscribe function as well
 export const webpushUnsubscribe = async () => {
-  const registration = await navigator.serviceWorker.ready
-  const subscription = await registration.pushManager.getSubscription()
-  if (subscription) await subscription.unsubscribe() // This tells our browser that we want to unsubscribe
-}
+  const registration = await navigator.serviceWorker.ready;
+  const subscription = await registration.pushManager.getSubscription();
+  if (subscription) await subscription.unsubscribe(); // This tells our browser that we want to unsubscribe
+};
 // This tells our Express server that we want to unsubscribe
 // await fetch(VITE_API_URL + '/api/webpush/unsub?subId=test', {
 //   method: 'POST',
@@ -40,34 +40,34 @@ export const webpushUnsubscribe = async () => {
 // but I could not find the original author
 // here's one such source:
 // https://stackoverflow.com/questions/42362235/web-pushnotification-unauthorizedregistration-or-gone-or-unauthorized-sub
-const urlBase64ToUint8Array = (base64String) => {
+const urlBase64ToUint8Array = base64String => {
   // const padding = '='.repeat((4 - base64String.length % 4) % 4)
   // const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
   // https://stackoverflow.com/questions/52379865/eslint-replace-cant-read-method
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
 
-  const rawData = window.atob(base64)
-  const outputArray = new Uint8Array(rawData.length)
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
 
   for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i)
+    outputArray[i] = rawData.charCodeAt(i);
   }
-  return outputArray
-}
+  return outputArray;
+};
 
-const handleSwMessage = async (e) => {
+const handleSwMessage = async e => {
   // console.log('handleSwMessage', e)
   //NOSONAR if (e && e.data && e.data.msg === 'pushsubscriptionchange') { }
-}
+};
 
 export const addSwMessageEvent = (handler = handleSwMessage) => {
-  navigator.serviceWorker.addEventListener('message', handleSwMessage)
-}
+  navigator.serviceWorker.addEventListener('message', handleSwMessage);
+};
 
 export const removeSwMessageEvent = (handler = handleSwMessage) => {
-  navigator.serviceWorker.removeEventListener('message', handleSwMessage)
-}
+  navigator.serviceWorker.removeEventListener('message', handleSwMessage);
+};
 
 // https://felixgerschau.com/how-to-communicate-with-service-workers/
 // app to sw

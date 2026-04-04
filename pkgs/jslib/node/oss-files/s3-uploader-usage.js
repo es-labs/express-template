@@ -8,8 +8,8 @@ import S3Uploader from './s3-uploader-client.js';
 
 const uploader = new S3Uploader({
   getSignedUrlEndpoint: '/api/s3/sign', // your backend
-  chunkSize: 10 * 1024 * 1024,         // 10MB parts
-  maxConcurrent: 3,                    // 3 parallel part uploads
+  chunkSize: 10 * 1024 * 1024, // 10MB parts
+  maxConcurrent: 3, // 3 parallel part uploads
 });
 
 // ─── Basic upload ─────────────────────────────────────────────────────────────
@@ -18,7 +18,7 @@ async function uploadFile(file) {
   try {
     const result = await uploader.upload(file, {
       key: `uploads/${Date.now()}-${file.name}`, // custom S3 key (optional)
-      onProgress: (pct) => {
+      onProgress: pct => {
         // TBD console.log(`Upload progress: ${pct}%`);
         document.getElementById('progress').value = pct;
       },
@@ -40,7 +40,7 @@ async function uploadWithCancel(file) {
 
   try {
     const result = await uploader.upload(file, {
-      onProgress: (pct) => {
+      onProgress: pct => {
         // TBD console.log(`${pct}%`)
       },
       signal: controller.signal,
@@ -63,7 +63,7 @@ function cancelUpload() {
 
 // ─── Wire up to a file input ──────────────────────────────────────────────────
 
-document.getElementById('fileInput').addEventListener('change', (e) => {
+document.getElementById('fileInput').addEventListener('change', e => {
   const file = e.target.files[0];
   if (file) uploadWithCancel(file);
 });

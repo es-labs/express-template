@@ -1,4 +1,4 @@
-import '@common/apps/config' // setup env vars
+import '@common/apps/config'; // setup env vars
 // TBD testing websockets using native node testing
 import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert';
@@ -26,8 +26,8 @@ before(async () => {
 });
 // afterAll
 after(async () => {
-  await services.stop()
-})
+  await services.stop();
+});
 
 /*
 describe('categoryController.create', () => {
@@ -125,21 +125,21 @@ describe('categoryController.remove', () => {
 describe.only('categoryController.find', () => {
   it.only('should have a get function', () => {
     // expect(typeof categoryController.find).toBe('function')
-    assert.strictEqual(typeof categoryController.find, 'function')
-  })
+    assert.strictEqual(typeof categoryController.find, 'function');
+  });
   it.only('should return status 200 and authors', async () => {
-    await categoryController.find(req, res)
-    assert.strictEqual(res.statusCode, 200)
+    await categoryController.find(req, res);
+    assert.strictEqual(res.statusCode, 200);
     //   // expect(res.statusCode).toBe(200)
     //   // expect(res._isEndCalled()).toBeTruthy()
     //   // expect(res._getJSONData().total).toBeDefined
     //   // console.log(res._getJSONData())
-  })
+  });
   // 500 error not able to cover?
-})
+});
 
 describe.only('Category Unit Test', () => {
   it.only('should pass', () => {
-    assert.strictEqual(true, true)
-  })
-})
+    assert.strictEqual(true, true);
+  });
+});

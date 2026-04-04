@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@es-labs/jslib": "0.0.2",
-    "@scalar/express-api-reference": "^0.9.5",
+    "@scalar/express-api-reference": "^0.9.6",
     "connect-history-api-fallback": "^2.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

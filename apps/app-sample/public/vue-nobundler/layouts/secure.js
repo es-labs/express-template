@@ -1,4 +1,4 @@
-const template = /*html*/`
+const template = /*html*/ `
 <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
     <a class="navbar-item">
@@ -73,12 +73,12 @@ const template = /*html*/`
     <router-view :key="$route.fullPath"></router-view>
   </div>
 </div>
-`
+`;
 
-import { statex } from '../store.js'
+import { statex } from '../store.js';
 // import Navbar from '../components/navbar.js'
-const { onMounted, onUnmounted, ref, computed  } = Vue
-const { useRouter } = VueRouter
+const { onMounted, onUnmounted, ref, computed } = Vue;
+const { useRouter } = VueRouter;
 
 export default {
   template,
@@ -86,17 +86,17 @@ export default {
   //   'ms-navbar': Navbar
   // },
   setup() {
-    const router = useRouter()
-    const showSide = ref(true)
-    const subMenu0 = ref(true)
-    const subMenu1 = ref(false)
+    const router = useRouter();
+    const showSide = ref(true);
+    const subMenu0 = ref(true);
+    const subMenu1 = ref(false);
 
     onMounted(async () => {
-      console.log('Secure mounted!')
-    })
+      console.log('Secure mounted!');
+    });
     onUnmounted(async () => {
-      console.log('Secure unmounted!')
-    })
+      console.log('Secure unmounted!');
+    });
     const clickBurger = () => {
       // console.log('showSide.value', showSide.value)
       // const elNavbarBurger = document.querySelector('.navbar-burger')
@@ -110,20 +110,20 @@ export default {
       // }
       // elNavbarBurger.classList.toggle("is-active")
       // elNavbarMenu.classList.toggle("is-active")
-    }
+    };
     const clickLogo = () => {
-      const elMainContent = document.querySelector('.main > .content')
-      showSide.value = !showSide.value
+      const elMainContent = document.querySelector('.main > .content');
+      showSide.value = !showSide.value;
       if (showSide.value) {
-        elMainContent.style.width = 'calc(100vw - 218px)'
+        elMainContent.style.width = 'calc(100vw - 218px)';
       } else {
-        elMainContent.style.width = '100vw'
+        elMainContent.style.width = '100vw';
       }
-    }
+    };
     const logout = () => {
-      statex.user = null
-      router.push('/') // if /dashboard should be kicked back to / 
-    }
+      statex.user = null;
+      router.push('/'); // if /dashboard should be kicked back to /
+    };
     return {
       statex,
       clickLogo,
@@ -131,7 +131,7 @@ export default {
       showSide,
       subMenu0,
       subMenu1,
-      logout
-    }
-  }
-}
+      logout,
+    };
+  },
+};

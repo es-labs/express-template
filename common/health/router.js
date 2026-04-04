@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { liveness, readiness } from './controller.js';
 
-export const healthRouter = Router({caseSensitive: true});
+export const healthRouter = Router({ caseSensitive: true });
 
 /**
  * GET /health
@@ -10,7 +10,7 @@ export const healthRouter = Router({caseSensitive: true});
  * @tags health
  * @return {object} 200 - success response - application/json
  */
-healthRouter.get('/', liveness);   // GET /health
+healthRouter.get('/', liveness); // GET /health
 
 /**
  * GET /health/ready
@@ -18,4 +18,4 @@ healthRouter.get('/', liveness);   // GET /health
  * @tags health
  * @return {object} 200 - success response - application/json
  */
-healthRouter.get('/ready', readiness);  // GET /health/ready
+healthRouter.get('/ready', readiness); // GET /health/ready

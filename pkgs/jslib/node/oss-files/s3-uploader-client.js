@@ -1,7 +1,7 @@
 /**
  * S3 Large File Uploader (Client-Side)
  * Supports multipart upload for files > 5MB using pre-signed URLs
- * 
+ *
  * Usage:
  *   const uploader = new S3Uploader({ getSignedUrlEndpoint: '/api/s3/sign' });
  *   await uploader.upload(file, { onProgress: (pct) => console.log(pct) });
@@ -63,7 +63,7 @@ class S3Uploader {
     });
 
     // 2. PUT the file directly to S3
-    await this._putToS3(signedUrl, file, file.type, (pct) => onProgress(pct), signal);
+    await this._putToS3(signedUrl, file, file.type, pct => onProgress(pct), signal);
 
     onProgress(100);
     return { key, location };
@@ -113,12 +113,12 @@ class S3Uploader {
           signedUrl,
           chunk,
           file.type,
-          (bytesDone) => {
+          bytesDone => {
             partProgress[index] = bytesDone;
             updateProgress();
           },
           signal,
-          true // returnEtag
+          true, // returnEtag
         );
 
         completedParts.push({ PartNumber: currentPart, ETag: etag });
@@ -185,7 +185,7 @@ class S3Uploader {
       xhr.open('PUT', signedUrl);
       xhr.setRequestHeader('Content-Type', contentType);
 
-      xhr.upload.addEventListener('progress', (e) => {
+      xhr.upload.addEventListener('progress', e => {
         if (e.lengthComputable) onChunkProgress(e.loaded);
       });
 

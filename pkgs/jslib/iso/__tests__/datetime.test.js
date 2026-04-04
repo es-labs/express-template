@@ -8,7 +8,7 @@ import {
   getLocaleTimeISO,
   getTzOffsetISO,
   getYmdhmsUtc,
-  getDayOfWeek
+  getDayOfWeek,
 } from '../datetime.js';
 
 describe.skip('datetime.js', () => {

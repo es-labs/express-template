@@ -18,7 +18,7 @@ async function requireUser(req) {
   const token = params.get('token');
   if (!token) throw new Error('No token');
 
-  const user = await verifyToken(token);  // your JWT/session check
+  const user = await verifyToken(token); // your JWT/session check
   if (!user) throw new Error('Invalid token');
   return user;
 }
@@ -33,10 +33,10 @@ async function requireAdmin(req) {
 function rejectSocket(socket, code, message) {
   socket.write(
     `HTTP/1.1 ${code} ${message}\r\n` +
-    `Content-Type: text/plain\r\n` +
-    `Connection: close\r\n` +
-    `\r\n` +
-    `${message}`
+      `Content-Type: text/plain\r\n` +
+      `Connection: close\r\n` +
+      `\r\n` +
+      `${message}`,
   );
   socket.destroy();
 }
@@ -52,7 +52,11 @@ function broadcast(wss, payload) {
 }
 
 function safeParseJSON(raw) {
-  try { return JSON.parse(raw.toString()); } catch { return null; }
+  try {
+    return JSON.parse(raw.toString());
+  } catch {
+    return null;
+  }
 }
 
 const MAX_BYTES = 64 * 1024; // 64 KB
@@ -78,7 +82,7 @@ function error(message) {
 
 function getServerStats() {
   return {
-    chat:  chatWSS.clients.size,
+    chat: chatWSS.clients.size,
     notif: notifWSS.clients.size,
     admin: adminWSS.clients.size,
     uptime: process.uptime(),
@@ -88,8 +92,8 @@ function getServerStats() {
 async function verifyToken(token) {
   // Replace with real JWT verification, e.g. jose or jsonwebtoken
   const users = {
-    'user-token-abc':  { id: 1, name: 'Alice', role: 'user' },
-    'admin-token-xyz': { id: 2, name: 'Bob',   role: 'admin' },
+    'user-token-abc': { id: 1, name: 'Alice', role: 'user' },
+    'admin-token-xyz': { id: 2, name: 'Bob', role: 'admin' },
   };
   return users[token] ?? null;
 }
@@ -106,15 +110,15 @@ export function pushToUser(userId, payload) {
 
 export default function wsLoader(server) {
   // ─── Multiple WSS instances on the same HTTP server ──────────────────────────
-  const chatWSS  = new WebSocketServer({ noServer: true });
+  const chatWSS = new WebSocketServer({ noServer: true });
   const notifWSS = new WebSocketServer({ noServer: true });
   const adminWSS = new WebSocketServer({ noServer: true });
 
   // ─── Route map ───────────────────────────────────────────────────────────────
   const wsRoutes = [
-    { prefix: '/ws/chat',    wss: chatWSS,  auth: requireUser  },
-    { prefix: '/ws/notif',   wss: notifWSS, auth: requireUser  },
-    { prefix: '/ws/admin',   wss: adminWSS, auth: requireAdmin },
+    { prefix: '/ws/chat', wss: chatWSS, auth: requireUser },
+    { prefix: '/ws/notif', wss: notifWSS, auth: requireUser },
+    { prefix: '/ws/admin', wss: adminWSS, auth: requireAdmin },
   ];
 
   // ─── Manual upgrade handler ──────────────────────────────────────────────────
@@ -143,7 +147,7 @@ export default function wsLoader(server) {
     req.user = context;
 
     // Complete the WebSocket handshake and emit 'connection'
-    route.wss.handleUpgrade(req, socket, head, (ws) => {
+    route.wss.handleUpgrade(req, socket, head, ws => {
       route.wss.emit('connection', ws, req);
     });
   });
@@ -153,13 +157,13 @@ export default function wsLoader(server) {
     const { user } = req;
     console.log(`[chat] connected: ${user.name}`);
     ws.send(JSON.stringify({ type: 'welcome', room: 'chat', user: user.name }));
-    ws.on('message', (data) => {
+    ws.on('message', data => {
       const msg = safeParseJSON(data);
       if (!msg) return ws.send(error('Invalid JSON'));
       broadcast(chatWSS, { type: 'message', from: user.name, text: msg.text }); // Broadcast to all connected chat clients
     });
     ws.on('close', () => console.log(`[chat] disconnected: ${user.name}`));
-    ws.on('error', (err) => console.error(`[chat] error:`, err.message));
+    ws.on('error', err => console.error(`[chat] error:`, err.message));
   });
 
   notifWSS.on('connection', (ws, req) => {
@@ -167,13 +171,13 @@ export default function wsLoader(server) {
     console.log(`[notif] connected: ${user.name}`);
     ws.userId = user.id; // Tag socket with user id for targeted pushes
     ws.send(JSON.stringify({ type: 'welcome', room: 'notif' }));
-    ws.on('error', (err) => console.error(`[notif] error:`, err.message));
+    ws.on('error', err => console.error(`[notif] error:`, err.message));
   });
 
   adminWSS.on('connection', (ws, req) => {
     const { user } = req;
     console.log(`[admin] connected: ${user.name} (role=${user.role})`);
     ws.send(JSON.stringify({ type: 'stats', data: getServerStats() })); // Send current server stats on connect
-    ws.on('error', (err) => console.error(`[admin] error:`, err.message));
+    ws.on('error', err => console.error(`[admin] error:`, err.message));
   });
 }

@@ -4,9 +4,9 @@
 // Generates docs/openapi/openapi.merged.yaml from Zod v4 schemas at common/schemas/*.schema.js.
 // Uses zod-openapi — no monkey-patching, no separate registry object.
 //
-import { writeFileSync, mkdirSync } from 'fs';
-import { resolve, dirname, relative } from 'path';
-import { fileURLToPath } from 'url';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { resolve, dirname, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
 import { createDocument } from 'zod-openapi';
 
@@ -22,11 +22,7 @@ import {
 // Import error schema explicitly so it is included as a reusable component
 import '../common/schemas/error.schema.js';
 
-import {
-  PaymentSchema,
-  CreatePaymentBodySchema,
-  PaymentParamsSchema,
-} from '../common/schemas/payment.schema.js';
+import { PaymentSchema, CreatePaymentBodySchema, PaymentParamsSchema } from '../common/schemas/payment.schema.js';
 
 import {
   NotificationSchema,
@@ -35,7 +31,7 @@ import {
 } from '../common/schemas/notification.schema.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT      = resolve(__dirname, '..');
+const ROOT = resolve(__dirname, '..');
 
 // ── Reusable error response content block ──────────────────────────────────
 const errorContent = {
@@ -46,22 +42,22 @@ const errorContent = {
 const document = createDocument({
   openapi: '3.1.0',
   info: {
-    title:       'Microservices — Merged API',
+    title: 'Microservices — Merged API',
     description: 'Auto-generated from Zod v4 schemas via zod-openapi. Do not edit manually.',
-    version:     '1.0.0',
-    contact:     { name: 'API Support', email: 'support@example.com' },
+    version: '1.0.0',
+    contact: { name: 'API Support', email: 'support@example.com' },
   },
   servers: [
-    { url: 'http://localhost:8080',   description: 'Local (via API Gateway)' },
+    { url: 'http://localhost:8080', description: 'Local (via API Gateway)' },
     { url: 'https://api.example.com', description: 'Production' },
   ],
   components: {
     securitySchemes: {
       bearerAuth: {
-        type:         'http',
-        scheme:       'bearer',
+        type: 'http',
+        scheme: 'bearer',
         bearerFormat: 'JWT',
-        description:  'JWT issued by POST /api/v1/auth/login',
+        description: 'JWT issued by POST /api/v1/auth/login',
       },
     },
   },
@@ -69,11 +65,11 @@ const document = createDocument({
     // ── Auth ───────────────────────────────────────────────────────────────
     '/api/v1/auth/register': {
       post: {
-        tags:    ['Auth'],
+        tags: ['Auth'],
         summary: 'Register a new user',
         requestBody: {
           required: true,
-          content:  { 'application/json': { schema: RegisterBodySchema } },
+          content: { 'application/json': { schema: RegisterBodySchema } },
         },
         responses: {
           201: {
@@ -86,11 +82,11 @@ const document = createDocument({
     },
     '/api/v1/auth/login': {
       post: {
-        tags:    ['Auth'],
+        tags: ['Auth'],
         summary: 'Authenticate and receive a JWT',
         requestBody: {
           required: true,
-          content:  { 'application/json': { schema: LoginBodySchema } },
+          content: { 'application/json': { schema: LoginBodySchema } },
         },
         responses: {
           200: {
@@ -98,7 +94,7 @@ const document = createDocument({
             content: { 'application/json': { schema: TokenResponseSchema } },
           },
           401: { description: 'Invalid credentials', content: errorContent },
-          422: { description: 'Validation error',    content: errorContent },
+          422: { description: 'Validation error', content: errorContent },
         },
       },
     },
@@ -106,25 +102,25 @@ const document = createDocument({
     // ── Payments ───────────────────────────────────────────────────────────
     '/api/v1/payments': {
       post: {
-        tags:     ['Payments'],
-        summary:  'Create a new payment',
+        tags: ['Payments'],
+        summary: 'Create a new payment',
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
-          content:  { 'application/json': { schema: CreatePaymentBodySchema } },
+          content: { 'application/json': { schema: CreatePaymentBodySchema } },
         },
         responses: {
           201: {
             description: 'Payment created',
             content: { 'application/json': { schema: PaymentSchema } },
           },
-          401: { description: 'Unauthorized',     content: errorContent },
+          401: { description: 'Unauthorized', content: errorContent },
           422: { description: 'Validation error', content: errorContent },
         },
       },
       get: {
-        tags:     ['Payments'],
-        summary:  'List all payments',
+        tags: ['Payments'],
+        summary: 'List all payments',
         security: [{ bearerAuth: [] }],
         responses: {
           200: {
@@ -137,8 +133,8 @@ const document = createDocument({
     },
     '/api/v1/payments/{id}': {
       get: {
-        tags:     ['Payments'],
-        summary:  'Get a payment by ID',
+        tags: ['Payments'],
+        summary: 'Get a payment by ID',
         security: [{ bearerAuth: [] }],
         requestParams: { path: PaymentParamsSchema },
         responses: {
@@ -147,7 +143,7 @@ const document = createDocument({
             content: { 'application/json': { schema: PaymentSchema } },
           },
           401: { description: 'Unauthorized', content: errorContent },
-          404: { description: 'Not found',    content: errorContent },
+          404: { description: 'Not found', content: errorContent },
         },
       },
     },
@@ -155,25 +151,25 @@ const document = createDocument({
     // ── Notifications ──────────────────────────────────────────────────────
     '/api/v1/notifications': {
       post: {
-        tags:     ['Notifications'],
-        summary:  'Send a notification',
+        tags: ['Notifications'],
+        summary: 'Send a notification',
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
-          content:  { 'application/json': { schema: SendNotificationBodySchema } },
+          content: { 'application/json': { schema: SendNotificationBodySchema } },
         },
         responses: {
           201: {
             description: 'Notification sent',
             content: { 'application/json': { schema: NotificationSchema } },
           },
-          401: { description: 'Unauthorized',     content: errorContent },
+          401: { description: 'Unauthorized', content: errorContent },
           422: { description: 'Validation error', content: errorContent },
         },
       },
       get: {
-        tags:     ['Notifications'],
-        summary:  'List all notifications',
+        tags: ['Notifications'],
+        summary: 'List all notifications',
         security: [{ bearerAuth: [] }],
         responses: {
           200: {
@@ -186,8 +182,8 @@ const document = createDocument({
     },
     '/api/v1/notifications/{id}': {
       get: {
-        tags:     ['Notifications'],
-        summary:  'Get a notification by ID',
+        tags: ['Notifications'],
+        summary: 'Get a notification by ID',
         security: [{ bearerAuth: [] }],
         requestParams: { path: NotificationParamsSchema },
         responses: {
@@ -196,7 +192,7 @@ const document = createDocument({
             content: { 'application/json': { schema: NotificationSchema } },
           },
           401: { description: 'Unauthorized', content: errorContent },
-          404: { description: 'Not found',    content: errorContent },
+          404: { description: 'Not found', content: errorContent },
         },
       },
     },

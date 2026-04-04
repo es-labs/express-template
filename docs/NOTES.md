@@ -76,3 +76,4 @@ useConst - safe
 useOptionalChain
 useTemplate
 useNodejsImportProtocol
+noConsole (set to warn first, convert using logger, then set back to error)

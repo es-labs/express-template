@@ -12,14 +12,14 @@
 // ─── Default Config ───────────────────────────────────────────────────────────
 
 const DEFAULTS = {
-  timeout: 10_000,          // ms per attempt before aborting
-  retries: 3,               // max retry attempts (0 = no retries)
-  baseDelay: 300,           // ms — base for exponential backoff
-  maxDelay: 10_000,         // ms — cap on backoff delay
-  backoffFactor: 2,         // exponential multiplier
-  jitter: true,             // randomise delay to avoid thundering herd
+  timeout: 10_000, // ms per attempt before aborting
+  retries: 3, // max retry attempts (0 = no retries)
+  baseDelay: 300, // ms — base for exponential backoff
+  maxDelay: 10_000, // ms — cap on backoff delay
+  backoffFactor: 2, // exponential multiplier
+  jitter: true, // randomise delay to avoid thundering herd
   retryOn: [408, 429, 500, 502, 503, 504], // HTTP codes to retry on
-  onRetry: null,            // ({ attempt, error, delay }) => void
+  onRetry: null, // ({ attempt, error, delay }) => void
 };
 
 // ─── Core ─────────────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ async function fetchWithRetry(url, options = {}) {
     retryOn,
     onRetry,
     signal: externalSignal, // caller-supplied cancel signal
-    ...fetchOptions          // remaining standard fetch options
+    ...fetchOptions // remaining standard fetch options
   } = { ...DEFAULTS, ...options };
 
   let attempt = 0;
@@ -67,9 +67,7 @@ async function fetchWithRetry(url, options = {}) {
     const timeoutId = setTimeout(() => timeoutController.abort(), timeout);
 
     // Merge the timeout signal with any external signal
-    const signal = externalSignal
-      ? mergeSignals([timeoutController.signal, externalSignal])
-      : timeoutController.signal;
+    const signal = externalSignal ? mergeSignals([timeoutController.signal, externalSignal]) : timeoutController.signal;
 
     let response;
     let error;
@@ -84,7 +82,7 @@ async function fetchWithRetry(url, options = {}) {
 
     // ── Determine if we should retry ────────────────────────────────────────
 
-    const isTimeout    = error?.name === 'AbortError' && timeoutController.signal.aborted;
+    const isTimeout = error?.name === 'AbortError' && timeoutController.signal.aborted;
     const isNetworkErr = error && !isTimeout;
     const isExternalAbort = externalSignal?.aborted;
 
@@ -94,8 +92,7 @@ async function fetchWithRetry(url, options = {}) {
     }
 
     const shouldRetry =
-      attempt < retries &&
-      (isTimeout || isNetworkErr || (response && retryOn.includes(response.status)));
+      attempt < retries && (isTimeout || isNetworkErr || (response && retryOn.includes(response.status)));
 
     if (!shouldRetry) {
       // No more retries — resolve or throw
@@ -130,7 +127,7 @@ async function fetchWithRetry(url, options = {}) {
 
 /** Exponential backoff with optional jitter */
 function calcDelay({ attempt, baseDelay, maxDelay, backoffFactor, jitter }) {
-  const exponential = baseDelay * (backoffFactor ** attempt);
+  const exponential = baseDelay * backoffFactor ** attempt;
   const capped = Math.min(exponential, maxDelay);
   return jitter
     ? capped * (0.5 + Math.random() * 0.5) // jitter: 50%–100% of capped
@@ -149,7 +146,10 @@ function mergeSignals(signals) {
   // Polyfill for older environments
   const controller = new AbortController();
   for (const signal of signals) {
-    if (signal.aborted) { controller.abort(signal.reason); break; }
+    if (signal.aborted) {
+      controller.abort(signal.reason);
+      break;
+    }
     signal.addEventListener('abort', () => controller.abort(signal.reason), { once: true });
   }
   return controller.signal;
@@ -160,10 +160,14 @@ function sleep(ms, signal) {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) return reject(new DOMException('Aborted', 'AbortError'));
     const id = setTimeout(resolve, ms);
-    signal?.addEventListener('abort', () => {
-      clearTimeout(id);
-      reject(new DOMException('Aborted', 'AbortError'));
-    }, { once: true });
+    signal?.addEventListener(
+      'abort',
+      () => {
+        clearTimeout(id);
+        reject(new DOMException('Aborted', 'AbortError'));
+      },
+      { once: true },
+    );
   });
 }
 

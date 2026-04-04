@@ -1,1 +1,1 @@
-export const foobar = Math.PI + Math.SQRT2
+export const foobar = Math.PI + Math.SQRT2;

@@ -4,7 +4,7 @@ import {
   S3ServiceException,
   // This command supersedes the ListObjectsCommand and is the recommended way to list objects.
   paginateListObjectsV2,
-} from "@aws-sdk/client-s3";
+} from '@aws-sdk/client-s3';
 
 /**
  * Log all of the object keys in a bucket.
@@ -21,7 +21,7 @@ export const main = async ({ bucketName, pageSize }) => {
     );
 
     for await (const page of paginator) {
-      objects.push(page.Contents.map((o) => o.Key));
+      objects.push(page.Contents.map(o => o.Key));
     }
     objects.forEach((objectList, pageNum) => {
       // TBD console.log(
@@ -29,10 +29,7 @@ export const main = async ({ bucketName, pageSize }) => {
       // );
     });
   } catch (caught) {
-    if (
-      caught instanceof S3ServiceException &&
-      caught.name === "NoSuchBucket"
-    ) {
+    if (caught instanceof S3ServiceException && caught.name === 'NoSuchBucket') {
       // TBD console.error(
       //   `Error from S3 while listing objects for "${bucketName}". The bucket doesn't exist.`,
       // );
@@ -45,8 +42,6 @@ export const main = async ({ bucketName, pageSize }) => {
     }
   }
 };
-
-
 
 /*
 

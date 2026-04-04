@@ -1,9 +1,9 @@
-import Knex from 'knex'
+import Knex from 'knex';
 
 export default class StoreKnex {
-	constructor(options = JSON.parse(process.env.KNEXFILE || null) || {}) {
-    this._KNEXFILE = options
-    this._knex = null
+  constructor(options = JSON.parse(process.env.KNEXFILE || null) || {}) {
+    this._KNEXFILE = options;
+    this._knex = null;
   }
 
   async open() {
@@ -11,23 +11,26 @@ export default class StoreKnex {
       // TBD console.log('KNEXFILE property empty or undefined - knex not started')
     } else {
       try {
-        this._knex = Knex(this._KNEXFILE)
+        this._knex = Knex(this._KNEXFILE);
         // sqlite, may need to use another statement with other sql dbs
-        await this._knex.raw('select 1+1 as result')
-        .then(() => {
-          // TBD console.log('knex CONNECTED')
-        })
-        .catch(err => { 
-          // TBD console.log('DB error: ' + err.toString()) 
-        })
+        await this._knex
+          .raw('select 1+1 as result')
+          .then(() => {
+            // TBD console.log('knex CONNECTED')
+          })
+          .catch(err => {
+            // TBD console.log('DB error: ' + err.toString())
+          });
       } catch (e) {
         // TBD console.log('knex CONNECT ERROR', e.toString())
       }
     }
   }
-  get () { return this._knex }
-  async close () {
-    if (this._knex) await this._knex.destroy()
+  get() {
+    return this._knex;
+  }
+  async close() {
+    if (this._knex) await this._knex.destroy();
     // TBD console.log('knex closed')
   }
 }
