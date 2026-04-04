@@ -1,9 +1,9 @@
 import express from 'express';
 import * as auth from '@common/node/auth/index';
-import * as own from '@common/node/express/controller/auth/own';
-import * as oauth from '@common/node/express/controller/auth/oauth';
-import * as oidc from '@common/node/express/controller/auth/oidc';
-import * as saml from '@common/node/express/controller/auth/saml';
+import * as own from '@common/express/controller/auth/own';
+import * as oauth from '@common/express/controller/auth/oauth';
+import * as oidc from '@common/express/controller/auth/oidc';
+import * as saml from '@common/express/controller/auth/saml';
 
 export const myauthRoute = express
   .Router()

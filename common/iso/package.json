@@ -1,11 +1,11 @@
 {
-  "name": "@common/node",
+  "name": "@common/iso",
   "version": "0.0.2",
   "author": "Aaron Gong",
   "license": "MIT",
-  "description": "Shareable Node Runtime JS library using ES modules",
+  "description": "Shareable isomorphic JS library using ES modules",
   "keywords": [
-    "javscript",
+    "javascript",
     "module"
   ],
   "homepage": "https://github.com/es-labs/express-template#readme",
@@ -21,24 +21,9 @@
     "./*": "./*.js",
     "./**/*": "./**/*.js"
   },
-  "main": "index.js",
+  "main": "fetch.js",
   "scripts": {
     "test": "node --experimental-test-coverage --test-reporter=spec --test **/__tests__/*.test.js",
     "cover": "node --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info --test __tests__/**/*.spec.js"
-  },
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.1024.0",
-    "ali-oss": "^6.23.0",
-    "bcryptjs": "^3.0.3",
-    "js-yaml": "^4.1.1",
-    "keyv": "^5.6.0",
-    "knex": "^3.2.9",
-    "mysql": "^2.18.1",
-    "pg": "^8.20.0",
-    "sqlite3": "^5.1.7",
-    "web-push": "^3.6.7",
-    "ws": "^8.20.0",
-    "zod": "^4.3.6",
-    "zod-openapi": "^5.4.6"
   }
 }

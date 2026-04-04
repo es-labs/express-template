@@ -1,5 +1,5 @@
 {
-  "name": "@common/node",
+  "name": "@common/express",
   "version": "0.0.2",
   "author": "Aaron Gong",
   "license": "MIT",
@@ -27,18 +27,19 @@
     "cover": "node --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info --test __tests__/**/*.spec.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1024.0",
-    "ali-oss": "^6.23.0",
+    "@common/node": "file:../node",
+    "@node-saml/node-saml": "^5.1.0",
+    "@scalar/express-api-reference": "^0.9.6",
     "bcryptjs": "^3.0.3",
+    "connect-history-api-fallback": "^2.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
     "js-yaml": "^4.1.1",
-    "keyv": "^5.6.0",
-    "knex": "^3.2.9",
-    "mysql": "^2.18.1",
-    "pg": "^8.20.0",
-    "sqlite3": "^5.1.7",
-    "web-push": "^3.6.7",
-    "ws": "^8.20.0",
-    "zod": "^4.3.6",
-    "zod-openapi": "^5.4.6"
+    "path-to-regexp": "^8.4.2",
+    "multer": "^2.1.1",
+    "serve-index": "^1.9.2"
   }
 }
