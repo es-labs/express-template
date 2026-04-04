@@ -1,4 +1,4 @@
-import '@common/apps/config'; // setup env - TBD: handle vault in production
+import '@common/node/config'; // setup env - TBD: handle vault in production
 import { server } from './app.js';
 // import * as z from "zod";
 // const Player = z.object({

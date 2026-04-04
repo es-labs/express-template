@@ -5,15 +5,13 @@
         <a-form-item label="Field A">
           <a-input v-model:value="formState.fieldA" placeholder="input placeholder" />
         </a-form-item>
-        <a-form-item>
-          <a-button type="primary">Submit</a-button>
-        </a-form-item>
+        <a-form-item> <a-button type="primary">Submit</a-button> </a-form-item>
       </a-form>
     </a-card>
 
     <a-card v-for="i in 9" :key="i" hoverable class="ds-card">
       <template #cover>
-        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
+        <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png">
       </template>
       <template #actions>
         <setting-outlined key="setting" />
@@ -30,12 +28,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
-import { SettingOutlined, EditOutlined, EllipsisOutlined } from '@ant-design/icons-vue'
+import { ref, onMounted, reactive } from 'vue';
+import { SettingOutlined, EditOutlined, EllipsisOutlined } from '@ant-design/icons-vue';
 
 const formState = reactive({
-  fieldA: ''
-})
+  fieldA: '',
+});
 </script>
 
 <style>

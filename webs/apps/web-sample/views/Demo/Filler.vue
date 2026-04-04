@@ -5,7 +5,7 @@
     <p>Route Param: {{ routeParam }}</p>
     <a-button v-if="!routeParam" @click="$router.push(`${$route.path}/111`)">Set Param</a-button>
     <a-button v-else @click="$router.back()">Back</a-button>
-    <hr />
+    <hr>
     <p>Show a long list to test scrolling</p>
     <ul>
       <li v-for="n in 50" :key="n">{{ n }}</li>
@@ -14,20 +14,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 const props = defineProps({
   testId: {
     type: Number,
-    default: -1
-  }
-})
+    default: -1,
+  },
+});
 
-const route = useRoute()
-const routeParam = ref(route.params.param)
-console.log('props', props)
-console.log('route', route)
+const route = useRoute();
+const routeParam = ref(route.params.param);
+console.log('props', props);
+console.log('route', route);
 
 // TODELETE
 // export default {

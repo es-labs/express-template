@@ -91,7 +91,7 @@ Build image and deploy to a container registry
   - CR_NS: container registry namespace (for deployment)
   - CR_IMAGENAME: The image name. If not specified, the repository name will be used
 
-### pkgs/jslib
+### common/jslib - TBD
 
 Publish a package to NPM
 

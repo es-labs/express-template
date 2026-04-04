@@ -6,20 +6,14 @@
         <a-input data-cy="username" label="Username" type="text" v-model:value="email"></a-input>
         <a-input data-cy="password" label="Password" type="password" v-model:value="password"></a-input>
         <a-checkbox v-model:checked="forced">Force Login</a-checkbox>
-        <div class="buttons-box-flex">
-          <a-button data-cy="login" @click="login">Login</a-button>
-        </div>
-        <div class="buttons-box-flex">
-          <a-button @click="oauthLogin">OAuth</a-button>
-        </div>
+        <div class="buttons-box-flex"><a-button data-cy="login" @click="login">Login</a-button></div>
+        <div class="buttons-box-flex"><a-button @click="oauthLogin">OAuth</a-button></div>
         <p><router-link to="/signup">Sign Up</router-link></p>
       </div>
       <div v-show="mode === 'otp'">
         <h1>Enter OTP</h1>
         <a-input data-cy="pin" label="OTP" type="text" v-model:value="otp"></a-input>
-        <div class="buttons-box-flex">
-          <a-button data-cy="otp" @click="otpLogin">OTP</a-button>
-        </div>
+        <div class="buttons-box-flex"><a-button data-cy="otp" @click="otpLogin">OTP</a-button></div>
       </div>
       <p v-if="errorMessage">{{ errorMessage }}</p>
       <p>{{ isMobile ? 'Mobile' : 'Not Mobile' }}</p>
@@ -28,137 +22,137 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
-import { useMainStore } from '../store.js'
-import { useRoute } from 'vue-router'
-import { useMediaQuery } from '../../../common/plugins/useMediaQuery.js'
+import { ref, onMounted, onBeforeUnmount, onUnmounted } from 'vue';
+import { useMainStore } from '../store.js';
+import { useRoute } from 'vue-router';
+import { useMediaQuery } from '../../../common/plugins/useMediaQuery.js';
 
-import parseJwt from '@es-labs/jslib/web/parse-jwt'
+import parseJwt from '../../../../common/web/parse-jwt.js';
 
-import { http } from '@common/vue/plugins/fetch.js'
-import { useI18n } from '@common/vue/plugins/i18n.js'
+import { http } from '@common/vue/plugins/fetch.js';
+import { useI18n } from '@common/vue/plugins/i18n.js';
 
-const { VITE_REFRESH_URL, MODE } = import.meta.env
-const store = useMainStore()
-const route = useRoute()
-const i18n = useI18n()
-const loading = store.loading
-const email = ref('test')
-const password = ref('test')
-const errorMessage = ref('')
-const mode = ref('login') // login, otp
-const otp = ref('')
+const { VITE_REFRESH_URL, MODE } = import.meta.env;
+const store = useMainStore();
+const route = useRoute();
+const i18n = useI18n();
+const loading = store.loading;
+const email = ref('test');
+const password = ref('test');
+const errorMessage = ref('');
+const mode = ref('login'); // login, otp
+const otp = ref('');
 
-const forced = ref(false)
-let otpCount = 0
-let otpId = ''
+const forced = ref(false);
+let otpCount = 0;
+let otpId = '';
 
-const isMobile = useMediaQuery('(max-width: 425px)')
+const isMobile = useMediaQuery('(max-width: 425px)');
 
 const setToLogin = () => {
   // reset email and password
-  mode.value = 'login' // ui-reactive...
-  otp.value = ''
-  otpCount = 0 // non-ui-reactive
-}
+  mode.value = 'login'; // ui-reactive...
+  otp.value = '';
+  otpCount = 0; // non-ui-reactive
+};
 
-onUnmounted(() => console.log('signIn unmounted'))
+onUnmounted(() => console.log('signIn unmounted'));
 
 onMounted(async () => {
-      console.log('signIn mounted!', route.hash) // deal with hashes here if necessary
-      setToLogin()
-      otp.value = '111111'
-      errorMessage.value = ''
-      store.loading = false
-})
+  console.log('signIn mounted!', route.hash); // deal with hashes here if necessary
+  setToLogin();
+  otp.value = '111111';
+  errorMessage.value = '';
+  store.loading = false;
+});
 
 onBeforeUnmount(() => {
   // console.log('signIn onBeforeUnmount')
-})
+});
 
 const _setUser = async (data, decoded) => {
   // store user
-  await store.doLogin(decoded)
+  await store.doLogin(decoded);
   // id, groups, access_token, refresh_token
-}
+};
 
 const login = async () => {
-  console.log('login clicked', forced.value)
+  console.log('login clicked', forced.value);
   if (forced.value) {
     _setUser(null, {
       id: 1,
       access_token: '',
-      refresh_token: ''
-    })
-    return
+      refresh_token: '',
+    });
+    return;
   }
-  if (store.value) return
-  store.loading = true
-  errorMessage.value = ''
+  if (store.value) return;
+  store.loading = true;
+  errorMessage.value = '';
   try {
     const { data } = await http.post('/api/auth/login', {
       email: email.value,
-      password: password.value
-    })
+      password: password.value,
+    });
     if (data.otp) {
       // OTP
-      mode.value = 'otp'
-      otpId = data.otp
-      otpCount = 0
+      mode.value = 'otp';
+      otpId = data.otp;
+      otpCount = 0;
     } else {
       // logged in
-      const decoded = parseJwt(data.access_token)
-      http.setTokens({ access: data.access_token, refresh: data.refresh_token })
-      http.setOptions({ refreshUrl: VITE_REFRESH_URL })
-      _setUser(data, decoded)
+      const decoded = parseJwt(data.access_token);
+      http.setTokens({ access: data.access_token, refresh: data.refresh_token });
+      http.setOptions({ refreshUrl: VITE_REFRESH_URL });
+      _setUser(data, decoded);
     }
   } catch (e) {
     // fetch failed
     // auth failed
-    console.log('login error', e.toString(), e)
-    errorMessage.value = e?.data?.message || e.toString()
+    console.log('login error', e.toString(), e);
+    errorMessage.value = e?.data?.message || e.toString();
   }
-  store.loading = false
-}
+  store.loading = false;
+};
 
 const otpLogin = async () => {
-  if (store.loading) return
-  store.loading = true
-  errorMessage.value = ''
+  if (store.loading) return;
+  store.loading = true;
+  errorMessage.value = '';
   try {
-    http.setOptions({ refreshUrl: VITE_REFRESH_URL })
-    const { data } = await http.post('/api/auth/otp', { id: otpId, pin: otp.value })
+    http.setOptions({ refreshUrl: VITE_REFRESH_URL });
+    const { data } = await http.post('/api/auth/otp', { id: otpId, pin: otp.value });
     // logged in
-    const decoded = parseJwt(data.access_token)
-    http.setTokens({ access: data.access_token, refresh: data.refresh_token })
-    http.setOptions({ refreshUrl: VITE_REFRESH_URL })
-    _setUser(data, decoded)
+    const decoded = parseJwt(data.access_token);
+    http.setTokens({ access: data.access_token, refresh: data.refresh_token });
+    http.setOptions({ refreshUrl: VITE_REFRESH_URL });
+    _setUser(data, decoded);
   } catch (e) {
     if (e.data.message === 'Token Expired Error') {
-      errorMessage.value = 'OTP Expired'
-      setToLogin()
+      errorMessage.value = 'OTP Expired';
+      setToLogin();
     } else if (otpCount < 3) {
-      otpCount++
-      errorMessage.value = 'OTP Error'
+      otpCount++;
+      errorMessage.value = 'OTP Error';
     } else {
-      errorMessage.value = 'OTP Tries Exceeded'
-      setToLogin()
+      errorMessage.value = 'OTP Tries Exceeded';
+      setToLogin();
     }
   }
-  store.loading = false
-}
+  store.loading = false;
+};
 
 const oauthLogin = () => {
-  alert('Please set appropriate callback URL at oauth side')
+  alert('Please set appropriate callback URL at oauth side');
   if (MODE === 'mocked') {
-    window.location.assign('/callback#mocked')
+    window.location.assign('/callback#mocked');
   } else {
-    const OAUTH_URL = 'https://github.com/login/oauth/authorize?scope=user:email&client_id'
-    const OAUTH_CLIENT_ID = 'a355948a635c2a2066e2'
-    http.setOptions({ refreshUrl: VITE_REFRESH_URL })
-    window.location.replace(`${OAUTH_URL}=${OAUTH_CLIENT_ID}`)
+    const OAUTH_URL = 'https://github.com/login/oauth/authorize?scope=user:email&client_id';
+    const OAUTH_CLIENT_ID = 'a355948a635c2a2066e2';
+    http.setOptions({ refreshUrl: VITE_REFRESH_URL });
+    window.location.replace(`${OAUTH_URL}=${OAUTH_CLIENT_ID}`);
   }
-}
+};
 </script>
 
 <style scoped>

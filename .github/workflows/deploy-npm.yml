@@ -49,6 +49,6 @@ jobs:
       # Setup .npmrc file to publish to npm
       - run: echo checking out branch/tag ${GITHUB_REF##*/}
       # - run: npm install --production --workspace=libs/${{ github.event.inputs.pkg }} # NOT NEEDED CURRENTLY
-      - run: npm publish --access public --workspace=pkgs/${{ github.event.inputs.pkg }}
+      - run: npm publish --access public --workspace=common/${{ github.event.inputs.pkg }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

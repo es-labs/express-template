@@ -4,31 +4,30 @@
       <a-col class="ds-stat" :sm="24" :md="12" :xl="6">
         <a-card>
           <a-statistic title="Feedback" :value="11.28" :precision="2" suffix="%" :value-style="{ color: '#3f8600' }">
-            <template #prefix>
-              <arrow-up-outlined />
-            </template>
+            <template #prefix> <arrow-up-outlined /> </template>
           </a-statistic>
         </a-card>
       </a-col>
       <a-col class="ds-stat" :sm="24" :md="12" :xl="6">
         <a-card>
-          <a-statistic title="Idle" :value="9.3" :precision="2" suffix="%" class="demo-class" :value-style="{ color: '#cf1322' }">
-            <template #prefix>
-              <arrow-down-outlined />
-            </template>
+          <a-statistic
+            title="Idle"
+            :value="9.3"
+            :precision="2"
+            suffix="%"
+            class="demo-class"
+            :value-style="{ color: '#cf1322' }"
+          >
+            <template #prefix> <arrow-down-outlined /> </template>
           </a-statistic>
         </a-card>
       </a-col>
 
       <a-col class="ds-stat" :sm="24" :md="12" :xl="6">
-        <a-card>
-          <a-statistic title="Active Users" :value="112893" />
-        </a-card>
+        <a-card> <a-statistic title="Active Users" :value="112893" /> </a-card>
       </a-col>
       <a-col class="ds-stat" :sm="24" :md="12" :xl="6">
-        <a-card>
-          <a-statistic title="Account Balance (CNY)" :precision="2" :value="112893" />
-        </a-card>
+        <a-card> <a-statistic title="Account Balance (CNY)" :precision="2" :value="112893" /> </a-card>
       </a-col>
     </a-row>
 
@@ -45,12 +44,8 @@
                       <template #icon><UserOutlined /></template>
                     </a-avatar>
                     <a-card-meta>
-                      <template #title>
-                        <span>{{ item.name }}</span>
-                      </template>
-                      <template #description>
-                        <span style="font-size: 0.8em">{{ item.title }}</span>
-                      </template>
+                      <template #title> <span>{{ item.name }}</span> </template>
+                      <template #description> <span style="font-size: 0.8em">{{ item.title }}</span> </template>
                     </a-card-meta>
                   </a-card>
                 </a-list-item>
@@ -62,10 +57,10 @@
             <a-list item-layout="horizontal" :data-source="data">
               <template #renderItem="{ item }">
                 <a-list-item>
-                  <a-list-item-meta description="Ant Design, a design language for background applications, is refined by Ant UED Team">
-                    <template #title>
-                      <a href="https://www.antdv.com/">{{ item.title }}</a>
-                    </template>
+                  <a-list-item-meta
+                    description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                  >
+                    <template #title> <a href="https://www.antdv.com/">{{ item.title }}</a> </template>
                     <template #avatar>
                       <a-avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
                     </template>
@@ -113,14 +108,14 @@
 </template>
 
 <script setup>
-import { ArrowUpOutlined, ArrowDownOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { ArrowUpOutlined, ArrowDownOutlined, UserOutlined } from '@ant-design/icons-vue';
 
 const data = [
   { name: 'Faith', title: 'Full-stack Dev' },
   { name: 'Hope', title: 'Data Scientist' },
   { name: 'Charity', title: 'Data Engineer' },
-  { name: 'Love', title: 'Data Scientist' }
-]
+  { name: 'Love', title: 'Data Scientist' },
+];
 </script>
 
 <style>

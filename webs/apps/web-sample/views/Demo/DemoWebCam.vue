@@ -9,12 +9,12 @@
 </template>
 
 <script>
-import '@es-labs/jslib/web/web-cam' // served from express /esm static route
+import '../../../../../common/web/web-cam'; // served from express /esm static route
 
-const snappedFn = (e) => {
-  alert('see console log for snapped picture data')
-  console.log('snappedFn', e.detail)
-}
+const snappedFn = e => {
+  alert('see console log for snapped picture data');
+  console.log('snappedFn', e.detail);
+};
 </script>
 
 <style scoped>

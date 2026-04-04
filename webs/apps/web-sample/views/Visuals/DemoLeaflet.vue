@@ -6,8 +6,8 @@
 </template>
 
 <script setup>
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 // NOSONAR
 // import 'leaflet-tracksymbol'
 // import '@/assets/leaflet.latlng-graticule'
@@ -17,17 +17,17 @@ import 'leaflet/dist/leaflet.css'
 // import marker2x from 'leaflet/dist/images/marker-icon-2x.png'
 // import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 
-import { onMounted } from 'vue'
+import { onMounted } from 'vue';
 
 onMounted(async () => {
-  const map = L.map('map').setView([51.505, -0.09], 13)
+  const map = L.map('map').setView([51.505, -0.09], 13);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map)
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
 
-  L.marker([51.5, -0.09]).addTo(map).bindPopup('A pretty CSS3 popup.<br> Easily customizable.').openPopup()
-})
+  L.marker([51.5, -0.09]).addTo(map).bindPopup('A pretty CSS3 popup.<br> Easily customizable.').openPopup();
+});
 </script>
 
 <style scoped>

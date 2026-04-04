@@ -1,4 +1,4 @@
-import { openWs, closeWs } from './ws'
+import { openWs, closeWs } from './ws';
 
-export const onLogin = () => openWs()
-export const onLogout = () => closeWs()
+export const onLogin = () => openWs();
+export const onLogout = () => closeWs();

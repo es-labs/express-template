@@ -15,16 +15,12 @@ const authObj = {};
 /*
 // beforeAll
 before(async () => {
-  require('@es-labs/jslib/express/init')() // TODELETE require(path.join(process.cwd(), 'common', 'init'))()
-  require('@es-labs/jslib/express/preRoute')(app, express) // TODELETE require(path.join(process.cwd(), 'common', 'preRoute'))(app, express)
-  process.env.WS_PORT = '' // disable websocket for now
+  preRoute
+  process.env?.WS_PORT = '' // disable websocket for now
 
   require(path.join(process.cwd(), 'apps', 'apploader'))(app)
   require(path.join(process.cwd(), 'router'))(app)
 
-  services = require('@es-labs/jslib/services')
-  authService = require('@es-labs/jslib/auth')
-  // await services.start()
   // authService.setup(services.get("keyv"), services.get("knex1"));
   // const tokens = await authService.createToken({ id: 100, groups: 'TestGroup' })
   // authObj = {

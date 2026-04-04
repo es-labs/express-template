@@ -3,8 +3,8 @@ const config = {
     baseURL: 'http://localhost:8080',
     browserName: 'chromium',
     // screenshot: 'only-on-failure', // on, off, only-on-failure
-    headless: true
-  }
-}
+    headless: true,
+  },
+};
 
-module.exports = config
+module.exports = config;

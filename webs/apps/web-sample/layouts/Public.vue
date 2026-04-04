@@ -6,11 +6,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue'
-import { useMainStore } from '../store'
+import { computed, onMounted, onUnmounted } from 'vue';
+import { useMainStore } from '../store';
 
-const store = useMainStore()
-onMounted(() => console.log('PUBLIC mounted!'))
-onUnmounted(() => console.log('PUBLIC unmounted'))
-const loading = computed(() => store.loading)
+const store = useMainStore();
+onMounted(() => console.log('PUBLIC mounted!'));
+onUnmounted(() => console.log('PUBLIC unmounted'));
+const loading = computed(() => store.loading);
 </script>

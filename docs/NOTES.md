@@ -2,8 +2,8 @@
 
 - apps: backend applications
 - common: common javascript used by the apps folder (TBD also for other folders), also common schemas
+  - packages can be uploaded to npm
 - docs: documentation
-- pkgs: packages can be uploaded to npm
 - scripts: deploy, documentation scripts
 - webs: frontend applications using VueJS
 
@@ -77,3 +77,14 @@ useOptionalChain
 useTemplate
 useNodejsImportProtocol
 noConsole (set to warn first, convert using logger, then set back to error)
+
+# WIP
+@common/iso/sleep.js
+@common/node/services/index
+- JSON in env, refactor to use something else
+- fix logging
+- organize files
+- safeJSON
+
+## Github Related To Read
+- https://github.com/settings/security_analysis

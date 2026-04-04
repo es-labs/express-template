@@ -2,7 +2,14 @@
   <a-form :model="formState" layout="vertical">
     <h1>Store Counter {{ storeCounter }}</h1>
     <a-form-item label="Region">
-      <a-select mode="multiple" placeholder="Please select" v-model:value="formState.regions" style="width: 300px" @blur="blurRegion" @deselect="blurRegion">
+      <a-select
+        mode="multiple"
+        placeholder="Please select"
+        v-model:value="formState.regions"
+        style="width: 300px"
+        @blur="blurRegion"
+        @deselect="blurRegion"
+      >
         <a-select-option v-for="region in formState.regionList" :key="region">{{ region }}</a-select-option>
       </a-select>
     </a-form-item>
@@ -19,14 +26,14 @@
   </a-form>
 </template>
 <script setup>
-import { reactive, toRaw, onMounted, computed } from 'vue'
-import { useAppStore } from '../../store.js'
+import { reactive, toRaw, onMounted, computed } from 'vue';
+import { useAppStore } from '../../store.js';
 
 // a-select - allowClear (handle event)
 // TODO select / clear all
 
-const appStore = useAppStore()
-onMounted(() => {})
+const appStore = useAppStore();
+onMounted(() => {});
 
 const formState = reactive({
   regions: [],
@@ -39,34 +46,34 @@ const formState = reactive({
     NA: ['United States', 'Canada'],
     SA: ['Brazil', 'Argentina', 'Ecuador'],
     Africa: ['Egypt', 'Nigeria', 'Kenya', 'Liberia'],
-    ME: ['Egypt', 'Saudi Arabia', 'Afghanistan']
-  }
-})
+    ME: ['Egypt', 'Saudi Arabia', 'Afghanistan'],
+  },
+});
 
 const onSubmit = () => {
-  console.log('submit!', toRaw(formState))
-}
+  console.log('submit!', toRaw(formState));
+};
 
 const blurRegion = () => {
-  console.log('blurRegion!', toRaw(formState))
-  const keys = {}
-  const list = []
-  const newCountries = []
+  console.log('blurRegion!', toRaw(formState));
+  const keys = {};
+  const list = [];
+  const newCountries = [];
   for (const region of formState.regions) {
     for (const country of formState.countriesMasterList[region]) {
       if (!keys[country]) {
-        list.push(country)
-        keys[country] = true
-        const item = formState.countries.find((item) => item === country)
+        list.push(country);
+        keys[country] = true;
+        const item = formState.countries.find(item => item === country);
         if (item) {
-          newCountries.push(item)
+          newCountries.push(item);
         }
       }
     }
   }
-  formState.countries = [...newCountries]
-  formState.countriesList = [...list]
-}
+  formState.countries = [...newCountries];
+  formState.countriesList = [...list];
+};
 
-const storeCounter = computed(() => appStore.counter)
+const storeCounter = computed(() => appStore.counter);
 </script>

@@ -1,17 +1,19 @@
 import { loadEnvFile } from 'node:process';
-import vue from '@vitejs/plugin-vue'
+import vue from '@vitejs/plugin-vue';
 
-export default ({ command, mode }) => { // command = serve, build
-  loadEnvFile(`.env.${mode}`)
+export default ({ command, mode }) => {
+  // command = serve, build
+  loadEnvFile(`.env.${mode}`);
   return {
     define: {
-      __VUE_PROD_DEVTOOLS__: false
+      __VUE_PROD_DEVTOOLS__: false,
     },
     base: process.env.BASE_PATH || '/', // set to '/vite' for dev:build, '/' otherwise
     build: {
-      esbuildOptions: { // VITE uses esbuild by default
-        drop: mode === 'production' ? ['console', 'debugger'] : []
-      }
+      esbuildOptions: {
+        // VITE uses esbuild by default
+        drop: mode === 'production' ? ['console', 'debugger'] : [],
+      },
       // sourcemap: true,
       // rollupOptions: {
       //   // external: [ 'react' ] // ignore react stuff
@@ -31,21 +33,19 @@ export default ({ command, mode }) => { // command = serve, build
       vue({
         template: {
           compilerOptions: {
-            isCustomElement: (tag) => tag.startsWith('bwc-') || tag.startsWith('vcxwc-')
-          }
-        }
-      })
+            isCustomElement: tag => tag.startsWith('bwc-') || tag.startsWith('vcxwc-'),
+          },
+        },
+      }),
     ],
     resolve: {
       alias: {
         // https://github.com/vitejs/vite/issues/279#issuecomment-636110354
-        // '@': path.resolve(__dirname, 'apps') // import aa from '@/esm/aaa.js',
-        // '/@es-labs/jslib': require('path').join(__dirname, '@es-labs', 'esm')
-      }
+      },
     },
     server: {
       host: '127.0.0.1',
-      port: 8080
-    }
-  }
-}
+      port: 8080,
+    },
+  };
+};

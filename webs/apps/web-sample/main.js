@@ -1,23 +1,23 @@
-import '@common/vue'
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import Antd from 'ant-design-vue'
-import router from './router.js'
-import App from './App.vue'
+import '@common/vue';
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import Antd from 'ant-design-vue';
+import router from './router.js';
+import App from './App.vue';
 
-import './style/main.css' // app overall custom style
-import '../common/msw.js' // msw
-import '../common/pwa.js' // pwa
-import createSentry from '../common/sentry.js' // sentry
+import './style/main.css'; // app overall custom style
+import '../common/msw.js'; // msw
+import '../common/pwa.js'; // pwa
+import createSentry from '../common/sentry.js'; // sentry
 
-import '@es-labs/jslib/web/bwc-loading-overlay' // our own web components
+import '@common/web/bwc-loading-overlay'; // our own web components
 
 import { version } from './package.json' with { type: 'json' };
-console.log(`V${version}`)
+console.log(`V${version}`);
 
-const app = createApp(App)
-createSentry(app, router) // add or remove your post createApp code here...
-app.use(createPinia()) // state management
+const app = createApp(App);
+createSentry(app, router); // add or remove your post createApp code here...
+app.use(createPinia()); // state management
 
 // NOSONAR
 // https://zhuanlan.zhihu.com/p/135280049
@@ -25,7 +25,7 @@ app.use(createPinia()) // state management
 
 // avoid using provide & inject - reduce tech footprint
 // app.use(createPinia()) // state management
-app.use(router) // routing
-app.use(Antd)
+app.use(router); // routing
+app.use(Antd);
 
-app.mount('#app')
+app.mount('#app');

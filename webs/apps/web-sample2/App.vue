@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import Hello from './Hello.vue'
+import Hello from './Hello.vue';
 
-console.log('hello script setup')
+console.log('hello script setup');
 </script>

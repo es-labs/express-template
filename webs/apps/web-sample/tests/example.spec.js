@@ -1,33 +1,33 @@
-const { test, expect } = require('@playwright/test')
+const { test, expect } = require('@playwright/test');
 
 // https://github.com/calm1205/vite-playwright-msw/blob/main/src/__tests__/index.spec.ts
 
-const BASE_URL = 'http://127.0.0.1:8080/'
+const BASE_URL = 'http://127.0.0.1:8080/';
 test.describe('New Todo', () => {
-  test.beforeEach(async ({ page }) => await page.goto(BASE_URL))
+  test.beforeEach(async ({ page }) => await page.goto(BASE_URL));
 
   test('basic test', async ({ page }) => {
-    page.on('console', (msg) => {
-      console.log(msg)
-    })
-    await page.waitForTimeout(2000)
+    page.on('console', msg => {
+      console.log(msg);
+    });
+    await page.waitForTimeout(2000);
 
     // await page.goto('http://127.0.0.1:8080/')
 
     // await page.locator('text=Login').click()
-    await page.locator('[data-cy="login"]').click()
+    await page.locator('[data-cy="login"]').click();
     // await page.waitForURL('**/') // need timeout
-    await expect(page.url()).toEqual(BASE_URL)
+    await expect(page.url()).toEqual(BASE_URL);
 
-    const xx = await page.locator('[data-cy="otp"]').click()
-    console.log('>>>>', xx)
+    const xx = await page.locator('[data-cy="otp"]').click();
+    console.log('>>>>', xx);
     // .click()
 
     // await page.locator('text=Login').click()
     // await expect(page.url()).toEqual(BASE_URL)
 
-    await page.waitForURL('**/dashboard') // need timeout
-    await expect(page.url()).toEqual(`${BASE_URL}dashboard`)
+    await page.waitForURL('**/dashboard'); // need timeout
+    await expect(page.url()).toEqual(`${BASE_URL}dashboard`);
 
     // console.log(page.url())
     // await page.waitForTimeout(2000)
@@ -36,5 +36,5 @@ test.describe('New Todo', () => {
     // await page.goto('https://playwright.dev/')
     // const title = page.locator('.navbar__inner .navbar__title')
     // await expect(title).toHaveText('Playwright')
-  })
-})
+  });
+});

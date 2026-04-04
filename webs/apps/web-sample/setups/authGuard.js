@@ -1,6 +1,6 @@
-import { useMainStore } from '../store'
+import { useMainStore } from '../store';
 // TBD import { http } from '@common/vue/plugins/fetch'
-const { VITE_API_URL } = import.meta.env
+const { VITE_API_URL } = import.meta.env;
 
 // const permissions = {
 //   // g1 = route groups, g2 = user groups
@@ -13,13 +13,13 @@ const { VITE_API_URL } = import.meta.env
 //   '/test': ['TestGroup'] //
 // }
 
-const { VITE_INITIAL_SECURE_PATH, VITE_INITIAL_PUBLIC_PATH } = import.meta.env
+const { VITE_INITIAL_SECURE_PATH, VITE_INITIAL_PUBLIC_PATH } = import.meta.env;
 
 export const authGuard = async (to, from, next) => {
-  const store = useMainStore()
+  const store = useMainStore();
 
   const previouslyLoggedIn = async () => {
-    return false
+    return false;
     // let result = false
     // const store = useMainStore()
 
@@ -31,7 +31,7 @@ export const authGuard = async (to, from, next) => {
     //   result = true
     // }
     // return result
-  }
+  };
 
   // TODO find users from localStorage? // potential security leak
   // const item = localStorage.getItem('session') // survive a refresh - POTENTIAL SECURITY RISK - TO REVIEW AND CHANGE USE HTTPONLY COOKIES
@@ -40,8 +40,8 @@ export const authGuard = async (to, from, next) => {
   //   store.commit('setUser', user) // need user.token only
   // }
 
-  const loggedIn = !!store.user
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const loggedIn = !!store.user;
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
   // const { groups } = store.state.user
   // if (routeGroups[to.matched[0].path]) {
@@ -52,18 +52,18 @@ export const authGuard = async (to, from, next) => {
   //   }
   // }
   if (loggedIn === requiresAuth) {
-    next()
+    next();
   } else if (!loggedIn && requiresAuth) {
-    const result = await previouslyLoggedIn()
+    const result = await previouslyLoggedIn();
     if (result) {
-      next()
+      next();
     } else {
-      next(VITE_INITIAL_PUBLIC_PATH)
+      next(VITE_INITIAL_PUBLIC_PATH);
     }
   } else if (loggedIn && !requiresAuth) {
-    next(VITE_INITIAL_SECURE_PATH)
+    next(VITE_INITIAL_SECURE_PATH);
   } else {
     // should not get here
-    console.log('router should not get here', loggedIn, requiresAuth)
+    console.log('router should not get here', loggedIn, requiresAuth);
   }
-}
+};

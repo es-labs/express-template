@@ -1,5 +1,5 @@
 import express from 'express';
-// const { authUser } = require('@es-labs/jslib/auth')
+// const { authUser } = require('@common/node/auth')
 
 // channel
 // https://stackoverflow.com/questions/33858927/how-to-obtain-the-chat-id-of-a-private-telegram-channel

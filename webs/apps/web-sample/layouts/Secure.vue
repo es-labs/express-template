@@ -7,7 +7,9 @@
       <a-menu class="sider-menu" theme="dark" mode="inline" v-model:selectedKeys="selectedKeys">
         <template v-for="route in mappedRoutes">
           <a-sub-menu v-if="route.submenu" :key="route.submenu" :title="toPascalCase(route.submenu)">
-            <a-menu-item v-for="menu in subMenus[route.submenu]" :key="`sm-${menu.path}`" @click="$router.push(menu)">{{ menu.name }}</a-menu-item>
+            <a-menu-item v-for="menu in subMenus[route.submenu]" :key="`sm-${menu.path}`" @click="$router.push(menu)"
+              >{{ menu.name }}</a-menu-item
+            >
           </a-sub-menu>
           <a-menu-item v-else :key="`m-${route.path}`" @click="$router.push(route)">{{ route.name }}</a-menu-item>
         </template>
@@ -20,7 +22,9 @@
         <menu-fold-outlined v-else class="trigger" @click="() => (collapsed = !collapsed)" />
         <span>Sample App</span>
       </a-layout-header>
-      <a-layout-content :style="{ overflowY: 'auto', margin: '8px 8px', padding: '8px', background: '#fff', height: 'calc(100vh - 96px)' }">
+      <a-layout-content
+        :style="{ overflowY: 'auto', margin: '8px 8px', padding: '8px', background: '#fff', height: 'calc(100vh - 96px)' }"
+      >
         <a-breadcrumb style="margin: 8px 0">
           <a-breadcrumb-item>Home</a-breadcrumb-item>
           <a-breadcrumb-item>Dashboard</a-breadcrumb-item>
@@ -34,69 +38,69 @@
 
 <script setup>
 // :key="$route.fullPath" // this is causing problems
-import { onMounted, onUnmounted, onBeforeUnmount, ref, reactive, computed } from 'vue'
-import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
-import { useMainStore } from '../store.js'
-import { SECURE_ROUTES } from '../setups/routes.js'
-import { onLogin, onLogout } from '../setups/events.js'
+import { onMounted, onUnmounted, onBeforeUnmount, ref, reactive, computed } from 'vue';
+import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue';
+import { useMainStore } from '../store.js';
+import { SECURE_ROUTES } from '../setups/routes.js';
+import { onLogin, onLogout } from '../setups/events.js';
 
-import idleTimer from '@es-labs/jslib/web/idle'
+import idleTimer from '@common/web/idle';
 
-const store = useMainStore()
+const store = useMainStore();
 // const loading = store.loading
-const mappedRoutes = reactive([])
-const subMenus = reactive({})
-const loading = computed(() => store.loading)
-const selectedKeys = ref(['1'])
-const collapsed = ref(false)
+const mappedRoutes = reactive([]);
+const subMenus = reactive({});
+const loading = computed(() => store.loading);
+const selectedKeys = ref(['1']);
+const collapsed = ref(false);
 
-const toPascalCase = (str) => {
-  str = str.replace(/-\w/g, (x) => ` ${x[1].toUpperCase()}`)
-  return str[0].toUpperCase() + str.substring(1, str.length)
-}
+const toPascalCase = str => {
+  str = str.replace(/-\w/g, x => ` ${x[1].toUpperCase()}`);
+  return str[0].toUpperCase() + str.substring(1, str.length);
+};
 
 onMounted(async () => {
-  console.log('SECURE mounted!')
-  idleTimer.timeouts.push({ time: 300, fn: () => alert('Idle Timeout Test'), stop: true })
-  idleTimer.start()
+  console.log('SECURE mounted!');
+  idleTimer.timeouts.push({ time: 300, fn: () => alert('Idle Timeout Test'), stop: true });
+  idleTimer.start();
 
-  SECURE_ROUTES.filter((route) => route.meta.layout === 'layout-secure').forEach((route) => {
+  SECURE_ROUTES.filter(route => route.meta.layout === 'layout-secure').forEach(route => {
     if (!route.hidden) {
-      const pathLen = route.path.split('/').length
+      const pathLen = route.path.split('/').length;
       if (pathLen === 2 || pathLen === 3) {
-        const submenu = pathLen === 3 ? route.path.split('/', 2)[1] : ''
+        const submenu = pathLen === 3 ? route.path.split('/', 2)[1] : '';
         // console.log('submenu', route, '-', submenu, '-', pathLen)
         if (submenu) {
           if (!subMenus[submenu]) {
             // first time
-            subMenus[submenu] = []
-            mappedRoutes.push({ ...route, submenu: submenu })
+            subMenus[submenu] = [];
+            mappedRoutes.push({ ...route, submenu: submenu });
           }
-          subMenus[submenu].push({ ...route }) // add item
+          subMenus[submenu].push({ ...route }); // add item
         } else {
-          mappedRoutes.push({ ...route, submenu: '' }) // add item
+          mappedRoutes.push({ ...route, submenu: '' }); // add item
         }
       }
     }
-  })
-  onLogin?.()
-})
+  });
+  onLogin?.();
+});
 onUnmounted(() => {
-  console.log('SECURE unmounted')
-})
+  console.log('SECURE unmounted');
+});
 onBeforeUnmount(() => {
   // close WS
-  idleTimer.stop()
-  onLogout?.()
-})
+  idleTimer.stop();
+  onLogout?.();
+});
 
 const logout = async () => {
-  console.time('time-logout')
-  store.loading = true
-  await store.doLogin(null)
-  store.loading = false
-  console.timeEnd('time-logout')
-}
+  console.time('time-logout');
+  store.loading = true;
+  await store.doLogin(null);
+  store.loading = false;
+  console.timeEnd('time-logout');
+};
 </script>
 
 <style>

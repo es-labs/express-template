@@ -1,4 +1,4 @@
-import * as s from '@es-labs/jslib/services';
+import * as s from '@common/node/services/index';
 
 const create = async (req, res, next) => {
   const rv = await s.get('knex1')('categories').insert(req.body);

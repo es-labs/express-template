@@ -3,10 +3,14 @@
     <a-form-item label="Continents">
       <a-checkbox @change="onCheckAllChange">Select all</a-checkbox>
       <!-- v-model:checked="checkAll" -->
-      <a-select mode="multiple" placeholder="Please select" v-model:value="formState.continents" @blur="blurSelect" @deselect="blurSelect">
-        <template #clearIcon>
-          <setting-outlined />
-        </template>
+      <a-select
+        mode="multiple"
+        placeholder="Please select"
+        v-model:value="formState.continents"
+        @blur="blurSelect"
+        @deselect="blurSelect"
+      >
+        <template #clearIcon> <setting-outlined /> </template>
         <a-select-option v-for="item in lists.continentsList" :key="item">{{ item }}</a-select-option>
       </a-select>
     </a-form-item>
@@ -17,7 +21,14 @@
       </a-select>
     </a-form-item>
     <a-form-item label="Countries West Hemisphere">
-      <a-select mode="multiple" placeholder="Please select" v-model:value="formState.countriesWest" allow-clear @blur="blurSelect2" @deselect="blurSelect2">
+      <a-select
+        mode="multiple"
+        placeholder="Please select"
+        v-model:value="formState.countriesWest"
+        allow-clear
+        @blur="blurSelect2"
+        @deselect="blurSelect2"
+      >
         <a-select-option v-for="item in lists.countriesWestList" :key="item">{{ item }}</a-select-option>
       </a-select>
     </a-form-item>
@@ -32,17 +43,13 @@
     <a-form-item label="Force Include">
       <a-checkbox @change="onCheckAllChangeIncludes">Select all</a-checkbox>
       <a-select mode="multiple" placeholder="Please select" v-model:value="formState.forceIncludes">
-        <a-select-option v-for="item in forceListFiltered" :key="item" :value="item">
-          {{ item }}
-        </a-select-option>
+        <a-select-option v-for="item in forceListFiltered" :key="item" :value="item"> {{ item }} </a-select-option>
       </a-select>
     </a-form-item>
     <a-form-item label="Force Exclude">
       <a-checkbox @change="onCheckAllChangeExcludes">Select all</a-checkbox>
       <a-select mode="multiple" placeholder="Please select" v-model:value="formState.forceExcludes">
-        <a-select-option v-for="item in forceListFiltered" :key="item" :value="item">
-          {{ item }}
-        </a-select-option>
+        <a-select-option v-for="item in forceListFiltered" :key="item" :value="item"> {{ item }} </a-select-option>
       </a-select>
     </a-form-item>
 
@@ -55,11 +62,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, toRaw, onMounted, computed } from 'vue'
-import { SettingOutlined } from '@ant-design/icons-vue'
+import { ref, reactive, toRaw, onMounted, computed } from 'vue';
+import { SettingOutlined } from '@ant-design/icons-vue';
 
-onMounted(async () => {})
-const formRef = ref()
+onMounted(async () => {});
+const formRef = ref();
 const lists = reactive({
   continentsList: ['Asia', 'Europe', 'NA', 'SA', 'Africa', 'ME'],
 
@@ -68,13 +75,13 @@ const lists = reactive({
     Asia: ['Russia', 'Japan', 'Burma', 'Indonesia', 'Afghanistan'],
     Europe: ['Russia', 'Germany', 'France', 'Poland', 'Sweden', 'Italy'],
     Africa: ['Egypt', 'Nigeria', 'Kenya', 'Liberia'],
-    ME: ['Egypt', 'Saudi Arabia', 'Afghanistan']
+    ME: ['Egypt', 'Saudi Arabia', 'Afghanistan'],
   },
 
   countriesWestList: [],
   countriesWestMasterList: {
     NA: ['United States', 'Canada'],
-    SA: ['Brazil', 'Argentina', 'Ecuador']
+    SA: ['Brazil', 'Argentina', 'Ecuador'],
   },
 
   westCountryStatesList: [],
@@ -83,9 +90,9 @@ const lists = reactive({
     Canada: ['Ontario', 'Quebec', 'BC', 'Alberta'],
     Brazil: ['B1', 'B2'],
     Argentina: ['A1', 'A2', 'A3'],
-    Ecuador: ['EC1', 'EC2']
-  }
-})
+    Ecuador: ['EC1', 'EC2'],
+  },
+});
 
 const formState = reactive({
   // form
@@ -94,77 +101,77 @@ const formState = reactive({
   continents: [],
   countriesEast: [],
   countriesWest: [],
-  westCountryStates: []
-})
+  westCountryStates: [],
+});
 
-const onCheckAllChange = (e) => {
+const onCheckAllChange = e => {
   if (e.target.checked === true) {
-    formState.continents = [...lists.continentsList]
-    blurSelect() // select all countriesEast / countriesWest
+    formState.continents = [...lists.continentsList];
+    blurSelect(); // select all countriesEast / countriesWest
   } else {
-    formState.continents = []
-    blurSelect() // clear all countriesEast / countriesWest
+    formState.continents = [];
+    blurSelect(); // clear all countriesEast / countriesWest
   }
-}
+};
 
 const blurSelect = () => {
   // console.log('blurSelect!', toRaw(formState));
-  const key = 'continents'
+  const key = 'continents';
   const subs = [
     {
       subKey: 'countriesEast',
       subKeyMasterList: 'countriesEastMasterList',
-      subKeyList: 'countriesEastList'
+      subKeyList: 'countriesEastList',
     },
     {
       subKey: 'countriesWest',
       subKeyMasterList: 'countriesWestMasterList',
-      subKeyList: 'countriesWestList'
-    }
+      subKeyList: 'countriesWestList',
+    },
     // can add more...
-  ]
+  ];
   for (let sub of subs) {
     // all dropdowns affected
-    const { subKey, subKeyMasterList, subKeyList } = sub
-    const keys = {}
-    const list = []
-    const newSelected = []
+    const { subKey, subKeyMasterList, subKeyList } = sub;
+    const keys = {};
+    const list = [];
+    const newSelected = [];
     for (let _item of formState[key]) {
       // loop continent from continents
       if (lists[subKeyMasterList][_item]) {
         for (let _subItem of lists[subKeyMasterList][_item]) {
           // loop through every country in a continent
           if (!keys[_subItem]) {
-            list.push(_subItem)
-            keys[_subItem] = true
-            const found = formState[subKey].find((item) => item === _subItem)
-            if (found) newSelected.push(found)
+            list.push(_subItem);
+            keys[_subItem] = true;
+            const found = formState[subKey].find(item => item === _subItem);
+            if (found) newSelected.push(found);
           }
         }
       }
     }
-    formState[subKey] = [...newSelected]
-    lists[subKeyList] = [...list]
+    formState[subKey] = [...newSelected];
+    lists[subKeyList] = [...list];
   }
-  blurSelect2()
-}
+  blurSelect2();
+};
 
 const blurSelect2 = () => {
   // console.log('blurSelect!', toRaw(formState));
-  const key = 'countriesWest'
+  const key = 'countriesWest';
   const subs = [
     {
       subKey: 'westCountryStates',
       subKeyMasterList: 'westCountryStatesMasterList',
-      subKeyList: 'westCountryStatesList'
-    }
-  ]
+      subKeyList: 'westCountryStatesList',
+    },
+  ];
   for (let sub of subs) {
     // all dropdowns affected
-    const { subKey, subKeyMasterList, subKeyList } = sub
-    const keys = {}
-    const list = []
-    const newSelected = []
+    const { subKey, subKeyMasterList, subKeyList } = sub;
+    const keys = {};
+    const list = [];
+    const newSelected = [];
     for (let _item of formState[key]) {
       // loop country from list of countries
       if (lists[subKeyMasterList][_item]) {
@@ -172,50 +179,55 @@ const blurSelect2 = () => {
         for (let _subItem of lists[subKeyMasterList][_item]) {
           // loop through every state in a country
           if (!keys[_subItem]) {
-            list.push(_subItem)
-            keys[_subItem] = true
-            const found = formState[subKey].find((item) => item === _subItem)
-            if (found) newSelected.push(found)
+            list.push(_subItem);
+            keys[_subItem] = true;
+            const found = formState[subKey].find(item => item === _subItem);
+            if (found) newSelected.push(found);
           }
         }
         // end
       }
     }
-    formState[subKey] = [...newSelected]
-    lists[subKeyList] = [...list]
+    formState[subKey] = [...newSelected];
+    lists[subKeyList] = [...list];
   }
-}
+};
 
-const forceListFiltered = computed(() => forceList.filter((o) => !formState.forceIncludes.includes(o) && !formState.forceExcludes.includes(o)))
-const forceList = ['aa1', 'aa22', 'aa23', 'aa4', 'aa5', 'bb1', 'bb22', 'bb23', 'bb4', 'bb5']
+const forceListFiltered = computed(() =>
+  forceList.filter(o => !formState.forceIncludes.includes(o) && !formState.forceExcludes.includes(o)),
+);
+const forceList = ['aa1', 'aa22', 'aa23', 'aa4', 'aa5', 'bb1', 'bb22', 'bb23', 'bb4', 'bb5'];
 
-const onCheckAllChangeIncludes = (e) => {
+const onCheckAllChangeIncludes = e => {
   if (e.target.checked) {
-    formState.forceIncludes = [...formState.forceIncludes, ...forceList.filter((o) => !formState.forceIncludes.includes(o) && !formState.forceExcludes.includes(o))]
+    formState.forceIncludes = [
+      ...formState.forceIncludes,
+      ...forceList.filter(o => !formState.forceIncludes.includes(o) && !formState.forceExcludes.includes(o)),
+    ];
   } else {
-    formState.forceIncludes = []
+    formState.forceIncludes = [];
   }
-}
+};
 
-const onCheckAllChangeExcludes = (e) => {
+const onCheckAllChangeExcludes = e => {
   if (e.target.checked) {
   } else {
-    formState.forceExlcudes = []
+    formState.forceExlcudes = [];
   }
-}
+};
 
 const onSubmit = async () => {
-  console.log('submit!', toRaw(formState))
-}
+  console.log('submit!', toRaw(formState));
+};
 
 const labelCol = {
   // form
-  span: 4
-}
+  span: 4,
+};
 
 const wrapperCol = {
-  span: 14
-}
+  span: 14,
+};
 
 // :tip-formatter="formatter"
 // const formatter = value => {
@@ -224,11 +236,11 @@ const wrapperCol = {
 
 const onClear = () => {
   // formRef.value.resetFields() //  does not work
-  formState.forceIncludes = []
-  formState.forceExcludes = []
-  formState.continents = []
-  formState.countriesEast = []
-  formState.countriesWest = []
-  formState.westCountryStates = []
-}
+  formState.forceIncludes = [];
+  formState.forceExcludes = [];
+  formState.continents = [];
+  formState.countriesEast = [];
+  formState.countriesWest = [];
+  formState.westCountryStates = [];
+};
 </script>
