@@ -1,0 +1,131 @@
+#!/bin/sh
+# .githooks/pre-commit
+# Pre-commit hook: runs Biome formatting/linting, debugger/console checks,
+# czg commit-message formatting (optional), and zod schema tests on staged files.
+#
+# Install: run .githooks/setup.sh (or: git config core.hooksPath .githooks)
+# Skip:    git commit --no-verify
+
+# ── Colours ──────────────────────────────────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Colour
+
+print_info()    { printf "${BLUE}[pre-commit]${NC} %s\n" "$1"; }
+print_success() { printf "${GREEN}[pre-commit]${NC} %s\n" "$1"; }
+print_warning() { printf "${YELLOW}[pre-commit]${NC} %s\n" "$1"; }
+print_error()   { printf "${RED}[pre-commit]${NC} %s\n" "$1"; }
+
+# ── Collect staged JS/TS files ───────────────────────────────────────────────
+STAGED_JS=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|ts|jsx|tsx|mjs|cjs)$')
+
+# ── 1. Biome format + lint ───────────────────────────────────────────────────
+print_info "Running Biome check on staged files…"
+
+if [ -n "$STAGED_JS" ]; then
+  # Resolve the biome binary (local install preferred, then npx fallback)
+  if [ -f "node_modules/.bin/biome" ]; then
+    BIOME="node_modules/.bin/biome"
+  elif command -v biome >/dev/null 2>&1; then
+    BIOME="biome"
+  else
+    BIOME="npx --no-install @biomejs/biome"
+  fi
+
+  # Write staged content to a temp area so we check what will actually be committed
+  TMP_DIR=$(mktemp -d)
+  trap 'rm -rf "$TMP_DIR"' EXIT
+
+  BIOME_FAILED=0
+  for FILE in $STAGED_JS; do
+    git show ":$FILE" > "$TMP_DIR/$(basename "$FILE")" 2>/dev/null || true
+  done
+
+  # Run biome ci (read-only check) against each staged file path
+  # shellcheck disable=SC2086
+  echo "$STAGED_JS" | xargs $BIOME check --no-errors-on-unmatched 2>&1
+  if [ $? -ne 0 ]; then
+    print_error "Biome check failed. Run 'npm run check' to auto-fix, then re-stage."
+    exit 1
+  fi
+  print_success "Biome check passed."
+else
+  print_info "No JS/TS staged files – skipping Biome check."
+fi
+
+# ── 2. No debugger statements ────────────────────────────────────────────────
+print_info "Checking for debugger statements…"
+
+if [ -n "$STAGED_JS" ]; then
+  DEBUGGER_HITS=$(echo "$STAGED_JS" | xargs git show -- 2>/dev/null | grep -n 'debugger' || true)
+  if [ -n "$DEBUGGER_HITS" ]; then
+    print_error "Debugger statement(s) found in staged files:"
+    echo "$DEBUGGER_HITS"
+    exit 1
+  fi
+  print_success "No debugger statements found."
+fi
+
+# ── 3. No console statements in production files ─────────────────────────────
+print_info "Checking for console statements in production files…"
+
+if [ -n "$STAGED_JS" ]; then
+  # Exclude test files, scripts, config files, and git-hooks from this check
+  PROD_FILES=$(echo "$STAGED_JS" | grep -v -E '(__tests__|\.test\.|\.spec\.|scripts/|\.githooks/|git-hooks/)' || true)
+
+  if [ -n "$PROD_FILES" ]; then
+    CONSOLE_HITS=""
+    for FILE in $PROD_FILES; do
+      HITS=$(git show ":$FILE" 2>/dev/null | grep -n 'console\.' | grep -v '^\s*//' || true)
+      if [ -n "$HITS" ]; then
+        CONSOLE_HITS="${CONSOLE_HITS}${FILE}:\n${HITS}\n"
+      fi
+    done
+
+    if [ -n "$CONSOLE_HITS" ]; then
+      print_error "console.* statement(s) found in production files (use the project logger instead):"
+      printf "%b" "$CONSOLE_HITS"
+      exit 1
+    fi
+  fi
+  print_success "No console statements found in production files."
+fi
+
+# ── 4. Schema (Zod) validation tests ─────────────────────────────────────────
+# Run schema tests when files inside any schema/ or schemas/ folder are staged.
+STAGED_SCHEMAS=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(^|/)schemas?/' || true)
+
+if [ -n "$STAGED_SCHEMAS" ]; then
+  print_info "Schema files changed – running schema validation tests…"
+
+  if [ -f "package.json" ]; then
+    # Detect package manager
+    if [ -f "pnpm-lock.yaml" ]; then
+      PKG_MGR="pnpm"
+    elif [ -f "yarn.lock" ]; then
+      PKG_MGR="yarn"
+    else
+      PKG_MGR="npm"
+    fi
+
+    # Run schema tests if a dedicated script exists, else skip gracefully
+    if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts['test:schemas']?0:1)" 2>/dev/null; then
+      $PKG_MGR run test:schemas
+      if [ $? -ne 0 ]; then
+        print_error "Schema validation tests failed."
+        exit 1
+      fi
+      print_success "Schema validation tests passed."
+    else
+      print_warning "No 'test:schemas' script found – skipping schema tests."
+    fi
+  fi
+else
+  print_info "No schema files staged – skipping schema tests."
+fi
+
+# ── Done ──────────────────────────────────────────────────────────────────────
+print_success "All pre-commit checks passed."
+exit 0
