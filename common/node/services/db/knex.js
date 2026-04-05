@@ -8,7 +8,7 @@ export default class StoreKnex {
 
   async open() {
     if (!this._KNEXFILE) {
-      logger.info('KNEXFILE property empty or undefined - knex not started')
+      logger.info('KNEXFILE property empty or undefined - knex not started');
     } else {
       try {
         this._knex = Knex(this._KNEXFILE);
@@ -16,13 +16,13 @@ export default class StoreKnex {
         await this._knex
           .raw('select 1+1 as result')
           .then(() => {
-            logger.info('knex CONNECTED')
+            logger.info('knex CONNECTED');
           })
           .catch(err => {
-            logger.info('DB error: ' + err.toString())
+            logger.info('DB error: ' + err.toString());
           });
       } catch (e) {
-        logger.info('knex CONNECT ERROR', e.toString())
+        logger.info('knex CONNECT ERROR', e.toString());
       }
     }
   }
@@ -31,7 +31,7 @@ export default class StoreKnex {
   }
   async close() {
     if (this._knex) await this._knex.destroy();
-    logger.info('knex closed')
+    logger.info('knex closed');
   }
 }
 

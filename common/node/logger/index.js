@@ -19,7 +19,6 @@ const log = (level, message, meta = {}) => {
   level === 'error' ? console.error(entry) : console.log(entry);
 };
 
-
 const logger = {
   error: (msg, meta) => log('error', msg, meta),
   warn: (msg, meta) => log('warn', msg, meta),
@@ -32,10 +31,10 @@ const loggerMiddleware = (req, res, next) => {
   // reason for 4xx can be logged in meta, e.g. validation_error, auth_failed, etc.
   req.log = logger;
   req.startTime = Date.now();
-  req.socket.setTimeout(process.env?.WS_KEEPALIVE_MS || 30000); // 30 seconds
+  req.socket.setTimeout(Number(process.env?.WS_KEEPALIVE_MS) || 30000); // 30 seconds
   let logged = false; // Prevent duplicate logs
 
-    // Log incoming request
+  // Log incoming request
   req.log.info(`${req.method} ${req.path}`, {
     method: req.method,
     path: req.path,

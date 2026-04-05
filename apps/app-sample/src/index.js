@@ -1,4 +1,4 @@
-import '@common/node/logging'; // Initialize global loggers
+import '@common/node/logger'; // Initialize global loggers
 import '@common/node/config'; // setup env - TBD: handle vault in production
 
 import { server } from './app.js';

@@ -80,20 +80,3 @@ export const errorHandler = (err, req, res, next) => {
 export const notFoundHandler = (req, res, next) => {
   next(new NotFoundError(req.path));
 };
-
-// OBSOLOETE
-// export default (error, req, res, next) => {
-//   // error middleware - 200s should not reach here
-//   // console.log('typeof error', error instanceof Error)
-//   console.log('error middleware', error)
-//   let message = 'Unknown Error'
-//   if (error.message) {
-//     // console.log('Error Object', error.name, error.name, error.stack)
-//     message = (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev') ? error.stack : error.message
-//   } else if (typeof error === 'string') {
-//     message = error
-//   } else if (error?.toString) {
-//     message = error.toString()
-//   }
-//   return !res.headersSent ? res.status(500).json({ message }) : next()
-// }

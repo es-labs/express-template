@@ -7,7 +7,7 @@ import { isInvalidInput, mapRelation, formUniqueKey, kvDb2Col, setAuditData } fr
 const csvParse = parse;
 
 const upload = async (req, res) => {
-  console.log('base upload');
+  logger.info('base upload');
   const { table } = req;
   if (!table.import) throw new Error('Forbidden - Upload');
   const csv = req.file.buffer.toString('utf-8');
@@ -97,7 +97,7 @@ const upload = async (req, res) => {
           await svc.get(table.conn)('audit_logs').insert(audit);
         }
       } catch (e) {
-        console.log('error writing to audit table');
+        logger.info('error writing to audit table');
       }
       return res.status(200).json({ errorCount: errors.length, errors });
     });
@@ -109,7 +109,7 @@ const find = async (req, res) => {
   let { page = 1, limit = 25, filters = null, sorter = null, csv = '' } = req.query;
   page = parseInt(page); // 1-based
   limit = parseInt(limit);
-  // console.log('t4t filters and sort', filters, sorter, table.name, page, limit)
+  // logger.info('t4t filters and sort', filters, sorter, table.name, page, limit)
   filters = JSON.parse(filters ? filters : null); // ignore where col === null, sort it 'or' first then 'and' // [ { col, op, val,andOr } ]
   sorter = JSON.parse(sorter ? sorter : '[]'); // [ { column, order: 'asc' } ] / [] order = asc, desc
   if (req.table?.defaultSort && sorter.length === 0 && req.table.defaultSort.length > 0) {
@@ -238,7 +238,7 @@ const remove = async (req, res) => {
           const keyName = table.multiKey[i];
           multiKey[keyName] = id_a[i];
         }
-        console.log('multiKey', multiKey); // AARON
+        logger.info('multiKey', multiKey); // AARON
         return svc.get(table.conn)(table.name).where(multiKey).delete().transacting(trx);
       });
       await Promise.allSettled(keys);
@@ -252,7 +252,7 @@ const remove = async (req, res) => {
       deletedRows: ids.length,
     });
   } catch (e) {
-    console.log(e); // TBD
+    logger.error(e); // TBD
     await trx.rollback();
     throw e;
   }

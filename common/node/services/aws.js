@@ -24,19 +24,13 @@ export const main = async ({ bucketName, pageSize }) => {
       objects.push(page.Contents.map(o => o.Key));
     }
     objects.forEach((objectList, pageNum) => {
-      logger.info(
-       `Page ${pageNum + 1}\n------\n${objectList.map((o) => `• ${o}`).join("\n")}\n`,
-      );
+      logger.info(`Page ${pageNum + 1}\n------\n${objectList.map(o => `• ${o}`).join('\n')}\n`);
     });
   } catch (caught) {
     if (caught instanceof S3ServiceException && caught.name === 'NoSuchBucket') {
-      logger.error(
-        `Error from S3 while listing objects for "${bucketName}". The bucket doesn't exist.`,
-      );
+      logger.error(`Error from S3 while listing objects for "${bucketName}". The bucket doesn't exist.`);
     } else if (caught instanceof S3ServiceException) {
-      logger.error(
-        `Error from S3 while listing objects for "${bucketName}".  ${caught.name}: ${caught.message}`,
-      );
+      logger.error(`Error from S3 while listing objects for "${bucketName}".  ${caught.name}: ${caught.message}`);
     } else {
       throw caught;
     }

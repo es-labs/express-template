@@ -6,9 +6,9 @@ import router from './router.js';
 import App from './App.vue';
 
 import './style/main.css'; // app overall custom style
-import '../common/msw.js'; // msw
-import '../common/pwa.js'; // pwa
-import createSentry from '../common/sentry.js'; // sentry
+import './msw.js'; // msw
+import './pwa.js'; // pwa
+import createSentry from './sentry.js'; // sentry
 
 import '@common/web/bwc-loading-overlay'; // our own web components
 

@@ -36,7 +36,7 @@ async function uploadWithCancel(file) {
     const result = await uploader.upload(file, {
       key: `uploads/${file.name}`,
       onProgress: pct => {
-        logger.info(`${pct}%`)
+        logger.info(`${pct}%`);
       },
       signal: controller.signal,
     });

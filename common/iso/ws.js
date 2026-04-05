@@ -37,14 +37,14 @@ class Ws {
     }
   }
   connect() {
-    // console.log(`ws connecting... endpoint=${this.options.endpoint} reconnectMs=${this.options.reconnectMS}`)
-    if (!this.options.endpoint) return; // console.log('ws connect failed - no endpoint')
-    if (this.instance) return; // console.log('ws connect failed - already connected')
+    logger.info(`ws connecting... endpoint=${this.options.endpoint} reconnectMs=${this.options.reconnectMS}`)
+    if (!this.options.endpoint) return; logger.info('ws connect failed - no endpoint')
+    if (this.instance) return; logger.info('ws connect failed - already connected')
 
     try {
       this.instance = new WebSocket(this.options.endpoint);
-      // this.instance.onopen = () => console.log('ws open - connected') // TBD Log Error
-      // this.instance.onerror = (err) => console.log(err) // TBD Log Error
+      // this.instance.onopen = () => logger.info('ws open - connected') // TBD Log Error
+      // this.instance.onerror = (err) => logger.info(err) // TBD Log Error
       this.instance.onmessage = this.options.onmessage;
       this.instance.onclose = e => {
         if (!e.wasClean && this.options.reconnectMs) {
@@ -55,11 +55,11 @@ class Ws {
             this.options.reconnectMs > 1000 ? this.options.reconnectMs : 1000,
           );
         } else {
-          // TBD console.log(`ws connection closed cleanly, code=${e.code} reason=${e.reason}`)
+          logger.info(`ws connection closed cleanly, code=${e.code} reason=${e.reason}`)
         }
       };
     } catch (e) {
-      // TBD console.log('ws connect error', e.toString())
+      logger.info('ws connect error', e.toString())
     }
   }
 }

@@ -110,32 +110,32 @@ export default {
     };
 
     const rowClick = e => {
-      console.log('rowClick', e.detail);
+      // console.log('rowClick', e.detail);
     };
     const checked = e => {
-      console.log('checked', e.detail);
+      // console.log('checked', e.detail);
     };
     const triggered = e => {
-      console.log('triggered', e.detail);
+      // console.log('triggered', e.detail);
       page.value = e.detail.page;
       pageSize.value = e.detail.pageSize;
-      console.log(page.value, pageSize.value);
+      // console.log(page.value, pageSize.value);
       setItems();
     };
     const cmd = e => {
-      console.log('cmd', e.detail);
+      // console.log('cmd', e.detail);
     };
     const testevent = e => {
-      console.log('testevent', e.detail, e.target);
+      // console.log('testevent', e.detail, e.target);
       const { key, val, idx } = e.detail;
-      console.log('ev2', table.items[idx].age);
+      // console.log('ev2', table.items[idx].age);
       table.items[idx].age += 1;
       setItems();
     };
 
     onMounted(async () => {
       // addEventListener('testevent', (e) => console.log('testevent', e), true)
-      console.log('ui2 mounted!');
+      // console.log('ui2 mounted!');
       t4t.setTableName('student');
       // form.config = await t4t.getConfig()
       // form.record = await t4t.findOne('5f3a35197dc9e61b64e0dea9')

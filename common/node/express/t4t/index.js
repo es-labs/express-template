@@ -3,7 +3,7 @@ import t4t from './t4t.js';
 
 // export your routes here - make sure no clashes
 function mockAuthUser(req, res, next) {
-  console.log('WARNING Auth bypass in t4t.js');
+  logger.info('WARNING Auth bypass in t4t.js');
   req.decoded = {
     id: 'testuser',
     groups: 'admin,editor,viewer', // rename to roles?

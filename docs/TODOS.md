@@ -12,13 +12,18 @@ npx biome format common apps webs scripts
 npx biome lint common apps webs scripts
 ```
 
+## 
+apps/* - use backend logger
+webs/* - use frontend logger
+common/iso - both (should be simple files remove console.logs)
+common/node - backend (use backend logger)
+common/node/express - backend (use backend logger)
+common/vue -frontend (allow console, remove in prod)
+common/web -frontend (allow console, remove in prod)
+
 # WIP
-@es-labs/jslib
-@common/iso/sleep.js
-@common/node/services/index
+- remove barrel index.js files...
 - JSON in env, refactor to use something else
-- fix logging
-- organize files
 - safeJSON
 
 ## Github Related To Read

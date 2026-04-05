@@ -36,7 +36,7 @@ export default class Wss {
       this._onClientMessage = async (data, isBinary, ws, wss) => {
         // client incoming message
         const message = isBinary ? data : data.toString();
-        logger.info('message', message)
+        logger.info('message', message);
         try {
           // try-catch only detect immediate error, cannot detect if write failure
           if (wss) {
@@ -50,7 +50,7 @@ export default class Wss {
             ws.send(message); // echo back message...
           }
         } catch (e) {
-          logger.info(e.toString())
+          logger.info(e.toString());
         }
       };
     }
@@ -113,10 +113,10 @@ export default class Wss {
         //   });
         // });
 
-        logger.info('WS API listening on port ' + this._port)
+        logger.info('WS API listening on port ' + this._port);
         if (this._wss) {
           this._wss.on('connection', ws => {
-            logger.info('ws client connected')
+            logger.info('ws client connected');
             this._onClientConnect(ws); // what else to do when client connects
             ws.isAlive = true;
             ws.on('pong', () => {
@@ -127,7 +127,7 @@ export default class Wss {
           });
           setInterval(() => {
             // set keep-alive
-            logger.info('WS Clients: ', this._wss.clients.size)
+            logger.info('WS Clients: ', this._wss.clients.size);
             this._wss?.clients.forEach(ws => {
               if (!ws.isAlive) {
                 ws.terminate(); // force close
@@ -139,12 +139,12 @@ export default class Wss {
           }, this._keepAliveMs);
         }
       } else {
-        logger.info('NO WS Service To Open')
+        logger.info('NO WS Service To Open');
       }
     } catch (e) {
       err = e.toString();
     }
-    logger.info('WS Open ' + (err ? err : 'Done'))
+    logger.info('WS Open ' + (err ? err : 'Done'));
     return this;
   }
 
@@ -158,8 +158,8 @@ export default class Wss {
         this._wss = null; //delete wss
       }
     } catch (e) {
-      logger.error(e.toString())
+      logger.error(e.toString());
     }
-    logger.info('WS API CLOSE OK')
+    logger.info('WS API CLOSE OK');
   }
 }

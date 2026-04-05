@@ -1,5 +1,5 @@
 import express from 'express';
-import * as s from '@common/node/services/index';
+import * as s from '@common/node/services';
 
 function openMissingFile() {
   fs.readFile('somefile4.txt', (err, data) => {

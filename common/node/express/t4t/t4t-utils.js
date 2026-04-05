@@ -2,7 +2,7 @@ const { TABLE_USER_ID_KEY, TABLE_USER_ROLE_KEY, TABLE_ORG_ID_KEY } = process.env
 
 export const noAuthFunc = (req, res, next) => {
   const message = 'no user auth middleware set';
-  console.log({
+  logger.info({
     error: message,
     expectedFormat: {
       'req.decoded': {
@@ -58,7 +58,7 @@ export const processJson = async (req, res, next) => {
 
 // both are comma seperated strings
 export const roleOperationMatch = (role, operation, col = null) => {
-  // console.log('roleOperationMatch (col, role, operation)', col, role, operation)
+  // logger.info('roleOperationMatch (col, role, operation)', col, role, operation)
   const operations = operation.split(',');
   const roles = role.split(',');
   for (const _role of roles) {
@@ -121,7 +121,7 @@ export const kvDb2Col = (_row, _joinCols, _tableCols) => {
         }
       }
     } else {
-      console.log(`Missing Col: ${k}`);
+      logger.info(`Missing Col: ${k}`);
     }
   }
   return _row;

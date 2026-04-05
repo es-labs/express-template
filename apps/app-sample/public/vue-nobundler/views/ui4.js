@@ -60,14 +60,14 @@ export default {
     let sorter = [];
 
     const rowClick = async e => {
-      console.log('rowClick', e.detail); // row, cod, data
+      // console.log('rowClick', e.detail); // row, cod, data
       form.record = await t4t.findOne(e.detail.data._id); // either use e.detail.data, or fetch from API
       mode.value = 'edit';
       // Object.assign(test, form.config)
     };
 
     const submitForm = async e => {
-      console.log('submitForm', e.detail);
+      // console.log('submitForm', e.detail);
       // do update here and display error message?
       const { data, error } = e.detail;
       if (error) return alert('Validation Error');
@@ -116,12 +116,12 @@ export default {
     };
 
     const doUpload = async e => {
-      console.log('doUpload', e.target.files);
+      // console.log('doUpload', e.target.files);
       try {
         const { files } = e.target;
         if (files?.length) {
           const rv = await t4t.upload(files[0]);
-          console.log(rv);
+          // console.log(rv);
           if (rv.data.errorCount) alert(`Error: ${JSON.stringify(rv.data.errors)}`);
           else alert('Upload OK');
           await refreshTable();
@@ -135,17 +135,17 @@ export default {
         webkitRelativePath: ""
         */
       } catch (e) {
-        console.log('doUpload', e.toString());
+        // console.log('doUpload', e.toString());
       }
     };
 
     // events
     const checked = e => {
-      console.log('checked', e.detail);
+      // console.log('checked', e.detail);
     };
     const triggered = async e => {
       // TODO if (name === 'page-size') ...
-      console.log('triggered', e.detail);
+      // console.log('triggered', e.detail);
       page.value = e.detail.page;
       pageSize.value = e.detail.pageSize;
       filters = e.detail.filters;
@@ -154,7 +154,7 @@ export default {
       await refreshTable();
     };
     const cmd = async e => {
-      console.log('cmd', e.detail);
+      // console.log('cmd', e.detail);
       try {
         if (e.detail.cmd === 'add') {
           form.record = t4t.initItem();
@@ -172,13 +172,13 @@ export default {
           if (data) downloadData(data.csv, `${tableName}.csv`, 'text/csv;charset=utf-8;');
         }
       } catch (e) {
-        console.log('error cmd', e.toString());
+        // console.log('error cmd', e.toString());
       }
     };
 
     // lifecycle
     onMounted(async () => {
-      console.log('ui4 mounted!');
+      // console.log('ui4 mounted!');
       t4t.setTableName(tableName); // country
       table.config = await t4t.getConfig();
 

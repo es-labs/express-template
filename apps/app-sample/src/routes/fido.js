@@ -29,11 +29,11 @@ const b_b64 = window ? (buf) => btoa(buf.reduce((data, val)=> data + String.from
 
 const b64 = b64url_b64(test) // convert base64url to base64
 const ab = Buffer.from(b64, 'base64') // convert base64 to array buffer
-console.log('ab', ab)
+logger.info('ab', ab)
 
 const b64_2 = Buffer.from(ab).toString('base64') // ab.toString('base64') // convert arraybuffer to base64
 const b64url = b64_b64url(b64_2)// convert base64 to base64url
-console.log('b64url', b64url)
+logger.info('b64url', b64url)
 */
 
 // could also use one or more of the options below,
@@ -79,7 +79,7 @@ export default express
     const regResponse = req.body;
     regResponse.rawId = b_ab(b64url_b(regResponse.rawId));
     // NOSONAR
-    // console.log('bbbbb', regResponse, b_b64url((ab_b(regResponse.rawId))))
+    // logger.info('bbbbb', regResponse, b_b64url((ab_b(regResponse.rawId))))
 
     const attestationExpectations = {
       challenge: registerChallenge,
@@ -101,13 +101,13 @@ export default express
       counter,
       publicKey,
     };
-    console.log(credId, counter, publicKey);
+    logger.info(credId, counter, publicKey);
 
     res.json({ msg: 'register ok' });
   })
   .get('/validate', async (req, res) => {
     const authnOptions = await f2l.assertionOptions();
-    console.log(authnOptions);
+    logger.info(authnOptions);
 
     validateChallenge = authnOptions.challenge; // store challenge
 
@@ -157,6 +157,6 @@ export default express
 
     // const authnResult =
     await f2l.assertionResult(regResponse, assertionExpectations); // will throw on error
-    // console.log(authnResult)
+    // logger.info(authnResult)
     res.json({ msg: 'validate ok' });
   });

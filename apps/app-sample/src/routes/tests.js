@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import express from 'express';
 import PdfKit from 'pdfkit';
-import * as services from '@common/node/services/index';
+import * as services from '@common/node/services';
 import { sleep } from '@common/iso/sleep';
 import { memoryUpload, storageUpload } from '@common/node/express/upload';
 
@@ -20,16 +20,6 @@ export default express
       detached: true,
       stdio: 'ignore',
     });
-    // NOSONAR
-    // child.stdout.on('data', function (data) {
-    //   console.log('Pipe data from python script ...')
-    //   dataToSend = data.toString()
-    //   console.log('dataToSend', dataToSend)
-    // })
-    // // in close event we are sure that stream from child process is closed
-    // child.on('close', (code) => {
-    //   console.log(`child process close all stdio with code ${code}`)
-    // })
     child.unref();
     res.json({});
   })
@@ -64,7 +54,7 @@ export default express
     const chunks = 5;
     let count = 1;
     while (count <= chunks) {
-      // console.log('streaming', count)
+      // logger.info('streaming', count)
       await sleep(1000); // eslint-disable-line
       res.write(`${JSON.stringify({ type: 'stream', chunk: count++ })}\n`);
     }
@@ -130,7 +120,7 @@ export default express
   // body action: 'read' | 'write', filename: 'my-file.txt', bucket: 'bucket name'
   .post('/upload-disk', storageUpload(process.env.UPLOAD_STATIC[0]).any(), (req, res) => {
     // avatar is form input name // single('filedata')
-    // console.log('files', req, req.files)
+    logger.info('files', req, req.files);
     // body is string, need to parse if json
     res.json({
       ok: true, // success

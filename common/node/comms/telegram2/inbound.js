@@ -1,5 +1,5 @@
 // ─── Extractors ───────────────────────────────────────────────────────────────
-const extractMessageData = (message) => {
+const extractMessageData = message => {
   if (!message) return null;
 
   return {
@@ -45,9 +45,9 @@ const extractMessageData = (message) => {
     // Media group (album)
     mediaGroupId: message.media_group_id ?? null,
   };
-}
+};
 
-const extractContent = (message) => {
+const extractContent = message => {
   // Text
   if (message.text) return { type: 'text', text: message.text };
 
@@ -193,9 +193,9 @@ const extractContent = (message) => {
   }
 
   return { type: 'unknown' };
-}
+};
 
-const extractEntities = (message) => {
+const extractEntities = message => {
   const raw = message.entities ?? message.caption_entities ?? [];
   if (!raw.length) return [];
 
@@ -210,9 +210,9 @@ const extractEntities = (message) => {
     user: e.user ?? null, // for text_mention entities
     language: e.language ?? null, // for pre/code blocks
   }));
-}
+};
 
-const extractForwardInfo = (message) => {
+const extractForwardInfo = message => {
   if (!message.forward_date) return null;
   return {
     date: new Date(message.forward_date * 1000).toISOString(),
@@ -221,14 +221,14 @@ const extractForwardInfo = (message) => {
     fromMessageId: message.forward_from_message_id ?? null,
     senderName: message.forward_sender_name ?? null, // when origin is hidden
   };
-}
+};
 
 // ─── Update dispatcher ────────────────────────────────────────────────────────
 
-// update 
+// update
 // input is the telegram payload received by webhook - req.body
 // output is parsed telegram data
-export const handleUpdate = (update) => {
+export const handleUpdate = update => {
   // Standard message (new or edited)
   const message = update.message ?? update.edited_message;
   if (message) return { updateType: 'message', data: extractMessageData(message) };
@@ -281,4 +281,4 @@ export const handleUpdate = (update) => {
   }
 
   return { updateType: 'unknown', data: update };
-}
+};

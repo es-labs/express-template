@@ -1,4 +1,4 @@
-export * from './logging/index.js';
+export * from './logger/index.js';
 // export * from './services/index.js';
 // export * from './auth/index.js';
 // TOCHecK

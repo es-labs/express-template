@@ -126,7 +126,7 @@ export default {
     };
 
     const selected = e => {
-      console.log('selected event', e.detail);
+      // console.log('selected event', e.detail);
     };
 
     const countrySearch = e => {
@@ -143,7 +143,7 @@ export default {
       country.items = [...result];
     };
     const countrySelected = e => {
-      console.log('country selected event', e.detail, country.value);
+      // console.log('country selected event', e.detail, country.value);
       // reset state
       state.value = '';
       state.items = [];
@@ -159,7 +159,7 @@ export default {
           }
         }
       }
-      console.log(countryStateList);
+      // console.log(countryStateList);
     };
 
     const stateSearch = e => {
@@ -179,12 +179,12 @@ export default {
       state.items = [...result];
     };
     const stateSelected = e => {
-      console.log('state selected event', e.detail, state.value);
+      // console.log('state selected event', e.detail, state.value);
     };
 
     onMounted(async () => {
-      console.log('ui1 mounted!');
-      console.log('mcRef', mcRef);
+      // console.log('ui1 mounted!');
+      // console.log('mcRef', mcRef);
       // mc.tags = ['aa1', 'aa2', 'aa1', 'aa3', 'aa4']
     });
 

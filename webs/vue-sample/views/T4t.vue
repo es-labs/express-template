@@ -60,15 +60,15 @@
       placement="left"
     >
       <a-form layout="vertical">
-        <a-form-item v-for="(filter, index) of table.filters" :key="index">
+        <a-form-item v-for="(filter, index) in table.filters" :key="index">
           <a-input-group compact>
             <a-select style="width: 125px" placeholder="Column" v-model:value="filter.col">
-              <a-select-option v-for="col of table.filterCols" :key="col.value" :value="col.value"
+              <a-select-option v-for="col in table.filterCols" :key="col.value" :value="col.value"
                 >{{ col.label }}</a-select-option
               >
             </a-select>
             <a-select style="width: 75px" placeholder="Operation" v-model:value="filter.op">
-              <a-select-option v-for="op of table.filterOps" :key="op" :value="op">{{ op }}</a-select-option>
+              <a-select-option v-for="op in table.filterOps" :key="op" :value="op">{{ op }}</a-select-option>
             </a-select>
             <a-input
               style="width: 125px"
@@ -77,7 +77,7 @@
               :type="table?.config?.cols[filter?.col]?.ui?.attrs?.type || 'text'"
             />
             <a-select style="width: 75px" placeholder="And Or" v-model:value="filter.andOr">
-              <a-select-option v-for="andOr of table.filterAndOr" :key="andOr" :value="andOr"
+              <a-select-option v-for="andOr in table.filterAndOr" :key="andOr" :value="andOr"
                 >{{ andOr }}</a-select-option
               >
             </a-select>

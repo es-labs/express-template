@@ -28,19 +28,19 @@ const start = async (app, server, config = JSON.parse(process.env.SERVICES_CONFI
       }
     });
   } catch (e) {
-    logger.info(e)
+    logger.info(e);
   }
 };
 
 const stop = async () => {
-  logger.info('services - stop - begin')
+  logger.info('services - stop - begin');
   try {
     const promises = servicesConfig.map(svc => services[svc.name].close());
     await Promise.allSettled(promises);
   } catch (e) {
-    logger.info(e.toString())
+    logger.info(e.toString());
   }
-  logger.info('services - stop - end')
+  logger.info('services - stop - end');
 };
 
 const get = service => services[service]?.get() || null;

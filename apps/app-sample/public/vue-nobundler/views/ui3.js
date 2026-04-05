@@ -23,15 +23,15 @@ export default {
 
     const test = reactive({});
 
-    const submit = e => console.log('submit', e.detail);
+    const submit = e => {}; // e.detail: { data, error }
 
     onMounted(async () => {
-      console.log('ui3 mounted!');
+      // console.log('ui3 mounted!');
       t4t.setTableName('student');
       form.config = await t4t.getConfig();
       form.record = await t4t.findOne('5f3a35197dc9e61b64e0dea9');
       Object.assign(test, form.config);
-      console.log(test, form.record);
+      // console.log(test, form.record);
       // for (var key in test) delete test[key]
       // Object.assign(test, {})
       // console.log(test.length)

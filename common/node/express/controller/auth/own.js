@@ -37,7 +37,9 @@ const logout = async (req, res) => {
       }
       return res.status(200).json({ message: 'Logged Out' });
     }
-  } catch (e) {}
+  } catch (e) {
+    logger.info('logout err', e.toString());
+  }
   return res.status(500).json();
 };
 
@@ -67,7 +69,7 @@ const login = async (req, res) => {
     setTokensToHeader(res, tokens);
     return res.status(200).json(tokens);
   } catch (e) {
-    // console.log('login err', e.toString())
+    // logger.info('login err', e.toString())
   }
   return res.status(500).json();
 };
@@ -89,7 +91,7 @@ const otp = async (req, res) => {
       }
     }
   } catch (e) {
-    // console.log('otp err', e.toString())
+    logger.info('otp err', e.toString())
   }
   return res.status(401).json({ message: 'Error token revoked' });
 };

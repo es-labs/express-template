@@ -2,7 +2,7 @@ import express from 'express';
 let clients = [];
 
 function sendEventsToAll(data) {
-  // console.log('Send SSE', clients, data)
+  logger.info('Send SSE', clients, data);
   clients.forEach(client => {
     client.res.write(`data: ${JSON.stringify(data)}`);
   });
@@ -25,9 +25,9 @@ export default express
     clients.push(newClient);
 
     req.on('close', () => {
-      // console.log(`${clientId} Connection closed`)
+      logger.info(`${clientId} Connection closed`);
       clients = clients.filter(client => client.id !== clientId);
-      // console.log('SSE Clients', clients)
+      logger.info('SSE Clients', clients);
     });
   })
   .post('/event', (req, res) => {

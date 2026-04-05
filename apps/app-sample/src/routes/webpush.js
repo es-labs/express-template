@@ -5,7 +5,7 @@ import {
 } from '@common/node/auth';
 import * as webpush from '@common/node/comms/webpush';
 
-console.log('WARNING Auth bypass in webpush.js');
+logger.info('WARNING Auth bypass in webpush.js');
 
 const authUser = (req, res, next) => {
   req.decoded = { id: 1 };
@@ -44,7 +44,7 @@ export default express
           // },
         };
         const subscription = JSON.parse(user.pnToken);
-        // console.log(id, mode, subscription, data, options)
+        // logger.info(id, mode, subscription, data, options)
         rv = await webpush.send(subscription, `FROM Backend: ${JSON.stringify(data)}`, options);
         res.json({ status: 'sent', mode, rv });
       } else {

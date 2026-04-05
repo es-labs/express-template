@@ -29,7 +29,7 @@ const storageUpload = () => {
     storage: multer.diskStorage({
       destination: (req, file, cb) => {
         const key = file.fieldname;
-        const { folder } = req.table.fileConfigUi[key].multer; // console.log('folder, file', folder, file)
+        const { folder } = req.table.fileConfigUi[key].multer; // logger.info('folder, file', folder, file)
         return cb(null, folder);
       },
       filename: (req, file, cb) => cb(null, file.originalname), // file.fieldname, file.originalname
@@ -89,7 +89,7 @@ const generateTable = async (req, res, next) => {
   const acStr = '/autocomplete';
   const acLen = acStr.length;
   if (req.path.substring(req.path.length - acLen) === acStr) {
-    console.log('auto complete here...');
+    logger.info('auto complete here...');
     return next();
   }
   req.table.create = roleOperationMatch(req.decoded[roleKey], req.table.create);
@@ -121,7 +121,7 @@ const generateTable = async (req, res, next) => {
     col.creator = !(col.creator && !roleOperationMatch(req.decoded[roleKey], col.creator, key));
     if (!col.creator && col.add) col.add = 'readonly';
   }
-  // console.log(req.table)
+  // logger.info(req.table)
   return next();
 };
 
@@ -198,8 +198,8 @@ const routes = options => {
   // delete file
   // export async function deleteFile(filePath) {
   //   fs.unlink(filePath, e => {
-  //     if (e) console.log(e)
-  //     else console.log(filePath +' deleted!')
+  //     if (e) logger.info(e)
+  //     else logger.info(filePath +' deleted!')
   //   })
   // }
 };

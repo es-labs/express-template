@@ -120,11 +120,11 @@ vi.mock('./health/router.js', () => ({
   healthRouter: mocks.healthRouter,
 }));
 
-vi.mock('../node/logging/index.js', () => ({
+vi.mock('../node/logger/index.js', () => ({
   logger: {},
 }));
 
-vi.mock('../node/logging/index.js', () => ({
+vi.mock('../node/logger/index.js', () => ({
   logger: {},
 }));
 
