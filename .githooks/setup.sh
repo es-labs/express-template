@@ -7,17 +7,9 @@
 #   chmod +x .githooks/setup.sh
 #   ./.githooks/setup.sh
 
-# ── Colours ──────────────────────────────────────────────────────────────────
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-print_info()    { printf "${BLUE}[setup]${NC} %s\n" "$1"; }
-print_success() { printf "${GREEN}[setup]${NC} %s\n" "$1"; }
-print_warning() { printf "${YELLOW}[setup]${NC} %s\n" "$1"; }
-print_error()   { printf "${RED}[setup]${NC} %s\n" "$1"; }
+HOOK_NAME=setup
+# shellcheck source=.githooks/_common.sh
+. "$(dirname "$0")/_common.sh"
 
 # ── Verify we are inside a git repository ─────────────────────────────────────
 if ! git rev-parse --git-dir >/dev/null 2>&1; then

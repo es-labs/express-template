@@ -6,17 +6,9 @@
 # Install: run .githooks/setup.sh (or: git config core.hooksPath .githooks)
 # Skip:    git commit --no-verify
 
-# ── Colours ──────────────────────────────────────────────────────────────────
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Colour
-
-print_info()    { printf "${BLUE}[pre-commit]${NC} %s\n" "$1"; }
-print_success() { printf "${GREEN}[pre-commit]${NC} %s\n" "$1"; }
-print_warning() { printf "${YELLOW}[pre-commit]${NC} %s\n" "$1"; }
-print_error()   { printf "${RED}[pre-commit]${NC} %s\n" "$1"; }
+HOOK_NAME=pre-commit
+# shellcheck source=.githooks/_common.sh
+. "$(dirname "$0")/_common.sh"
 
 # ── Collect all staged files ─────────────────────────────────────────────────
 STAGED=$(git diff --cached --name-only --diff-filter=ACMR)
