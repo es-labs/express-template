@@ -48,3 +48,18 @@ TBD
 - SQL Trigger + soft delete
   - mutable / immutable tables
 - or something else?
+
+
+
+
+on:
+  push:
+    branches: [tbd]
+    paths:
+      - 'services/auth-service/**'
+      - 'shared/**'
+      - '.github/workflows/deploy-auth-service.yml'
+
+
+- actions/checkout@v6
+- actions/setup-node@v6

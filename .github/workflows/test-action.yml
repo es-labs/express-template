@@ -22,13 +22,13 @@ jobs:
         node-version: [18.x]
     steps:
       - name: Add checkout plugin
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: main
       - name: Testing Using Local Action
         uses: ./.github/myactions/make-tag
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
       - name: Run commands 
