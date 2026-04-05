@@ -51,26 +51,47 @@ if [ $BIOME_FAILED -ne 0 ]; then
 fi
 
 # ── 2. Schema (Zod) validation tests ─────────────────────────────────────────
-# Run schema tests when files inside any schema/ or schemas/ folder are staged.
-STAGED_SCHEMAS=$(echo "$STAGED" | grep -E '(^|/)schemas?/' || true)
+# Detect staged files under the known schema folders:
+#   common/schema, common/schemas, apps/*/schema, apps/*/schemas
+SCHEMA_FAILED=0
 
-if [ -n "$STAGED_SCHEMAS" ]; then
-  print_info "Schema files changed – running schema validation tests…"
-
-  # Run schema tests if a dedicated script exists, else skip gracefully
+run_schema_tests() {
+  SCHEMA_DIR="$1"
   if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts['test:schemas']?0:1)" 2>/dev/null; then
-    npm run test:schemas
+    print_info "Running schema validation tests for $SCHEMA_DIR…"
+    npm run test:schemas -- "$SCHEMA_DIR"
     if [ $? -ne 0 ]; then
-      print_error "Schema validation tests failed."
-      exit 1
+      print_error "Schema validation tests failed for $SCHEMA_DIR."
+      return 1
     fi
-    print_success "Schema validation tests passed."
+    print_success "Schema validation tests passed for $SCHEMA_DIR."
   else
-    print_warning "No 'test:schemas' script found – skipping schema tests."
+    print_warning "No 'test:schemas' script found – skipping schema tests for $SCHEMA_DIR."
   fi
-else
-  print_info "No schema files staged – skipping schema tests."
+  return 0
+}
+
+# Check common/schema and common/schemas
+if echo "$STAGED" | grep -q '^common/schema/'; then
+  run_schema_tests common/schema || SCHEMA_FAILED=1
 fi
+if echo "$STAGED" | grep -q '^common/schemas/'; then
+  run_schema_tests common/schemas || SCHEMA_FAILED=1
+fi
+
+# Check apps/*/schema and apps/*/schemas (one call per matching app directory)
+APP_SCHEMA_DIRS=$(echo "$STAGED" | grep -oE '^apps/[^/]+/schemas?/' | sed 's|/$||' | sort -u)
+for SCHEMA_DIR in $APP_SCHEMA_DIRS; do
+  run_schema_tests "$SCHEMA_DIR" || SCHEMA_FAILED=1
+done
+
+if [ $SCHEMA_FAILED -ne 0 ]; then
+  exit 1
+fi
+
+# Report skip only when no schema folders were matched at all
+echo "$STAGED" | grep -qE '^common/schemas?/|^apps/[^/]+/schemas?/' \
+  || print_info "No schema files staged – skipping schema tests."
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 print_success "All pre-commit checks passed."

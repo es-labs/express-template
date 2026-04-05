@@ -30,7 +30,7 @@ Runs automatically on every `git commit`:
 | Check | Details |
 |-------|---------|
 | **Biome format & lint** | Runs `npx biome check` on each affected directory (`common/iso`, `common/node`, `common/vue`, `common/web`, `apps`, `webs`, `scripts`). Run `npm run check` to auto-fix. |
-| **Schema validation tests** | Runs `npm run test:schemas` when files in `schema/` or `schemas/` folders are staged. |
+| **Schema validation tests** | Runs `npm run test:schemas -- <folder>` for each affected schema directory (`common/schema`, `common/schemas`, `apps/*/schema`, `apps/*/schemas`). |
 
 To skip the pre-commit hook temporarily:
 ```bash
