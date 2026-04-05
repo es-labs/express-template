@@ -63,14 +63,6 @@ const throttle = (fn, wait) => {
   };
 };
 
-// https://www.samanthaming.com/tidbits/94-how-to-check-if-object-is-empty/
-/**
- * check if object is empty, also false if not object
- * @param {any} value - time to measure the number of calls
- * @returns {boolean} -  true if empty object, false otherwise
- */
-const emptyObject = value => value && Object.keys(value).length === 0 && value.constructor === Object;
-
 const isEmail = email => {
   // return /[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/.test(email)
   return /[\w\d-]+@[\w\d-]+\.[\w\d-]+/.test(email);
@@ -126,14 +118,4 @@ const traverseJson = (json, fn, parent = null, key = null) => {
   }
 };
 
-export {
-  debounce,
-  downloadData,
-  emptyObject,
-  isEmail,
-  jsonToCsv,
-  objectToQueryString,
-  rebaseString,
-  throttle,
-  traverseJson,
-};
+export { debounce, downloadData, isEmail, jsonToCsv, objectToQueryString, rebaseString, throttle, traverseJson };

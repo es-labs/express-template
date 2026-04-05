@@ -140,7 +140,7 @@ const preRoute = () => {
   try {
     const corsOptions = JSON.parse(CORS_OPTIONS || null);
     app.use(corsOptions ? cors(corsOptions) : cors()); // default { origin: '*' }
-    console.info('cors options done');
+    logger.info('cors options done');
   } catch (e) {
     logger.error('[cors options error]', e.toString());
     throw e;
@@ -182,7 +182,7 @@ const preRoute = () => {
     logger.error('[bodyparser setup error]', e.toString());
     throw e;
   }
-  console.info('bodyparser setup done');
+  logger.info('bodyparser setup done');
 
   logger.info({ COOKIE_SECRET });
   app.use(cookieParser(COOKIE_SECRET));

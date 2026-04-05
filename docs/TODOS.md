@@ -8,8 +8,9 @@ useNodejsImportProtocol
 noConsole (set to warn first, convert using logger, then set back to error)
 
 ```
-npx biome format common apps webs scripts
+npx biome <format/lint/check> common apps webs scripts
 npx biome lint common apps webs scripts
+ --only=useTemplate --write --unsafe
 ```
 
 ## 
@@ -17,9 +18,9 @@ apps/* - use backend logger
 webs/* - use frontend logger
 common/iso - both (should be simple files remove console.logs)
 common/node - backend (use backend logger)
-common/node/express - backend (use backend logger)
-common/vue -frontend (allow console, remove in prod)
-common/web -frontend (allow console, remove in prod)
+common/vue -frontend VueJS (allow console, remove in prod)
+common/web -frontend plainJS (allow console, remove in prod)
+common/scripts
 
 # WIP
 - remove barrel index.js files...

@@ -113,7 +113,7 @@ export default class Wss {
         //   });
         // });
 
-        logger.info('WS API listening on port ' + this._port);
+        logger.info(`WS API listening on port ${this._port}`);
         if (this._wss) {
           this._wss.on('connection', ws => {
             logger.info('ws client connected');
@@ -144,7 +144,7 @@ export default class Wss {
     } catch (e) {
       err = e.toString();
     }
-    logger.info('WS Open ' + (err ? err : 'Done'));
+    logger.info(`WS Open ${err ? err : 'Done'}`);
     return this;
   }
 

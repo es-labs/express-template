@@ -15,7 +15,7 @@ const upload = async (req, res) => {
   let columnsError = false;
   csvParse
     .parse(csv)
-    .on('error', e => console.error(e.message))
+    .on('error', e => logger.error(e.message))
     .on('readable', function () {
       let record = this.read();
       while (record) {

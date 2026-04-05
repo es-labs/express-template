@@ -44,7 +44,7 @@ export const errorHandler = (err, req, res, next) => {
 
   // Always log server errors; conditionally log client errors
   if (statusCode >= 500) {
-    console.error({
+    logger.error({
       type: 'server_error',
       code: error.code,
       message: error.message,
@@ -54,7 +54,7 @@ export const errorHandler = (err, req, res, next) => {
       stack: error.stack,
     });
   } else if (isDev) {
-    console.warn({
+    logger.warn({
       type: 'client_error',
       code: error.code,
       status: statusCode,

@@ -91,7 +91,7 @@ const otp = async (req, res) => {
       }
     }
   } catch (e) {
-    logger.info('otp err', e.toString())
+    logger.info('otp err', e.toString());
   }
   return res.status(401).json({ message: 'Error token revoked' });
 };

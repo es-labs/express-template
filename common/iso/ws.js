@@ -37,9 +37,11 @@ class Ws {
     }
   }
   connect() {
-    logger.info(`ws connecting... endpoint=${this.options.endpoint} reconnectMs=${this.options.reconnectMS}`)
-    if (!this.options.endpoint) return; logger.info('ws connect failed - no endpoint')
-    if (this.instance) return; logger.info('ws connect failed - already connected')
+    logger.info(`ws connecting... endpoint=${this.options.endpoint} reconnectMs=${this.options.reconnectMS}`);
+    if (!this.options.endpoint) return;
+    logger.info('ws connect failed - no endpoint');
+    if (this.instance) return;
+    logger.info('ws connect failed - already connected');
 
     try {
       this.instance = new WebSocket(this.options.endpoint);
@@ -55,11 +57,11 @@ class Ws {
             this.options.reconnectMs > 1000 ? this.options.reconnectMs : 1000,
           );
         } else {
-          logger.info(`ws connection closed cleanly, code=${e.code} reason=${e.reason}`)
+          logger.info(`ws connection closed cleanly, code=${e.code} reason=${e.reason}`);
         }
       };
     } catch (e) {
-      logger.info('ws connect error', e.toString())
+      logger.info('ws connect error', e.toString());
     }
   }
 }

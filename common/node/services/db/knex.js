@@ -19,7 +19,7 @@ export default class StoreKnex {
             logger.info('knex CONNECTED');
           })
           .catch(err => {
-            logger.info('DB error: ' + err.toString());
+            logger.info(`DB error: ${err.toString()}`);
           });
       } catch (e) {
         logger.info('knex CONNECT ERROR', e.toString());
