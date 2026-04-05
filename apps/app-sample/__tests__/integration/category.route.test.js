@@ -39,7 +39,6 @@ describe.only('Testing Categories Endpoint URL', () => {
   it('Always Pass', async () => expect(1).toBe(1))
 
   it.only('GET categories', async () => {
-    console.log('>>>>>>>>>>>>>>', endpointUrl)
     const response = await request(app)
       // .get('/api/app-sample/categories/categories')
       // .get('/api/app-sample/healthcheck')

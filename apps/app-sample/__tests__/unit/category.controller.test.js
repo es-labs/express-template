@@ -130,10 +130,10 @@ describe.only('categoryController.find', () => {
   it.only('should return status 200 and authors', async () => {
     await categoryController.find(req, res);
     assert.strictEqual(res.statusCode, 200);
-    //   // expect(res.statusCode).toBe(200)
-    //   // expect(res._isEndCalled()).toBeTruthy()
-    //   // expect(res._getJSONData().total).toBeDefined
-    //   // console.log(res._getJSONData())
+    // expect(res.statusCode).toBe(200)
+    // expect(res._isEndCalled()).toBeTruthy()
+    // expect(res._getJSONData().total).toBeDefined
+    // console.log(res._getJSONData())
   });
   // 500 error not able to cover?
 });
