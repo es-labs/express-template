@@ -22,10 +22,17 @@ common/vue -frontend VueJS (allow console, remove in prod)
 common/web -frontend plainJS (allow console, remove in prod)
 common/scripts
 
+## comitting
+
+czg https://cz-git.qbb.sh/cli/
+
+
+
 # WIP
 - remove barrel index.js files...
 - JSON in env, refactor to use something else
 - safeJSON
+- husky / commitizen
 
 ## Github Related To Read
 - https://github.com/settings/security_analysis
