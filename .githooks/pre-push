@@ -36,9 +36,8 @@ print_success "Unit tests passed."
 if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts['test:schemas']?0:1)" 2>/dev/null; then
   print_info "Running schema validation tests…"
   SCHEMA_DIRS=""
-  [ -d "common/schema" ]  && SCHEMA_DIRS="$SCHEMA_DIRS common/schema"
   [ -d "common/schemas" ] && SCHEMA_DIRS="$SCHEMA_DIRS common/schemas"
-  for DIR in apps/*/schema apps/*/schemas; do
+  for DIR in apps/*/schemas; do
     [ -d "$DIR" ] && SCHEMA_DIRS="$SCHEMA_DIRS $DIR"
   done
 

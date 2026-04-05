@@ -44,7 +44,7 @@ fi
 
 # ── 2. Schema (Zod) validation tests ─────────────────────────────────────────
 # Detect staged files under the known schema folders:
-#   common/schema, common/schemas, apps/*/schema, apps/*/schemas
+#   common/schemas, apps/*/schemas
 SCHEMA_FAILED=0
 
 run_schema_tests() {
@@ -63,16 +63,13 @@ run_schema_tests() {
   return 0
 }
 
-# Check common/schema and common/schemas
-if echo "$STAGED" | grep -q '^common/schema/'; then
-  run_schema_tests common/schema || SCHEMA_FAILED=1
-fi
+# Check common/schemas
 if echo "$STAGED" | grep -q '^common/schemas/'; then
   run_schema_tests common/schemas || SCHEMA_FAILED=1
 fi
 
-# Check apps/*/schema and apps/*/schemas (one call per matching app directory)
-APP_SCHEMA_DIRS=$(echo "$STAGED" | grep -oE '^apps/[^/]+/schemas?/' | sed 's|/$||' | sort -u)
+# Check apps/*/schemas (one call per matching app directory)
+APP_SCHEMA_DIRS=$(echo "$STAGED" | grep -oE '^apps/[^/]+/schemas/' | sed 's|/$||' | sort -u)
 for SCHEMA_DIR in $APP_SCHEMA_DIRS; do
   run_schema_tests "$SCHEMA_DIR" || SCHEMA_FAILED=1
 done
@@ -82,7 +79,7 @@ if [ $SCHEMA_FAILED -ne 0 ]; then
 fi
 
 # Report skip only when no schema folders were matched at all
-echo "$STAGED" | grep -qE '^common/schemas?/|^apps/[^/]+/schemas?/' \
+echo "$STAGED" | grep -qE '^common/schemas/|^apps/[^/]+/schemas/' \
   || print_info "No schema files staged – skipping schema tests."
 
 # ── Done ──────────────────────────────────────────────────────────────────────
