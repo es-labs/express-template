@@ -27,8 +27,9 @@ fi
 
 # ── Make hook scripts executable ─────────────────────────────────────────────
 print_info "Making hook scripts executable…"
-chmod +x "$HOOKS_DIR/pre-commit" 2>/dev/null && print_success "  pre-commit  ✓"
-chmod +x "$HOOKS_DIR/pre-push"   2>/dev/null && print_success "  pre-push    ✓"
+chmod +x "$HOOKS_DIR/pre-commit"  2>/dev/null && print_success "  pre-commit  ✓"
+chmod +x "$HOOKS_DIR/commit-msg"  2>/dev/null && print_success "  commit-msg  ✓"
+chmod +x "$HOOKS_DIR/pre-push"    2>/dev/null && print_success "  pre-push    ✓"
 
 # ── Configure git to use .githooks/ ──────────────────────────────────────────
 print_info "Configuring git hooksPath → .githooks"
@@ -37,6 +38,7 @@ git config core.hooksPath .githooks
 if [ $? -eq 0 ]; then
   print_success "Git hooks installed successfully."
   print_info "  pre-commit: Biome check per directory, schema tests"
+  print_info "  commit-msg: Conventional Commits format check (use 'npx czg' to compose)"
   print_info "  pre-push:   unit tests + schema validation"
   print_info ""
   print_info "To skip a hook temporarily:"

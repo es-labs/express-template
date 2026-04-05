@@ -10,13 +10,41 @@ on:
       - 'scripts/**'
   pull_request:
     branches: [main]
-    paths:
-      - 'common/**'
-      - 'apps/**'
-      - 'webs/**'
-      - 'scripts/**'
 
 jobs:
+  # ── Commit message format check (mirrors commit-msg hook) ────────────────
+  commit-lint:
+    name: Commit Message Format
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit messages
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^)]+\))?!?: .{1,}'
+          FAILED=0
+          git log --format="%s" "$BASE_SHA".."$HEAD_SHA" > /tmp/commit_msgs.txt
+          while IFS= read -r msg; do
+            case "$msg" in
+              Merge\ *|Revert\ *|fixup!\ *|squash!\ *) continue ;;
+            esac
+            if ! echo "$msg" | grep -Eq "$PATTERN"; then
+              echo "::error::Non-conventional commit message: $msg"
+              echo "  Expected: type(scope): description"
+              echo "  Types:    feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert"
+              echo "  Tip:      use 'npx czg' locally to generate a valid message."
+              FAILED=1
+            fi
+          done < /tmp/commit_msgs.txt
+          exit $FAILED
+
   # ── Biome checks (mirrors pre-commit hook) ───────────────────────────────
   biome:
     name: Biome Checks
