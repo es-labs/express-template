@@ -50,17 +50,32 @@ env:
   DOCKERFILE_PATH: ${{ github.event.inputs.dockerfile_path || '.' }}
   DOCKERFILE_TARGET: production # follow value in docker file
 jobs:
-  deploy_to_cr:
+  build:
+    name: Build Image
     runs-on: ubuntu-latest
-    name: Deploying CR
     steps:
-      - name: Workflow Inputs
+      - name: Show Workflow Inputs
         run: |
           echo "branch/tag: ${{ github.event.inputs.tag_gr }}"
           echo "image name: ${{ github.event.inputs.cr_imagename }}"
           echo "image tag: ${{ github.event.inputs.tag_ci }}"
           echo "docker file path: ${{ github.event.inputs.dockerfile_path }}"
           echo "environment: ${{ github.event.inputs.cr_env }}"
+  request-approval:
+    name: Request Deployment Approval
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment:
+      # ← configure required reviewers here in GitHub Settings
+      name: production
+    steps:
+      - name: Approval gate
+        run: echo "✅ Approved — deploying ${{ needs.build.outputs.image_tag }}"
+  deploy_to_cr:
+    runs-on: ubuntu-latest
+    name: Deploying CR
+    needs: [request-approval]
+    steps:
       - name: Add checkout plugin
         uses: actions/checkout@v6
         with:
@@ -80,3 +95,15 @@ jobs:
             $DOCKERFILE_PATH || exit 1001
           docker push $CR_HOST/$CR_NS/$CR_IMAGENAME:${{ github.event.inputs.tag_ci }}
           docker logout
+
+  # request-approval:
+  #   name: Request Deployment Approval
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     # ← configure required reviewers here in GitHub Settings
+  #     name: production
+
+  #   steps:
+  #     - name: Approval gate
+  #       run: echo "✅ Approved — deploying auth-service ${{ needs.build.outputs.image_tag }}"
