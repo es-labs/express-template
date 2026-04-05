@@ -1,0 +1,120 @@
+name: Hooks CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'common/**'
+      - 'apps/**'
+      - 'webs/**'
+      - 'scripts/**'
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Commit message format check (mirrors commit-msg hook) ────────────────
+  commit-lint:
+    name: Commit Message Format
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit messages
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^)]+\))?!?: .{1,}'
+          FAILED=0
+          git log --format="%s" "$BASE_SHA".."$HEAD_SHA" > /tmp/commit_msgs.txt
+          while IFS= read -r msg; do
+            case "$msg" in
+              Merge\ *|Revert\ *|fixup!\ *|squash!\ *) continue ;;
+            esac
+            if ! echo "$msg" | grep -Eq "$PATTERN"; then
+              echo "::error::Non-conventional commit message: $msg"
+              echo "  Expected: type(scope): description"
+              echo "  Types:    feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert"
+              echo "  Tip:      use 'npx czg' locally to generate a valid message."
+              FAILED=1
+            fi
+          done < /tmp/commit_msgs.txt
+          exit $FAILED
+
+  # ── Biome checks (mirrors pre-commit hook) ───────────────────────────────
+  biome:
+    name: Biome Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Biome CI – common/iso
+        if: hashFiles('common/iso/**') != ''
+        run: npx biome ci common/iso
+
+      - name: Biome CI – common/node
+        if: hashFiles('common/node/**') != ''
+        run: npx biome ci common/node
+
+      - name: Biome CI – common/vue
+        if: hashFiles('common/vue/**') != ''
+        run: npx biome ci common/vue
+
+      - name: Biome CI – common/web
+        if: hashFiles('common/web/**') != ''
+        run: npx biome ci common/web
+
+      - name: Biome CI – apps
+        if: hashFiles('apps/**') != ''
+        run: npx biome ci apps
+
+      - name: Biome CI – webs
+        if: hashFiles('webs/**') != ''
+        run: npx biome ci webs
+
+      - name: Biome CI – scripts
+        if: hashFiles('scripts/**') != ''
+        run: npx biome ci scripts
+
+  # ── Schema validation tests (mirrors pre-push hook) ──────────────────────
+  schema-tests:
+    name: Schema Validation Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Schema tests – common/schemas
+        if: hashFiles('common/schemas/**') != ''
+        run: npm run test:schemas -- common/schemas
+
+      - name: Schema tests – apps/*/schemas
+        run: |
+          for dir in apps/*/schemas; do
+            [ -d "$dir" ] || continue
+            echo "Running schema tests for $dir"
+            npm run test:schemas -- "$dir"
+          done
