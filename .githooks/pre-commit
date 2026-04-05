@@ -34,16 +34,7 @@ if [ -n "$STAGED_JS" ]; then
     BIOME="npx --no-install @biomejs/biome"
   fi
 
-  # Write staged content to a temp area so we check what will actually be committed
-  TMP_DIR=$(mktemp -d)
-  trap 'rm -rf "$TMP_DIR"' EXIT
-
-  BIOME_FAILED=0
-  for FILE in $STAGED_JS; do
-    git show ":$FILE" > "$TMP_DIR/$(basename "$FILE")" 2>/dev/null || true
-  done
-
-  # Run biome ci (read-only check) against each staged file path
+  # Run biome check against each staged file path
   # shellcheck disable=SC2086
   echo "$STAGED_JS" | xargs $BIOME check --no-errors-on-unmatched 2>&1
   if [ $? -ne 0 ]; then
@@ -59,10 +50,16 @@ fi
 print_info "Checking for debugger statements…"
 
 if [ -n "$STAGED_JS" ]; then
-  DEBUGGER_HITS=$(echo "$STAGED_JS" | xargs git show -- 2>/dev/null | grep -n 'debugger' || true)
-  if [ -n "$DEBUGGER_HITS" ]; then
-    print_error "Debugger statement(s) found in staged files:"
-    echo "$DEBUGGER_HITS"
+  DEBUGGER_FOUND=0
+  for FILE in $STAGED_JS; do
+    HITS=$(git show ":$FILE" 2>/dev/null | grep -n 'debugger' || true)
+    if [ -n "$HITS" ]; then
+      print_error "Debugger statement(s) found in staged file: $FILE"
+      echo "$HITS"
+      DEBUGGER_FOUND=1
+    fi
+  done
+  if [ $DEBUGGER_FOUND -ne 0 ]; then
     exit 1
   fi
   print_success "No debugger statements found."
@@ -76,17 +73,17 @@ if [ -n "$STAGED_JS" ]; then
   PROD_FILES=$(echo "$STAGED_JS" | grep -v -E '(__tests__|\.test\.|\.spec\.|scripts/|\.githooks/|git-hooks/)' || true)
 
   if [ -n "$PROD_FILES" ]; then
-    CONSOLE_HITS=""
+    CONSOLE_FOUND=0
     for FILE in $PROD_FILES; do
-      HITS=$(git show ":$FILE" 2>/dev/null | grep -n 'console\.' | grep -v '^\s*//' || true)
+      # grep -n output format: "lineno:content" — filter commented lines using the full line format
+      HITS=$(git show ":$FILE" 2>/dev/null | grep -nE 'console\.' | grep -vE '^[0-9]+:[[:space:]]*//' || true)
       if [ -n "$HITS" ]; then
-        CONSOLE_HITS="${CONSOLE_HITS}${FILE}:\n${HITS}\n"
+        print_error "console.* statement(s) found in production file: $FILE (use the project logger instead)"
+        echo "$HITS"
+        CONSOLE_FOUND=1
       fi
     done
-
-    if [ -n "$CONSOLE_HITS" ]; then
-      print_error "console.* statement(s) found in production files (use the project logger instead):"
-      printf "%b" "$CONSOLE_HITS"
+    if [ $CONSOLE_FOUND -ne 0 ]; then
       exit 1
     fi
   fi
