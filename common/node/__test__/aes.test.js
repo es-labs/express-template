@@ -37,15 +37,3 @@ describe('utils/aes.js', () => {
     assert.strictEqual(decrypted, plaintext);
   });
 });
-
-/*
-const test_aes = (data = 'test data', password = 'pw', algorithm = 'aes256') => {
-  const [iv, key] = [genIv(), genKey(algorithm, password)]
-  const encText = encryptText(algorithm, key, iv, data)
-  const decText = decryptText(algorithm, key, iv, encText)
-  console.log('Password:', password)
-  console.log('Key: ', key.toString(DEFAULT_ENCODING))
-  console.log('Plaintext: ' + decText)
-  console.log('Encrypted (aes256): ' + encText)
-}
-*/

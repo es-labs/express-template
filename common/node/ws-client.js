@@ -3,10 +3,10 @@ import WebSocket from 'ws';
 
 function connect(path, token, label) {
   const ws = new WebSocket(`ws://localhost:3000${path}?token=${token}`);
-  ws.on('open', () => console.log(`[${label}] open`));
-  ws.on('message', d => console.log(`[${label}]`, JSON.parse(d)));
-  ws.on('close', code => console.log(`[${label}] closed`, code));
-  ws.on('error', err => console.error(`[${label}] error`, err.message));
+  ws.on('open', () => logger.info(`[${label}] open`));
+  ws.on('message', d => logger.info(`[${label}]`, JSON.parse(d)));
+  ws.on('close', code => logger.info(`[${label}] closed`, code));
+  ws.on('error', err => logger.error(`[${label}] error`, err.message));
   return ws;
 }
 

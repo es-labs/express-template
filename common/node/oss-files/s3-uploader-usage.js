@@ -19,15 +19,15 @@ async function uploadFile(file) {
     const result = await uploader.upload(file, {
       key: `uploads/${Date.now()}-${file.name}`, // custom S3 key (optional)
       onProgress: pct => {
-        // TBD console.log(`Upload progress: ${pct}%`);
+        logger.info(`Upload progress: ${pct}%`);
         document.getElementById('progress').value = pct;
       },
     });
 
-    // TBD console.log('Upload complete!', result);
+    logger.info('Upload complete!', result);
     // result = { key: 'uploads/...', location: 'https://bucket.s3.amazonaws.com/...' }
   } catch (err) {
-    // TBD console.error('Upload failed:', err.message);
+    logger.error('Upload failed:', err.message);
   }
 }
 
@@ -41,18 +41,18 @@ async function uploadWithCancel(file) {
   try {
     const result = await uploader.upload(file, {
       onProgress: pct => {
-        // TBD console.log(`${pct}%`)
+        logger.info(`${pct}%`)
       },
       signal: controller.signal,
     });
-    // TBD console.log('Done:', result);
+    logger.info('Done:', result);
   } catch (err) {
     if (err.name === 'AbortError') {
-      // TBD console.log('Upload cancelled by user');
+      logger.info('Upload cancelled by user');
       // Optionally call your backend to abort the multipart upload in S3
       // to avoid storage costs for incomplete uploads
     } else {
-      // TBD console.error('Error:', err);
+      logger.error('Error:', err);
     }
   }
 }

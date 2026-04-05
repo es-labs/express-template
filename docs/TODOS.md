@@ -1,7 +1,5 @@
 ## linting auto fix
 
-// fix console.log / console.error TBDs... use pino
-
 useArrowFunction - safe
 useConst - safe
 useOptionalChain
@@ -9,8 +7,12 @@ useTemplate
 useNodejsImportProtocol
 noConsole (set to warn first, convert using logger, then set back to error)
 
+```
+npx biome format common apps webs scripts
+npx biome lint common apps webs scripts
+```
+
 # WIP
-- move vue devdependencies from root package.json to common/vue
 @es-labs/jslib
 @common/iso/sleep.js
 @common/node/services/index

@@ -19,14 +19,15 @@ const log = (level, message, meta = {}) => {
   level === 'error' ? console.error(entry) : console.log(entry);
 };
 
-export const logger = {
+
+const logger = {
   error: (msg, meta) => log('error', msg, meta),
   warn: (msg, meta) => log('warn', msg, meta),
   info: (msg, meta) => log('info', msg, meta),
   debug: (msg, meta) => log('debug', msg, meta),
 };
 
-export const httpLogger = (req, res, next) => {
+const loggerMiddleware = (req, res, next) => {
   // 5xx=error. 4xx=warn, 2xx-3xx=info.
   // reason for 4xx can be logged in meta, e.g. validation_error, auth_failed, etc.
   req.log = logger;
@@ -69,3 +70,8 @@ export const httpLogger = (req, res, next) => {
   req.socket.on('timeout', () => logResponse(408, 'socket_timeout'));
   next();
 };
+
+// Make logger globally available
+global.logger = logger;
+
+export { logger, loggerMiddleware };

@@ -4,7 +4,7 @@
  *
  * Usage:
  *   const uploader = new S3Uploader({ getSignedUrlEndpoint: '/api/s3/sign' });
- *   await uploader.upload(file, { onProgress: (pct) => console.log(pct) });
+ *   await uploader.upload(file, { onProgress: (pct) => logger.info(pct) });
  */
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB per part (min 5MB for S3 multipart)

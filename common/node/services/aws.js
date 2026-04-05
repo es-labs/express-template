@@ -24,19 +24,19 @@ export const main = async ({ bucketName, pageSize }) => {
       objects.push(page.Contents.map(o => o.Key));
     }
     objects.forEach((objectList, pageNum) => {
-      // TBD console.log(
-      //  `Page ${pageNum + 1}\n------\n${objectList.map((o) => `• ${o}`).join("\n")}\n`,
-      // );
+      logger.info(
+       `Page ${pageNum + 1}\n------\n${objectList.map((o) => `• ${o}`).join("\n")}\n`,
+      );
     });
   } catch (caught) {
     if (caught instanceof S3ServiceException && caught.name === 'NoSuchBucket') {
-      // TBD console.error(
-      //   `Error from S3 while listing objects for "${bucketName}". The bucket doesn't exist.`,
-      // );
+      logger.error(
+        `Error from S3 while listing objects for "${bucketName}". The bucket doesn't exist.`,
+      );
     } else if (caught instanceof S3ServiceException) {
-      // TBD console.error(
-      //   `Error from S3 while listing objects for "${bucketName}".  ${caught.name}: ${caught.message}`,
-      // );
+      logger.error(
+        `Error from S3 while listing objects for "${bucketName}".  ${caught.name}: ${caught.message}`,
+      );
     } else {
       throw caught;
     }
@@ -127,15 +127,15 @@ export const main = async () => {
 
     // After you get the presigned URL, you can provide your own file
     // data. Refer to put() above.
-    console.log("Calling PUT using presigned URL without client");
+    logger.info("Calling PUT using presigned URL without client");
     await put(noClientUrl, "Hello World");
 
-    console.log("Calling PUT using presigned URL with client");
+    logger.info("Calling PUT using presigned URL with client");
     await put(clientUrl, "Hello World");
 
-    console.log("\nDone. Check your S3 console.");
+    logger.info("\nDone. Check your S3 console.");
   } catch (err) {
-    console.error(err);
+    logger.error(err);
   }
 };
 */
@@ -166,7 +166,7 @@ export const main = async ({ bucketName, key }) => {
     );
     // A successful delete, or a delete for a non-existent object, both return
     // a 204 response code.
-    console.log(
+    logger.info(
       `The object "${key}" from bucket "${bucketName}" was deleted, or it didn't exist.`,
     );
   } catch (caught) {
@@ -174,11 +174,11 @@ export const main = async ({ bucketName, key }) => {
       caught instanceof S3ServiceException &&
       caught.name === "NoSuchBucket"
     ) {
-      console.error(
+      logger.error(
         `Error from S3 while deleting object from ${bucketName}. The bucket doesn't exist.`,
       );
     } else if (caught instanceof S3ServiceException) {
-      console.error(
+      logger.error(
         `Error from S3 while deleting object from ${bucketName}.  ${caught.name}: ${caught.message}`,
       );
     } else {

@@ -54,13 +54,13 @@ const countBucketObjects = async (bucketName = null) => {
  * @returns {{ status: Number, statusMessage: string, [objects]: ListV2Object[] }}
  */
 const listObjects = async ({ prefix = '', maxKeys = 10 } = {}) => {
-  // console.log(prefix, maxKeys)
+  logger.info(prefix, maxKeys)
   try {
     const result = await store.listV2({
       prefix,
       'max-keys': maxKeys,
     });
-    // console.log(result.res)
+    logger.info(result.res)
     const { status, statusMessage } = result.res;
     return {
       status,
@@ -68,7 +68,7 @@ const listObjects = async ({ prefix = '', maxKeys = 10 } = {}) => {
       objects: result.objects,
     };
   } catch (e) {
-    // console.log('ali - listObjects', e)
+    logger.info('ali - listObjects', e)
     return { status: 500, statusMessage: e.toString() };
   }
 };
@@ -83,11 +83,11 @@ const putObject = async (key, payload) => {
   // if (!store) return null
   try {
     const result = await store.put(key, payload); //
-    // console.log(result)
+    logger.info(result)
     const { status, statusMessage } = result.res;
     return { status, statusMessage };
   } catch (e) {
-    // console.log('ali - putObject', e)
+    logger.info('ali - putObject', e)
     return { status: 500, statusMessage: e.toString() };
   }
 };
@@ -102,9 +102,9 @@ const getObject = async key => {
   // if (!store) return null
   try {
     const result = await store.get(key);
-    // console.log(typeof result.content, result.content.toString('utf-8')) // content is Buffer object
-    // console.log(Buffer.isBuffer(result.content))
-    // console.log(result)
+    logger.info(typeof result.content, result.content.toString('utf-8')) // content is Buffer object
+    logger.info(Buffer.isBuffer(result.content))
+    logger.info(result)
     const { status, statusMessage } = result?.res || {};
     return {
       status,
@@ -112,7 +112,7 @@ const getObject = async key => {
       buffer: result?.content,
     };
   } catch (e) {
-    // console.log('ali - getObject', e)
+    logger.info('ali - getObject', e)
     return { status: 500, statusMessage: e.toString() };
   }
 };
@@ -126,7 +126,7 @@ const deleteObjects = async keys => {
   // if (!store) return null
   try {
     const result = await store.deleteMulti(keys, {});
-    // console.log(result)
+    logger.info(result)
     const { status, statusMessage } = result?.res || {};
     return {
       status,
@@ -134,7 +134,7 @@ const deleteObjects = async keys => {
       deleted: result.deleted,
     };
   } catch (e) {
-    // console.log('ali - deleteObjects', e)
+    logger.info('ali - deleteObjects', e)
     return { status: 500, statusMessage: e.toString() };
   }
 };
@@ -148,7 +148,7 @@ const deleteObjects = async keys => {
  */
 const getSignedUrl = async (method, expires, key, headers = null, additional = null) => {
   const signedUrl = await store.signatureUrlV4(method, expires, headers, key, additional);
-  // console.log(signedUrl)
+  logger.info(signedUrl)
   return signedUrl;
 };
 
@@ -206,39 +206,39 @@ const getUploadURL = async (directory, filename, contentType, action = 'write', 
 const test = async () => {
   // [bucket count]
   // const bucketObjCount = await countBucketObjects('no-such-bucket') // non-existing bucket, also test with existing bucket
-  // console.log('bucketObjCount', bucketObjCount) // -1 if error ?
+  logger.info('bucketObjCount', bucketObjCount) // -1 if error ?
 
   // [put] - if put same object name will replace...
   // const testFile1 = new File(['Hello, world 1!'], 'hello.txt', { type: 'text/plain' })
   // const testData1 = await testFile1.arrayBuffer()
   // const putRes1 = await putObject('hello1.txt', Buffer.from(testData1))
-  // console.log('putRes1', putRes1)
+  logger.info('putRes1', putRes1)
 
   // const testFile2 = new File(['Hello, world 2!'], 'hello.txt', { type: 'text/plain' })
   // const testData2 = await testFile2.arrayBuffer()
   // const putRes2 = await putObject('hello2.txt', Buffer.from(testData2))
-  // console.log('putRes2', putRes2)
+  logger.info('putRes2', putRes2)
 
   // [list objects]
   // const listRes = await listObjects({ prefix: 'hello' })
-  // console.log('listRes.objects', listRes?.objects?.length, listRes?.objects?.map(item => item.name))
+  logger.info('listRes.objects', listRes?.objects?.length, listRes?.objects?.map(item => item.name))
 
   // [get object]
   // const data1 = await getObject('hello1.txt')
-  // console.log('data1', data1?.buffer?.toString())
+  logger.info('data1', data1?.buffer?.toString())
   // const data2 = await getObject('hello2.txt')
-  // console.log('data2', data2?.buffer?.toString())
+  logger.info('data2', data2?.buffer?.toString())
 
   // [delete objects]
   // const deleteRes = await deleteObjects(['ahello1.txt', 'ahello2.txt', 'ahello3.txt'])
-  // console.log(deleteRes)
+  logger.info(deleteRes)
 
   const url = await getSignedUrl('GET', 60, 'hello1.txt');
   /*
   // -------------------------------------------------
   //  PutObject
   const putObejctUrl = await store.signatureUrlV4('PUT', 60, undefined, 'your obejct name');
-  console.log(putObejctUrl);
+  logger.info(putObejctUrl);
   // --------------------------------------------------
   const putObejctUrl = await store.signatureUrlV4(
     'PUT',
@@ -253,7 +253,7 @@ const test = async () => {
     'your obejct name',
     ['Content-Length']
   );
-  console.log(putObejctUrl);
+  logger.info(putObejctUrl);
   */
 };
 
@@ -265,7 +265,7 @@ const test = async () => {
 //   // list all inventory of the bucket
 //   do {
 //     const result = await store.listBucketInventory(bucket, nextContinuationToken)
-//     console.log(result.inventoryList)
+//     logger.info(result.inventoryList)
 //     nextContinuationToken = result.nextContinuationToken
 //   } while (nextContinuationToken)
 // }

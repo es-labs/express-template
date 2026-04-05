@@ -1,14 +1,14 @@
 // websocket.js
 // ─── Start ────────────────────────────────────────────────────────────────────
-// console.log('  ws://localhost:3000/ws/chat?token=user-token-abc');
-// console.log('  ws://localhost:3000/ws/notif?token=user-token-abc');
-// console.log('  ws://localhost:3000/ws/admin?token=admin-token-xyz');
+// logger.info('  ws://localhost:3000/ws/chat?token=user-token-abc');
+// logger.info('  ws://localhost:3000/ws/notif?token=user-token-abc');
+// logger.info('  ws://localhost:3000/ws/admin?token=admin-token-xyz');
 
 import { WebSocketServer } from 'ws';
 
 // import url from "url";
 // server.on('upgrade', (request, socket, head) => {
-//   console.log('upgrade event')
+//   logger.info('upgrade event')
 //   const pathname = url.parse(request.url).pathname // if (pathname === '/some-match') { }
 // })
 
@@ -139,7 +139,7 @@ export default function wsLoader(server) {
     try {
       context = await route.auth(req);
     } catch (err) {
-      console.warn(`[upgrade] auth failed: ${err.message}`);
+      logger.warn(`[upgrade] auth failed: ${err.message}`);
       return rejectSocket(socket, 401, 'Unauthorized');
     }
 
@@ -155,29 +155,29 @@ export default function wsLoader(server) {
   // ─── Per-WSS connection logic ─────────────────────────────────────────────────
   chatWSS.on('connection', (ws, req) => {
     const { user } = req;
-    console.log(`[chat] connected: ${user.name}`);
+    logger.info(`[chat] connected: ${user.name}`);
     ws.send(JSON.stringify({ type: 'welcome', room: 'chat', user: user.name }));
     ws.on('message', data => {
       const msg = safeParseJSON(data);
       if (!msg) return ws.send(error('Invalid JSON'));
       broadcast(chatWSS, { type: 'message', from: user.name, text: msg.text }); // Broadcast to all connected chat clients
     });
-    ws.on('close', () => console.log(`[chat] disconnected: ${user.name}`));
-    ws.on('error', err => console.error(`[chat] error:`, err.message));
+    ws.on('close', () => logger.info(`[chat] disconnected: ${user.name}`));
+    ws.on('error', err => logger.error(`[chat] error:`, err.message));
   });
 
   notifWSS.on('connection', (ws, req) => {
     const { user } = req;
-    console.log(`[notif] connected: ${user.name}`);
+    logger.info(`[notif] connected: ${user.name}`);
     ws.userId = user.id; // Tag socket with user id for targeted pushes
     ws.send(JSON.stringify({ type: 'welcome', room: 'notif' }));
-    ws.on('error', err => console.error(`[notif] error:`, err.message));
+    ws.on('error', err => logger.error(`[notif] error:`, err.message));
   });
 
   adminWSS.on('connection', (ws, req) => {
     const { user } = req;
-    console.log(`[admin] connected: ${user.name} (role=${user.role})`);
+    logger.info(`[admin] connected: ${user.name} (role=${user.role})`);
     ws.send(JSON.stringify({ type: 'stats', data: getServerStats() })); // Send current server stats on connect
-    ws.on('error', err => console.error(`[admin] error:`, err.message));
+    ws.on('error', err => logger.error(`[admin] error:`, err.message));
   });
 }

@@ -36,7 +36,7 @@ export default class Wss {
       this._onClientMessage = async (data, isBinary, ws, wss) => {
         // client incoming message
         const message = isBinary ? data : data.toString();
-        // console.log('message', message)
+        logger.info('message', message)
         try {
           // try-catch only detect immediate error, cannot detect if write failure
           if (wss) {
@@ -46,11 +46,11 @@ export default class Wss {
                 client.send(message); // send message to others
               }
             });
-            // ws.send('something', function ack(error) { console.log }) // If error !defined, send has been completed, otherwise error object will indicate what failed.
+            // ws.send('something', function ack(error) { logger.info }) // If error !defined, send has been completed, otherwise error object will indicate what failed.
             ws.send(message); // echo back message...
           }
         } catch (e) {
-          // TBD console.log(e.toString())
+          logger.info(e.toString())
         }
       };
     }
@@ -107,16 +107,16 @@ export default class Wss {
 
         // new WebSocketServer({ server }) - no need to handle upgrade event, ws will handle it internally
         // server.on('upgrade', (req, socket, head) => {
-        //   console.log('WS Upgrade Request Rexeived !!!')
+        //   logger.info('WS Upgrade Request Rexeived !!!')
         //   this._wss.handleUpgrade(req, socket, head, (ws) => {
         //     this._wss.emit('connection', ws, req);
         //   });
         // });
 
-        // TBD console.log('WS API listening on port ' + this._port)
+        logger.info('WS API listening on port ' + this._port)
         if (this._wss) {
           this._wss.on('connection', ws => {
-            // console.log('ws client connected')
+            logger.info('ws client connected')
             this._onClientConnect(ws); // what else to do when client connects
             ws.isAlive = true;
             ws.on('pong', () => {
@@ -127,7 +127,7 @@ export default class Wss {
           });
           setInterval(() => {
             // set keep-alive
-            // console.log('WS Clients: ', this._wss.clients.size)
+            logger.info('WS Clients: ', this._wss.clients.size)
             this._wss?.clients.forEach(ws => {
               if (!ws.isAlive) {
                 ws.terminate(); // force close
@@ -139,12 +139,12 @@ export default class Wss {
           }, this._keepAliveMs);
         }
       } else {
-        // TBD console.log('NO WS Service To Open')
+        logger.info('NO WS Service To Open')
       }
     } catch (e) {
       err = e.toString();
     }
-    // TBD console.log('WS Open ' + (err ? err : 'Done'))
+    logger.info('WS Open ' + (err ? err : 'Done'))
     return this;
   }
 
@@ -158,8 +158,8 @@ export default class Wss {
         this._wss = null; //delete wss
       }
     } catch (e) {
-      // TBD console.error(e.toString())
+      logger.error(e.toString())
     }
-    // TBD console.log('WS API CLOSE OK')
+    logger.info('WS API CLOSE OK')
   }
 }

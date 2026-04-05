@@ -60,6 +60,10 @@ Use `apps/app-sample` as an example on how to create a new service/application.
 
 ---
 
+## Common Library and all Node backends
+
+- use logger instead of console.log
+
 ### SPA Setup & Run - development environment
 
 See [docs/install-backend.md]() - for the sample Express App 

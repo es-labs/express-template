@@ -9,11 +9,11 @@ import http from 'node:http';
 import https from 'node:https';
 import express from 'express';
 
-import * as services from '../node/services/index.js';
-import * as authService from '../node/auth/index.js';
+import * as services from '../services/index.js';
+import * as authService from '../auth/index.js';
 
 import { healthRouter } from './health/router.js';
-import { logger } from '../node/logging/index.js';
+import { loggerMiddleware } from '../logging/index.js';
 
 const preRoute = () => {
   const { NODE_ENV } = process.env;
@@ -87,6 +87,8 @@ const preRoute = () => {
   } catch (e) {
     console.log(e);
   }
+
+  app.use(loggerMiddleware); // HTTP Request and Websocket Related logging
 
   // skip middleware for WebSocket upgrade requests
   app.use((req, res, next) => {

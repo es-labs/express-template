@@ -114,10 +114,7 @@ app.post('/api/s3/sign', async (req, res) => {
         return res.status(400).json({ error: `Unknown type: ${type}` });
     }
   } catch (err) {
-    // TBD console.error('[S3 sign error]', err);
+    logger.error('[S3 sign error]', err);
     res.status(500).json({ error: err.message });
   }
 });
-
-// app.listen(3000, () => console.log('Server running on http://localhost:3000'));
-export default app;

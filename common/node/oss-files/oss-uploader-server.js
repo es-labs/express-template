@@ -153,13 +153,10 @@ app.post('/api/oss/sign', async (req, res) => {
         return res.status(400).json({ error: `Unknown type: "${type}"` });
     }
   } catch (err) {
-    // TBD console.error('[OSS sign error]', err);
+    logger.error('[OSS sign error]', err);
     res.status(500).json({ error: err.message });
   }
 });
-
-// app.listen(3000, () => console.log('OSS sign server running on http://localhost:3000'));
-export default app;
 
 /*
  * ─── OSS Bucket CORS Configuration (required) ────────────────────────────────

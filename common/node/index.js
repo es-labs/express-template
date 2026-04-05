@@ -1,3 +1,6 @@
+export * from './logging/index.js';
+// export * from './services/index.js';
+// export * from './auth/index.js';
 // TOCHecK
 // common/index.js
 // Central barrel export for the shared library.

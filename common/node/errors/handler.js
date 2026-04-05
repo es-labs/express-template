@@ -11,16 +11,16 @@ let shuttingDown = false;
 
 const gracefulShutdown = async signal => {
   if (shuttingDown) return; // prevent multiple signals from triggering multiple shutdowns
-  console.log(`Cleanup initiated by signal: ${signal}`);
+  logger.info(`Cleanup initiated by signal: ${signal}`);
   setTimeout(() => {
     // give the LB time to notice the 503 and stop routing
-    console.error('Forced shutdown after timeout');
+    logger.error('Forced shutdown after timeout');
     process.exit(1);
   }, SHUTDOWN_TIMEOUT_MS);
   if (server) {
     server.close(async () => {
       await services.stop(); // promise all...
-      console.log('process exiting gracefully');
+      logger.info('process exiting gracefully');
       return process.exit(0);
     });
   }
@@ -32,10 +32,10 @@ if (GRACEFUL_EXIT) {
     process.on(signal, gracefulShutdown);
   }); // SIGKILL cannot be caught
   process.on('uncaughtException', (err, origin) =>
-    console.log(`Uncaught Exception - error: ${err} origin: ${origin}` && process.exit(1)),
+    logger.info(`Uncaught Exception - error: ${err} origin: ${origin}` && process.exit(1)),
   );
   process.on('unhandledRejection', (reason, promise) =>
-    console.log(`Unhandled Rejection - promise: ${promise} reason: ${reason}` && process.exit(1)),
+    logger.info(`Unhandled Rejection - promise: ${promise} reason: ${reason}` && process.exit(1)),
   );
 }
 
@@ -43,7 +43,7 @@ if (GRACEFUL_EXIT) {
 // export default (signalFn, exceptionFn) => {
 //   const defaultExceptionFn = async (e, type) => {
 //     // TBD REPLACE WITH logger
-//     // console.error(type, e.toString())
+//     // logger.error(type, e.toString())
 //     // process.emit("SIGTERM") // process.exit(0), process.kill(process.pid, type)
 //   };
 //   if (!exceptionFn) exceptionFn = defaultExceptionFn;
@@ -54,7 +54,7 @@ if (GRACEFUL_EXIT) {
 
 //   const defaultSignalFn = async type => {
 //     // TBD REPLACE WITH logger
-//     // console.error(type)
+//     // logger.error(type)
 //   };
 //   if (!signalFn) signalFn = defaultSignalFn;
 //   const signals = ['SIGTERM', 'SIGINT', 'SIGUSR2']; // SIGINT now works on windows

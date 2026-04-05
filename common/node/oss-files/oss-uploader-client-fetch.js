@@ -14,7 +14,7 @@
  *
  * Usage:
  *   const uploader = new OSSUploader({ signEndpoint: '/api/oss/sign' });
- *   const result = await uploader.upload(file, { onProgress: pct => console.log(pct + '%') });
+ *   const result = await uploader.upload(file, { onProgress: pct => logger.info(pct + '%') });
  *
  * Note on progress reporting with fetch:
  *   The fetch API does not natively expose upload progress (only download progress via

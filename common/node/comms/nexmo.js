@@ -36,7 +36,7 @@ export const ismsSend = async (sms, message, from) => {
       return await fetch(url, options);
     }
   } catch (e) {
-    // console.log('ismsSend', e.toString())
+    // logger.info('ismsSend', e.toString())
   }
   return null;
 };

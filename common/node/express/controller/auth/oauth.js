@@ -1,4 +1,4 @@
-import { authFns, createToken, setTokensToHeader } from '../../../node/auth/index.js';
+import { authFns, createToken, setTokensToHeader } from '@common/node/auth/index';
 
 const { AUTH_ERROR_URL } = process.env;
 const OAUTH_OPTIONS = JSON.parse(process.env.OAUTH_OPTIONS || null) || {};

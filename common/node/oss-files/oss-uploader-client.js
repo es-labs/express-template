@@ -14,7 +14,7 @@
  *
  * Usage:
  *   const uploader = new OSSUploader({ signEndpoint: '/api/oss/sign' });
- *   const result = await uploader.upload(file, { onProgress: pct => console.log(pct + '%') });
+ *   const result = await uploader.upload(file, { onProgress: pct => logger.info(pct + '%') });
  */
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB per part

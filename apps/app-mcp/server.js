@@ -72,14 +72,14 @@ app.post('/mcp', async (req, res) => {
       sessionIdGenerator: () => randomUUID(),
       onsessioninitialized: id => {
         transports.set(id, transport);
-        console.log(`[session] created: ${id}`);
+        // console.log(`[session] created: ${id}`);
       },
     });
 
     transport.onclose = () => {
       const id = transport.sessionId;
       transports.delete(id);
-      console.log(`[session] closed: ${id}`);
+      // console.log(`[session] closed: ${id}`);
     };
 
     const server = createMcpServer();
@@ -122,5 +122,5 @@ app.delete('/mcp', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`MCP server running at http://localhost:${PORT}/mcp`);
+  // console.log(`MCP server running at http://localhost:${PORT}/mcp`);
 });
