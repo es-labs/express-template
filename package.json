@@ -47,8 +47,6 @@
     "test:workspaces": "npm run test --workspaces",
     "test:cover-only": "node --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info --test __tests__/**/*.spec.js",
     "test:e2e": "start-server-and-test start http://localhost:8080 test",
-    "prepare2": "husky",
-    "commit": "cz",
     "release:auth": "semantic-release -e ./release/auth-service.release.config.cjs",
     "update-commit-hash": "git rev-parse --verify --short HEAD > commit-hash"
   },

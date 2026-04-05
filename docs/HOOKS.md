@@ -1,5 +1,17 @@
 ## Hooks Usage
 
+to remove hooks in git
+
+```
+git config --local --unset-all core.hooksPath
+```
+
+set it using npm script named `prepare`
+
+```
+git config --local core.hooksPath .githooks
+```
+
 ### Minimal
 
 Pre-commit:  
