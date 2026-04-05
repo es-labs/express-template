@@ -1,5 +1,5 @@
 import express from 'express';
-import * as auth from '@common/node/auth/index';
+import * as auth from '@common/node/auth';
 // import * as own from '@common/express/controller/auth/own';
 // import * as oauth from '@common/express/controller/auth/oauth';
 // import * as oidc from '@common/express/controller/auth/oidc';

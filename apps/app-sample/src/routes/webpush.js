@@ -2,7 +2,7 @@ import express from 'express';
 import {
   // authUser,
   authFns,
-} from '@common/node/auth/index';
+} from '@common/node/auth';
 import * as webpush from '@common/node/comms/webpush';
 
 console.log('WARNING Auth bypass in webpush.js');
