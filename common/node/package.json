@@ -21,6 +21,7 @@
     ".": "./index.js",
     "./auth": "./auth/index.js",
     "./express/controller/auth": "./express/controller/auth/index.js",
+    "./node/auth": "./node/auth/index.js",
     "./logging": "./logging/index.js",
     "./services": "./services/index.js",
     "./*": "./*.js",

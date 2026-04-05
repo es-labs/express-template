@@ -1,7 +1,7 @@
-import '@common/node/env'; // setup env vars
+import '../config.js'; // setup env vars
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert';
-import StoreKnex from '@common/node/services/db/knex.js';
+import StoreKnex from '../node/services/db/knex.js';
 
 let sqldb;
 

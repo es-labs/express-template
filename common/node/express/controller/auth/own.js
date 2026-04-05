@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 // import * as otplib from 'otplib';
 import { verify } from 'otplib';
 
-import { getSecret, createToken, setTokensToHeader, authFns } from '@common/node/auth/index';
+import { getSecret, createToken, setTokensToHeader, authFns } from '../../../auth/index.js';
 const {
   COOKIE_HTTPONLY,
   AUTH_USER_FIELD_LOGIN,

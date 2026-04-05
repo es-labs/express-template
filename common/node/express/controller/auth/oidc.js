@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { createToken, setTokensToHeader } from '@common/node/auth/index';
+import { createToken, setTokensToHeader } from '../../../auth/index.js';
 
 const { AUTH_ERROR_URL } = process.env;
 const OIDC_OPTIONS = JSON.parse(process.env.OIDC_OPTIONS || null) || {};

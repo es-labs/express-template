@@ -124,7 +124,7 @@ vi.mock('../node/logging/index.js', () => ({
   logger: {},
 }));
 
-vi.mock('@common/node/logging', () => ({
+vi.mock('../node/logging/index.js', () => ({
   logger: {},
 }));
 

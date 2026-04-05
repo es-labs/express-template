@@ -3,8 +3,8 @@ import express from 'express';
 import fs from 'node:fs';
 import yaml from 'js-yaml';
 import multer from 'multer';
-import * as svc from '@common/node/services';
-import { memoryUpload } from '@common/node/express/upload';
+import * as svc from '../../services';
+import { memoryUpload } from '../../express/upload';
 const {
   TABLE_CONFIGS_FOLDER_PATH,
   TABLE_CONFIGS_CSV_SIZE,
