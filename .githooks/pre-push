@@ -17,25 +17,14 @@ print_success() { printf "${GREEN}[pre-push]${NC} %s\n" "$1"; }
 print_warning() { printf "${YELLOW}[pre-push]${NC} %s\n" "$1"; }
 print_error()   { printf "${RED}[pre-push]${NC} %s\n" "$1"; }
 
-# ── Package manager detection ─────────────────────────────────────────────────
-if [ -f "pnpm-lock.yaml" ]; then
-  PKG_MGR="pnpm"
-elif [ -f "yarn.lock" ]; then
-  PKG_MGR="yarn"
-else
-  PKG_MGR="npm"
-fi
-
-print_info "Using package manager: $PKG_MGR"
-
 # ── 1. Unit tests ─────────────────────────────────────────────────────────────
 print_info "Running unit tests…"
 
 if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts['test:workspace']?0:1)" 2>/dev/null; then
-  $PKG_MGR run test:workspace
+  npm run test:workspace
   TEST_EXIT=$?
 elif node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts['test']?0:1)" 2>/dev/null; then
-  $PKG_MGR run test
+  npm run test
   TEST_EXIT=$?
 else
   print_warning "No 'test' script found in root package.json – skipping unit tests."
@@ -54,7 +43,7 @@ print_success "Unit tests passed."
 print_info "Running schema validation tests…"
 
 if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts['test:schemas']?0:1)" 2>/dev/null; then
-  $PKG_MGR run test:schemas
+  npm run test:schemas
   SCHEMA_EXIT=$?
   if [ $SCHEMA_EXIT -ne 0 ]; then
     print_error "Schema validation tests failed. Fix schema errors before pushing."

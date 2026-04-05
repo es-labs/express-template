@@ -21,7 +21,7 @@ git config core.hooksPath .githooks
 chmod +x .githooks/pre-commit .githooks/pre-push
 ```
 
-Running `npm install` (or `pnpm install` / `yarn install`) will also run `npm prepare`, which configures the hooks path automatically.
+Running `npm install` will also run `npm prepare`, which configures the hooks path automatically.
 
 ### pre-commit hook
 
@@ -29,9 +29,7 @@ Runs automatically on every `git commit`:
 
 | Check | Details |
 |-------|---------|
-| **Biome format & lint** | Checks staged JS/TS files with [Biome](https://biomejs.dev/). Run `npm run check` to auto-fix. |
-| **No `debugger` statements** | Prevents accidental debugger breakpoints from being committed. |
-| **No `console.*` in production code** | Enforces use of the project logger in `src/` files. Test files are excluded. |
+| **Biome format & lint** | Runs `npx biome check` on each affected directory (`common/iso`, `common/node`, `common/vue`, `common/web`, `apps`, `webs`, `scripts`). Run `npm run check` to auto-fix. |
 | **Schema validation tests** | Runs `npm run test:schemas` when files in `schema/` or `schemas/` folders are staged. |
 
 To skip the pre-commit hook temporarily:

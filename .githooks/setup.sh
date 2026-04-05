@@ -44,7 +44,7 @@ git config core.hooksPath .githooks
 
 if [ $? -eq 0 ]; then
   print_success "Git hooks installed successfully."
-  print_info "  pre-commit: Biome check, debugger/console scan, schema tests"
+  print_info "  pre-commit: Biome check per directory, schema tests"
   print_info "  pre-push:   unit tests + schema validation"
   print_info ""
   print_info "To skip a hook temporarily:"
