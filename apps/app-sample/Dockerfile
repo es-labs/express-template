@@ -29,12 +29,11 @@
 #   -f apps/app-sample/Dockerfile \
 #   --build-arg APP_NAME=app-sample \
 #   --build-arg API_PORT=3000 \
-#   --build-arg NODE_VERSION=22 \
 #   -t express-template/app-sample:latest \
 #   .
 
-# Set Node Version - version 22
-ARG NODE_VERSION=22
+# Set Node Version - version 24
+ARG NODE_VERSION=24
 ARG API_PORT=3000
 ARG APP_NAME=app-sample
 
@@ -49,7 +48,9 @@ WORKDIR /app
 
 # Copy workspace manifests first for better layer caching
 COPY package.json package-lock.json ./
-COPY common/package.json ./common/
+COPY common/node/package.json ./common/node/
+COPY common/iso/package.json ./common/iso/
+COPY common/schemas/ ./common/schemas/
 COPY apps/${APP_NAME}/package.json ./apps/${APP_NAME}/
 
 # npm workspaces: installs all deps hoisted to /app/node_modules
@@ -65,13 +66,17 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules/
 
 COPY package.json package-lock.json ./
-COPY common/package.json ./common/
+COPY common/node/package.json ./common/node/
+COPY common/iso/package.json ./common/iso/
+COPY common/schemas/ ./common/schemas/
 COPY apps/${APP_NAME}/package.json ./apps/${APP_NAME}/
 
 # Install devDependencies on top of the already-copied prod modules
 RUN npm ci
 
-COPY common/ ./common/
+COPY common/node/ ./common/node/
+COPY common/iso/ ./common/iso/
+COPY common/schemas/ ./common/schemas/
 COPY apps/${APP_NAME}/ ./apps/${APP_NAME}/
 
 # ─── Stage 3: production image ────────────────────────────────────────────────
@@ -87,14 +92,16 @@ WORKDIR /app
 
 # Copy production node_modules (hoisted by npm workspaces) and source
 COPY --from=deps  /app/node_modules                    ./node_modules/
-COPY --from=build /app/common                          ./common/
+COPY --from=build /app/common/node                     ./common/node/
+COPY --from=build /app/common/iso                      ./common/iso/
+COPY --from=build /app/common/schemas                  ./common/schemas/
 COPY --from=build /app/apps/${APP_NAME}                ./apps/${APP_NAME}/
 
 # Copy app-level node_modules if they exist (non-hoisted deps)
 # COPY --from=deps  /app/apps/${APP_NAME}/node_modules   ./apps/${APP_NAME}/node_modules/
 
 # ENV SERVICE_NAME=${APP_NAME} \
-#     API_PORT=${API_PORT}
+# API_PORT=${API_PORT}
 
 # Set final WORKDIR before dropping to non-root user
 WORKDIR /app/apps/${APP_NAME}

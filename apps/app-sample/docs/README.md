@@ -4,9 +4,9 @@
 
 ## Configuration (Environment Files)
 
-- .env.<env> : non-sensitive config values
-- .env.secret.<env> : values that are secret (should be in `vault` service for production)
-- JSON values are supported, be aware of syntax errors when setting up
+- `.env` for secrets and simple scalar values (should be in `vault` service for production)
+- `.runtime.json` for non-sensitive structured values in JSON, loaded into namespace `globalThis._xt`
+- namespace uses Javascript Symbol and is created when node/common/config is imported
 
 ## Some Features
 

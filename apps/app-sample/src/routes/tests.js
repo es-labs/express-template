@@ -5,7 +5,9 @@ import express from 'express';
 import PdfKit from 'pdfkit';
 import * as services from '@common/node/services';
 import { sleep } from '@common/iso/sleep';
-import { memoryUpload, storageUpload } from '@common/node/express/upload';
+import { storageUpload } from '@common/node/express/upload';
+
+const { UPLOAD_STATIC=null } = globalThis.__config;
 
 export default express
   .Router()
@@ -69,7 +71,7 @@ export default express
   .get('/download', (req, res, next) => {
     // serve a file download, you can add authorization here to control downloads
     const { filename } = req.query;
-    const fullPath = path.join(process.env.UPLOAD_STATIC[0].folder, filename);
+    const fullPath = path.join(UPLOAD_STATIC[0].folder, filename);
 
     // Do not read entire chunk
     // fs.readFile(fullPath, (err, data) => {
@@ -90,18 +92,6 @@ export default express
     res.setHeader(['Content-Disposition', `inline; filename="${filename}"`]);
     file.pipe(res);
   })
-  .get('/download-pdf', (req, res) => {
-    const { filename } = req.query;
-    const ext = path.extname(filename);
-    if (filename && ext === '.pdf') {
-      const fullPath = path.join(process.env.UPLOAD_STATIC[0].folder, filename);
-      const pdfDoc = new PdfKit();
-      pdfDoc.pipe(fs.createWriteStream(fullPath)); // save as file
-      pdfDoc.pipe(res); // stream to response
-      pdfDoc.text('hello world!');
-      pdfDoc.end();
-    }
-  })
 
   // message queues
   .get('/mq-agenda', async (req, res) => {
@@ -118,7 +108,7 @@ export default express
   // TODO /esm/upload-fe-testing.js
   // test uploads
   // body action: 'read' | 'write', filename: 'my-file.txt', bucket: 'bucket name'
-  .post('/upload-disk', storageUpload(process.env.UPLOAD_STATIC[0]).any(), (req, res) => {
+  .post('/upload-disk', storageUpload(UPLOAD_STATIC[0]).any(), (req, res) => {
     // avatar is form input name // single('filedata')
     logger.info('files', req, req.files);
     // body is string, need to parse if json
@@ -128,12 +118,3 @@ export default express
       body: req.body,
     });
   })
-  .post('/upload-memory', memoryUpload(process.env.UPLOAD_MEMORY[0]).single('memory'), (req, res) => {
-    // req.files is array of `photos` files
-    // req.body will contain the text fields, if there were any
-    res.json({
-      fileOriginalName: req.file.originalname,
-      body: req.body,
-      message: req.file.buffer.toString(),
-    });
-  });
