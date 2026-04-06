@@ -52,8 +52,6 @@ Use `apps/app-sample` as an example on how to create a new service/application.
 
 Need to tidy up documentation and tie up loose ends.
 
-DESIGN [docs/DESIGN.md]()
-TODOS [docs/TODOS.md]()
 NOTES [docs/NOTES.md]()
 HOOKS [docs/HOOKS.md]()
 CHANGELOG [CHANGELOG.md]()

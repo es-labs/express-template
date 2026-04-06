@@ -4,4 +4,9 @@
  * @param {any} value - time to measure the number of calls
  * @returns {boolean} -  true if empty object, false otherwise
  */
-export const emptyObject = value => value && Object.keys(value).length === 0 && value.constructor === Object;
+export const isEmptyObject = value => value && Object.keys(value).length === 0 && value.constructor === Object;
+
+export const isValidObject = value => value && typeof value === 'object' && value.constructor === Object;
+
+// backward compatiibility
+export const emptyObjects = isEmptyObject
