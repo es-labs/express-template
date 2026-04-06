@@ -1,7 +1,7 @@
 import Knex from 'knex';
 
 export default class StoreKnex {
-  constructor(options = JSON.parse(process.env.KNEXFILE || null) || {}) {
+  constructor(options = globalThis.__config?.KNEXFILE || {}) {
     this._KNEXFILE = options;
     this._knex = null;
   }

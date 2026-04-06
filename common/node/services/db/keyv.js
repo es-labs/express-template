@@ -1,7 +1,7 @@
 import { Keyv } from 'keyv';
 
 export default class StoreKeyV {
-  constructor(options = JSON.parse(process.env.KEYV_CACHE || null) || {}) {
+  constructor(options = globalThis.__config?.KEYV_CACHE || {}) {
     this._KEYV_CACHE = options;
     this._keyv = null;
   }

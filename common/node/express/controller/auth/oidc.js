@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { createToken, setTokensToHeader } from '../../../auth/index.js';
 
 const { AUTH_ERROR_URL } = process.env;
-const OIDC_OPTIONS = JSON.parse(process.env.OIDC_OPTIONS || null) || {};
+const OIDC_OPTIONS = globalThis.__config?.OIDC_OPTIONS || {};
 
 const AUTH_URL = OIDC_OPTIONS ? `${OIDC_OPTIONS.URL}/auth?` : '';
 const TOKEN_URL = OIDC_OPTIONS ? `${OIDC_OPTIONS.URL}/token` : '';

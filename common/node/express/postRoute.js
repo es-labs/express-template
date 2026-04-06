@@ -3,11 +3,10 @@ import history from 'connect-history-api-fallback';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 
 const postRoute = (app, express) => {
-  let { UPLOAD_STATIC, WEB_STATIC } = process.env;
+  let { UPLOAD_STATIC=null, WEB_STATIC=null } = globalThis.__config;
   // app.set('case sensitive routing', true)
 
   // Upload URL, Should use Signed URL and get from cloud storage instead
-  UPLOAD_STATIC = JSON.parse(UPLOAD_STATIC || null);
   if (UPLOAD_STATIC) {
     // connect-history-api-fallback causes problems, so do upload first
 
@@ -21,9 +20,7 @@ const postRoute = (app, express) => {
     });
   }
 
-  WEB_STATIC = JSON.parse(WEB_STATIC || null);
-  const hasWebStatic = WEB_STATIC?.length;
-  if (hasWebStatic) {
+  if (WEB_STATIC?.length) {
     app.use(history()); // causes problems when using postman - set header accept application/json in postman
     WEB_STATIC.forEach(item => {
       app.use(item.url, express.static(item.folder, item.options)); // { extensions: ['html'], index: false }

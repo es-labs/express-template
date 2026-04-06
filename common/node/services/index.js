@@ -8,12 +8,12 @@ import '../auth/index.js';
 let servicesConfig = [];
 const services = {};
 
-const start = async (app, server, config = JSON.parse(process.env.SERVICES_CONFIG || null) || []) => {
-  const serviceTypesAvailable = process.env.SERVICES_TYPES_AVAILABLE.split(',');
+const start = async (app, server, config = globalThis.__config?.SERVICES_CONFIG || []) => {
+  // const serviceTypesAvailable = process.env.SERVICES_TYPES_AVAILABLE.split(',');
   try {
     servicesConfig = config;
     servicesConfig.forEach(svc => {
-      const opts = JSON.parse(process.env[svc.options] || null);
+      const opts = globalThis.__config?.[svc.options];
       if (opts && svc.type === 'knex' && StoreKnex) services[svc.name] = new StoreKnex(opts);
       if (opts && svc.type === 'redis' && StoreRedis) services[svc.name] = new StoreRedis(opts);
       if (opts && svc.type === 'keyv' && StoreKeyV) services[svc.name] = new StoreKeyV(opts);

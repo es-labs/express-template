@@ -29,7 +29,7 @@
 import Redis from 'ioredis';
 
 export default class StoreRedis {
-  constructor(options = JSON.parse(process.env.REDIS_CONFIG || null) || {}) {
+  constructor(options = globalThis.__config?.REDIS_CONFIG || {}) {
     this._REDIS_CONFIG = options;
     this._redis = null;
   }

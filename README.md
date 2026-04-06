@@ -48,7 +48,18 @@ Use `apps/app-sample` as an example on how to create a new service/application.
 - TBD MCP and WS routes
 
 
+## UNDER REFACTORING ##
+
+Need to tidy up documentation and tie up loose ends.
+
+DESIGN [docs/DESIGN.md]()
+TODOS [docs/TODOS.md]()
+NOTES [docs/NOTES.md]()
+HOOKS [docs/HOOKS.md]()
+CHANGELOG [CHANGELOG.md]()
+
 **Suggested Conventions**
+- 
 - branch
   - main = stable
   - work = working branch
@@ -59,6 +70,9 @@ Use `apps/app-sample` as an example on how to create a new service/application.
   - should tag main branch
 
 ---
+
+See [.github/CONTRIBUTING.md]() - to setup the Git Hooks
+
 
 ## Common Library and all Node backends
 

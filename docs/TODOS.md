@@ -26,14 +26,6 @@ common/scripts
 
 czg https://cz-git.qbb.sh/cli/
 
-
-
-# WIP
-- remove barrel index.js files...
-- JSON in env, refactor to use something else
-- safeJSON
-- husky / commitizen
-
 ## Github Related To Read
 - https://github.com/settings/security_analysis
 
@@ -49,9 +41,6 @@ TBD
   - mutable / immutable tables
 - or something else?
 
-
-
-
 on:
   push:
     branches: [tbd]
@@ -63,3 +52,14 @@ on:
 
 - actions/checkout@v6
 - actions/setup-node@v6
+
+# WIP
+- JSON in env, refactor to use something else
+// Define a unique symbol under a namespace
+// globalThis.__myApp = globalThis.__myApp || {};
+// const _logger = Symbol('logger');
+// globalThis.__myApp[_logger] = myLogger;
+  - have issue with services where there is nested JSON
+- safeJSON
+- remove barrel index.js files...
+

@@ -101,7 +101,7 @@ const preRoute = () => {
 
   const {
     CORS_OPTIONS, // CORS_ORIGINS no longer in use
-    CORS_DEFAULTS,
+    RES_HEADERS_ADD,
     HELMET_OPTIONS,
     COOKIE_SECRET = (parseInt(Date.now() / 28800000) * 28800000).toString(),
   } = process.env;
@@ -117,7 +117,7 @@ const preRoute = () => {
   // ------ SECURITY ------
   logger.info('helmet setting up');
   try {
-    const helmetOptions = JSON.parse(HELMET_OPTIONS || null);
+    const helmetOptions = globalThis.__config?.HELMET_OPTIONS;
     if (helmetOptions) {
       if (helmetOptions.nosniff) app.use(helmet.noSniff());
       if (helmetOptions.xssfilter) app.use(helmet.xssFilter());
@@ -138,26 +138,26 @@ const preRoute = () => {
   // Access-Control-Allow-Headers=Content-Type, Authorization
   logger.info('cors setting up');
   try {
-    const corsOptions = JSON.parse(CORS_OPTIONS || null);
+    const corsOptions = globalThis.__config?.CORS_OPTIONS;
     app.use(corsOptions ? cors(corsOptions) : cors()); // default { origin: '*' }
     logger.info('cors options done');
   } catch (e) {
     logger.error('[cors options error]', e.toString());
     throw e;
   }
-  // Set CORS defaults if certain CORS headers are missing
+  // additional response headers if CORS headers are missing
   try {
-    const corsDefaults = JSON.parse(CORS_DEFAULTS || null);
-    if (corsDefaults) {
+    const resHeadersAdd = globalThis.__config?.RES_HEADERS_ADD;
+    if (Object.keys(resHeadersAdd)?.length) {
       app.use((req, res, next) => {
-        for (const key in corsDefaults) {
-          if (!res.get(key)) res.set(key, corsDefaults[key]);
+        for (const key in resHeadersAdd) {
+          if (!res.get(key)) res.set(key, resHeadersAdd[key]);
         }
         next();
       });
     }
   } catch (e) {
-    logger.error('[cors defaults error]', e.toString());
+    logger.error('[response headers setup error]', e.toString());
     throw e;
   }
 
@@ -174,10 +174,10 @@ const preRoute = () => {
         // raw routes - ignore bodyparser json
         next();
       } else {
-        express.json(JSON.parse(BODYPARSER_JSON || null) || { limit: '2mb' })(req, res, next);
+        express.json(globalThis.__config?.BODYPARSER_JSON || { limit: '2mb' })(req, res, next);
       }
     });
-    app.use(express.urlencoded(JSON.parse(BODYPARSER_URLENCODED || null) || { extended: true, limit: '2mb' })); // https://stackoverflow.com/questions/29175465/body-parser-extended-option-qs-vs-querystring/29177740#29177740
+    app.use(express.urlencoded(globalThis.__config?.BODYPARSER_URLENCODED || { extended: true, limit: '2mb' })); // https://stackoverflow.com/questions/29175465/body-parser-extended-option-qs-vs-querystring/29177740#29177740
   } catch (e) {
     logger.error('[bodyparser setup error]', e.toString());
     throw e;
