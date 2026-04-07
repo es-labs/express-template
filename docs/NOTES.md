@@ -1,6 +1,13 @@
+## Description
 
+This document is for
+- design preferences
+- open questions
+- caveats
+- migration notes
+- ideas that are not yet stable policy
 
-## Design
+### Design
 - Fully ES Modules - JS Compliant
 - Named exports preferred (default exports for class, config, or a plugin)
 - Use Native as much as viable (test runners, datetime, fetch / xhr, npm, git hooks)
@@ -40,6 +47,7 @@
 - use biome for formatting and linting
 
 ## Secrets Security
+
 - git guardian (use native Github for now)
 
 
@@ -55,22 +63,38 @@ npx biome <format/lint/check> common apps webs scripts
 npx biome lint common apps webs scripts --only=useTemplate --write --unsafe
 ```
 
-###
-apps/* - use backend logger
-webs/* - use frontend logger
-common/iso - both (should be simple files remove console.logs)
-common/node - backend (use backend logger)
-common/vue -frontend VueJS (allow console, remove in prod)
-common/web -frontend plainJS (allow console, remove in prod)
-common/scripts
+### logger usage
+
+- apps/* - use backend logger
+- webs/* - use frontend logger
+- common/iso - both (should be simple files remove console.logs)
+- common/node - backend (use backend logger)
+- common/vue -frontend VueJS (allow console, remove in prod)
+- common/web -frontend plainJS (allow console, remove in prod)
+- common/scripts
 
 ### comitting
 
-czg https://cz-git.qbb.sh/cli/
+- [czg](https://cz-git.qbb.sh/cli/)
+-[conventional commit]()
 
 ### Github Related To Read
+
 - https://github.com/settings/security_analysis
 
+
+### Handling Globals
+
+```js
+# Check if namespace exists, if not create it.
+globalThis.__myApp = globalThis.__myApp || {};
+# Define a unique symbol under a namespace
+const _logger = Symbol('logger');
+# Attach logger to global namespace using symbol as key
+globalThis.__myApp[_logger] = myLogger;
+```
+
+Currently we choose to do so without namespace.
 
 ## DB
 
@@ -97,10 +121,6 @@ on:
 
 ## TODO
 - JSON in env, refactor to use something else
-// Define a unique symbol under a namespace
-// globalThis.__myApp = globalThis.__myApp || {};
-// const _logger = Symbol('logger');
-// globalThis.__myApp[_logger] = myLogger;
   - have issue with services where there is nested JSON
 - safeJSON
 - remove barrel index.js files...

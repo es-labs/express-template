@@ -2,7 +2,6 @@
 // pino has fatal and trace levels, which we dot not use.
 // pino-http has some issues with logging response status codes on client disconnects and socket timeouts.
 // So we implement our own simple logger and http logger middleware.
-
 const LOG_LEVELS = { error: 0, warn: 1, info: 2, debug: 3 };
 const currentLevel = LOG_LEVELS[process.env.LOG_LEVEL] ?? LOG_LEVELS.info;
 

@@ -37,6 +37,7 @@ hotfix/payment-crash (check out from release/v1.0)
   → cherry-pick to release/2.0        (backport)
 ```
 
+---
 
 ## Hooks Usage
 

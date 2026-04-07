@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and Discussions
+    url: https://github.com/es-labs/express-template/discussions
+    about: Use GitHub Discussions for general questions, design discussion, and support requests.
+  - name: Contribution Guide
+    url: https://github.com/es-labs/express-template/blob/main/.github/CONTRIBUTING.md
+    about: Read the contribution guide before opening issues or pull requests.
