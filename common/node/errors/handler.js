@@ -42,7 +42,7 @@ if (GRACEFUL_EXIT) {
 // error and signal
 // export default (signalFn, exceptionFn) => {
 //   const defaultExceptionFn = async (e, type) => {
-//     // TBD REPLACE WITH logger
+//     // TODO REPLACE WITH logger
 //     // logger.error(type, e.toString())
 //     // process.emit("SIGTERM") // process.exit(0), process.kill(process.pid, type)
 //   };
@@ -53,7 +53,7 @@ if (GRACEFUL_EXIT) {
 //   });
 
 //   const defaultSignalFn = async type => {
-//     // TBD REPLACE WITH logger
+//     // TODO REPLACE WITH logger
 //     // logger.error(type)
 //   };
 //   if (!signalFn) signalFn = defaultSignalFn;

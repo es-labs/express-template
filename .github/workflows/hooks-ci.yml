@@ -1,15 +1,15 @@
-name: WIP - Hooks CI - Enable by changing branch from [tbd] to [main]
+name: TODO - Hooks CI - Enable by changing branch from [TODO] to [main]
 
 on:
   push:
-    branches: [tbd]
+    branches: [TODO]
     paths:
       - 'common/**'
       - 'apps/**'
       - 'webs/**'
       - 'scripts/**'
   pull_request:
-    branches: [tbd]
+    branches: [TODO]
 
 jobs:
   # ── Commit message format check (mirrors commit-msg hook) ────────────────

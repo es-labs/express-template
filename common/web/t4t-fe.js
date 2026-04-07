@@ -9,7 +9,7 @@ let http = new Fetch();
 function setTableName(name) {
   // set table name
   tableName = name;
-  parentFilter = null; // TBD: find a more sustainable way using prototype or let caller handle this part
+  parentFilter = null; // TODO: find a more sustainable way using prototype or let caller handle this part
 }
 
 // this might change
@@ -157,7 +157,7 @@ async function autocomplete(search, col, record, parentColVal = '') {
     });
     res = data;
   } catch (err) {
-    // TBD console.log('autocomplete', err.message)
+    // TODO console.log('autocomplete', err.message)
   }
   return res;
 }

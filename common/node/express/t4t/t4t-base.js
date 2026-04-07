@@ -252,7 +252,7 @@ const remove = async (req, res) => {
       deletedRows: ids.length,
     });
   } catch (e) {
-    logger.error(e); // TBD
+    logger.error(e); // TODO
     await trx.rollback();
     throw e;
   }
@@ -294,8 +294,8 @@ const update = async (req, res) => {
   }
   if (Object.keys(body).length) {
     // update if there is something to update
-    // TBD delete all related records in other tables?
-    // TBD delete images for failed update?
+    // TODO delete all related records in other tables?
+    // TODO delete images for failed update?
     const trx = await svc.get(table.conn).transaction();
     try {
       count = await svc.get(table.conn)(table.name).update(body).where(where).transacting(trx);

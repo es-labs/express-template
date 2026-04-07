@@ -155,7 +155,7 @@
             <!-- <div v-else>[{{ index }}] {{ table.formData[col] }}</div><br/> -->
           </a-form-item>
         </template>
-        <!-- TBD single autocomplete, multi autocomplete, multi select -->
+        <!-- TODOOOO single autocomplete, multi autocomplete, multi select -->
       </a-form>
       <div class="t4t-drawer">
         <a-button v-if="table?.config?.update" style="margin-left: 25px" @click="formSubmit" class="button-variation-2"
@@ -298,7 +298,7 @@ export default {
             continue;
 
           table.formCols[colName] = col;
-          table.formData[colName] = mode === 'add' ? table.config.cols[colName].default || '' : rv[colName]; // get the data // TBD May need formatting?
+          table.formData[colName] = mode === 'add' ? table.config.cols[colName].default || '' : rv[colName]; // get the data // TODO May need formatting?
           table.formColAttrs[colName] = {
             ...col.ui?.attrs,
             disabled:
@@ -346,7 +346,7 @@ export default {
               formData.append(col, file, file.name);
             }
           } else {
-            // TBD clearing file
+            // TODO clearing file
             // jsonData[col] = ''
           }
         }
@@ -392,11 +392,11 @@ export default {
         if (display && record[_col][display]) {
           record[_col] = record[_col][display];
         } else if (typeof record[_col] !== 'string') {
-          // TBD handle display === both
+          // TODO handle display === both
           record[_col] = JSON.stringify(record[_col]);
         }
       } else if (colObj?.ui?.tag === 'select') {
-        // TBD display label
+        // TODO display label
       }
       return record[_col];
     };
@@ -615,7 +615,7 @@ export default {
         { required: !!table.formColAttrs[val]?.required, message: `${table.formCols[val]?.label} is required` },
       ],
       openImg: col => {
-        // TBD handle multiple files
+        // TODO handle multiple files
         const file = table.formData[col];
         const path = table.config.cols[col]?.ui?.url;
         // console.log(path, file)

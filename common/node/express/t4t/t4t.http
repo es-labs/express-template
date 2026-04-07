@@ -160,7 +160,7 @@ Content-Type: text/csv
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 
-### Create a record - multi-key - TBD
+### Create a record - multi-key - TODO
 POST {{url}}/create/student_subject
 Content-Type: application/json
 
@@ -172,11 +172,11 @@ Content-Type: application/json
 }
 
 
-### Get one record - TBD
+### Get one record - TODO
 GET {{url}}/find-one/student_subject?__key=xx|yy
 Content-Type: application/json
 
-### Delete 2 records - multi-key - TBD
+### Delete 2 records - multi-key - TODO
 POST {{url}}/remove/student_subject
 Content-Type: application/json
 

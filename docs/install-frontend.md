@@ -37,7 +37,7 @@ npm run test:e2e
 ### TODO Run with MockServiceWorker
 
 ```bash
-# TBD
+# TODO
 npm run local:mocked # run locally with mock service worker (many other API calls will fail because they are not mocked)
 ```
 ---

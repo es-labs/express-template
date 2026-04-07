@@ -90,7 +90,7 @@ exports.up = async function(knex) {
     // table.index([
     //   { column: "location" },
     //   { column: "time", order: "DESC" },
-    // ]); // TBD indexing
+    // ]); // TODO indexing
   })
   await knex.schema.createTable('award', (table) => { // multi-tags (no repeat), test multi-select & multi-select autocomplete
     table.string('code').primary()

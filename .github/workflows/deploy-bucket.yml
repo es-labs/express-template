@@ -71,7 +71,7 @@ jobs:
           ref: ${{ github.event.inputs.tag }}
       - name: Install & Build
         run: npm i && cd webs/${{ github.event.inputs.app }} && npm run build --mode ${{ github.event.inputs.env }}
-        # run: npm run build # will create a dist folder (tbd build environment??)
+        # run: npm run build # will create a dist folder (TODO build environment??)
       - name: upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -80,7 +80,7 @@ jobs:
   deploy-oss: # aliyun OSS
     needs: run-build
     if: github.event.inputs.provider == 'oss'
-    name: Deploying To Aliyun OSS - Node Version TBD
+    name: Deploying To Aliyun OSS - Node Version TODO
     runs-on: ubuntu-latest
     steps:
       - name: download artifact
@@ -156,6 +156,24 @@ jobs:
           rm -r dist
           git checkout -f ${GITHUB_REF##*/}
           git branch -D gh-pages
+  ghsp2-tocheck:
+    runs-on: ubuntu-latest 
+    permissions: 
+      contents: read
+      packages: write 
+    steps:
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to GitHub Packages
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '24.x'
+          registry-url: 'https://npm.pkg.github.com'
+          # Defaults to the user or organization that owns the workflow file
+          scope: '@octocat'
+      - run: npm ci
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # # https://cli.vuejs.org/guide/deployment.html#github-pages
 

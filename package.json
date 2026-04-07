@@ -1,6 +1,6 @@
 {
   "name": "express-template",
-  "description": "express template",
+  "description": "Monorepo template for Express backends, Vue frontends, shared JS modules, schemas, and deployment tooling.",
   "version": "0.0.8",
   "private": true,
   "type": "module",

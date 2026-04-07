@@ -32,7 +32,7 @@ env:
 jobs:
   update_function:
     #vif: vars.BUCKET_TYPE == 'oss'
-    # name: Deploying To Aliyun OSS - Node Version TBD
+    # name: Deploying To Aliyun OSS - Node Version TODO
     runs-on: ubuntu-latest
     name: Restart FC
     steps:

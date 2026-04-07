@@ -1,5 +1,5 @@
 import { useMainStore } from '../store';
-// TBD import { http } from '@common/vue/plugins/fetch'
+// TODO import { http } from '@common/vue/plugins/fetch'
 const { VITE_API_URL } = import.meta.env;
 
 // const permissions = {

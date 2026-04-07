@@ -1,5 +1,5 @@
 import { useMainStore, useAppStore } from '../store.js';
-// TBD import { ws } from '@common/vue/plugins/ws.js'
+// TODO import { ws } from '@common/vue/plugins/ws.js'
 const { VITE_WS_URL } = import.meta.env;
 
 const wsDefaultMsgHandler = e => {

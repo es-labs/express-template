@@ -1,5 +1,5 @@
 import '@common/node/config'; // setup env vars
-// TBD testing websockets using native node testing
+// TODO testing websockets using native node testing
 import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import httpMocks from 'node-mocks-http';

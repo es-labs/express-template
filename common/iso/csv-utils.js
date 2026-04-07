@@ -19,8 +19,8 @@ const CHAR_LF = '\n';
 /**
  * RFC 4180-compliant CSV parser (handles quoted fields with embedded commas/newlines)
  * - 1. escaped correctly
- * - 2. same number of columns in each row (TBD?)
- * - 3. trims white space around fields (TBD?)
+ * - 2. same number of columns in each row (TODO?)
+ * - 3. trims white space around fields (TODO?)
  * @param {string} str - CSV string to parse
  * @returns {string[][]} - array of rows, each row is an array of fields
  * @throws {Error} - if CSV is invalid (e.g. unclosed quotes)

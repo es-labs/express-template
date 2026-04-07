@@ -118,7 +118,7 @@ cols:
       strict: true # cannot enter own values, must be selected
       key: code
       text: name # ,icc,updated
-      display: text # TBD key or text or both
+      display: text # TODO key or text or both
     ui:
       tag: autocomplete
       # exact match needed?
@@ -137,10 +137,10 @@ cols:
       limit: 8
       key: code
       text: name
-      display: key # TBD key or text or both
+      display: key # TODO key or text or both
     ui:
       tag: autocomplete
-  # TBD...
+  # TODO...
   # awards:
   #   label: Awards # key text...
   #   type: string # change to auto complete
@@ -157,7 +157,7 @@ cols:
   #     strict: true # cannot enter own values, must be selected
   #     key: code
   #     text: name
-  #     display: text # TBD key or text or both
+  #     display: text # TODO key or text or both
   #   ui:
   #     tag: select
   #     attrs:
@@ -170,7 +170,7 @@ cols:
     edit: true
     default: M
     ui:
-      display: label # unused - tbd get label from attrs.options
+      display: label # unused - TODO get label from attrs.options
       tag: select
       attrs:
         multiple: false
@@ -186,10 +186,10 @@ cols:
     type: link # link should not be updated or edited directly in this table
     filter: false
     sort: false
-    # TBD... display static text? count? elipsis?
+    # TODO... display static text? count? elipsis?
     link:
       display: static # count, elipsis
-      text: View Subjects # TBD, show is comma list? EL1,EM,AM,PHY,CHEM
+      text: View Subjects # TODO, show is comma list? EL1,EM,AM,PHY,CHEM
       keys: id # comma seperated
       ctable: student_subject # comma seperated
       ckeys: studentId # comma seperated

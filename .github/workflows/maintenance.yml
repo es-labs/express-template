@@ -1,4 +1,4 @@
-name: Maintenance
+name: Maintenance - Remove Artifacts
 
 on:
   # schedule:

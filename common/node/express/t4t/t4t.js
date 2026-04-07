@@ -25,7 +25,7 @@ const uploadMemory = {
 
 const storageUpload = () => {
   return multer({
-    // TBD handle errors of missing properties
+    // TODO handle errors of missing properties
     storage: multer.diskStorage({
       destination: (req, file, cb) => {
         const key = file.fieldname;
@@ -35,7 +35,7 @@ const storageUpload = () => {
       filename: (req, file, cb) => cb(null, file.originalname), // file.fieldname, file.originalname
     }),
     fileFilter: (req, file, cb) => {
-      // TBD check on individual file size
+      // TODO check on individual file size
       const key = file.fieldname;
       const { options } = req.table.fileConfigUi[key].multer;
       if (!req.fileCount) req.fileCount = {};
@@ -45,7 +45,7 @@ const storageUpload = () => {
         return cb(new Error(`Maximum Number Of Files Exceeded`), false);
       }
       req.fileCount[key]++; // Increment the file count for each processed file
-      // TBD validate binary file type... using npm file-type?
+      // TODO validate binary file type... using npm file-type?
       // https://dev.to/ayanabilothman/file-type-validation-in-multer-is-not-safe-3h8l
       // if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
       //   return cb(new Error('Invalid file type!'), false)
@@ -54,7 +54,7 @@ const storageUpload = () => {
     },
     limits: {
       // files: 3,
-      fileSize: Number(TABLE_CONFIGS_UPLOAD_SIZE) || 8000000, // TBD
+      fileSize: Number(TABLE_CONFIGS_UPLOAD_SIZE) || 8000000, // TODO
     },
   });
 };
@@ -141,7 +141,7 @@ const routes = options => {
     .post('/autocomplete/:table', authUser, generateTable, async (req, res) => {
       const { table } = req;
       const { key, text, search, parentTableColName, parentTableColVal, limit = 20 } = req.body;
-      // TBD use key to parentTable Col
+      // TODO use key to parentTable Col
 
       const query = svc
         .get(table.conn)(table.name)
@@ -179,7 +179,7 @@ const routes = options => {
       '/update/:table{/:id}',
       authUser,
       generateTable,
-      storageUpload().any(), // TBD what about multiple files? also need to find the column involved...
+      storageUpload().any(), // TODO what about multiple files? also need to find the column involved...
       processJson,
       async (req, res) => {
         return custom[req?.table?.name]?.update ? custom[req.table.name].update(req, res) : base.update(req, res);

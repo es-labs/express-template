@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { loadEnvFile } from 'node:process';
 
-// 1. TBD create namespace for glbalThis
+// 1. TODO create namespace for glbalThis
 // 2. Load optional structured, non-sensitive config into globalThis.__config.
 // 3. Keep secrets and scalar values in process.env.
 

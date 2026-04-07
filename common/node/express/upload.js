@@ -26,7 +26,7 @@ const memoryUpload = options =>
     ),
   );
 
-// TBD
+// TODO
 
 const storageUpload = ({ folder, options }) => {
   // validate binary file type... using npm file-type?

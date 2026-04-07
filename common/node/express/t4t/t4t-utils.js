@@ -18,7 +18,7 @@ export const isInvalidInput = (col, val, key = null) => {
   const inputTypeNumbers = ['number', 'range', 'date', 'datetime-local', 'month', 'time', 'week'];
   const inputTypeText = ['text', 'tel', 'email', 'password', 'url', 'search'];
   const { ui, required, multiKey } = col;
-  // TBD check for required also...
+  // TODO check for required also...
   if (required || multiKey) {
     if (val !== 0 && !val) return { status: 'error', message: `required input` };
   }
@@ -38,7 +38,7 @@ export const isInvalidInput = (col, val, key = null) => {
       }
     }
   } else if (ui?.tag === 'select') {
-    // TBD if options present, validate with it
+    // TODO if options present, validate with it
   }
   return false;
 };
@@ -136,6 +136,6 @@ export const setAuditData = (req, op, keys = '', body = '') => ({
   where_cols: keys ? req?.table?.pk || req?.table?.multiKey?.join('|') || '' : '',
   where_vals: keys,
   cols_changed: typeof body === 'object' ? JSON.stringify(Object.keys(body), null, 2) : '',
-  prev_values: '', // TBD
+  prev_values: '', // TODO
   new_values: typeof body === 'object' ? JSON.stringify(Object.values(body), null, 2) : body.toString(),
 });

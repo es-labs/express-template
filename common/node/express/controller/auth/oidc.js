@@ -9,7 +9,7 @@ const TOKEN_URL = OIDC_OPTIONS ? `${OIDC_OPTIONS.URL}/token` : '';
 
 // payload.append('client_secret', OIDC_OPTIONS.CLIENT_SECRET) // if keycloak client access type is confidential
 
-// TBD - verify endpoint for keycloak
+// TODO - verify endpoint for keycloak
 // https://stackoverflow.com/questions/48274251/keycloak-access-token-validation-end-point
 // curl --location --request POST 'https://HOST_KEYCLOAK/realms/master/protocol/openid-connect/token/introspect' \
 // --header 'Content-Type: application/x-www-form-urlencoded' \

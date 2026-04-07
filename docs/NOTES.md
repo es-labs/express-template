@@ -1,11 +1,3 @@
-## folder structure
-
-- apps: backend applications
-- common: common javascript used by the apps folder (TBD also for other folders), also common schemas
-  - packages can be uploaded to npm
-- docs: documentation
-- scripts: deploy, documentation scripts
-- webs: frontend applications using VueJS
 
 
 ## Design
@@ -23,9 +15,9 @@
 - automation
   - non-critical
     - commit messages - czg
-    - changelog - TBD
-    - release - TBD (semver release)
-    - code review AI - TBD
+    - changelog - TODO
+    - release - TODO (semver release)
+    - code review AI - TODO
   - api documentation
   - unit and integration test generation
 - global logger
@@ -39,42 +31,16 @@
 - testing
   - use native node test runner
   - playwright for e2e testing
-- DB audit logging strategy (triggers + soft delete) -TBD
+- DB audit logging strategy (triggers + soft delete) -TODO
 - jsdoc for typing and autocomplete on IDE ?
-
-
-### Rebase Or Merge
-
-Scenario 1: Large Team (50+ developers)
-- Strategy: Squash merge to main
-- Reason: Keeps history clean, easier to track PRs
-- GitHub setting: Default to squash merge
-- Branch protection: Require PR reviews before merge
-
-**recommended** Scenario 2: Monorepo with Multiple Teams 
-- Strategy: Merge commits with meaningful messages
-- Reason: Need to track which team merged what
-- Command: git merge --no-ff
-- Message: "Merge PR #123: Feature X (Team A)"
-
-Scenario 3: Microservices
-- Strategy: Squash merge per service
-- Reason: Each service is independent, one commit = one deploy
-- Per-service branch protection with squash merge
-
-Scenario 4: Open Source Project
-- Strategy: Rebase + merge
-- Reason: Linear history, clean for contributors
-- Setting: Allow rebase merge in GitHub
-- Enforce: Require commits to be signed
-
 
 
 ## precommits
 
 - use biome for formatting and linting
-- git guardian (use native Github for now)
 
+## Secrets Security
+- git guardian (use native Github for now)
 
 
 ## TODOS
@@ -86,8 +52,7 @@ unsafe - useTemplate, useNodejsImportProtocol, useOptionalChain,
 
 ```
 npx biome <format/lint/check> common apps webs scripts
-npx biome lint common apps webs scripts
- --only=useTemplate --write --unsafe
+npx biome lint common apps webs scripts --only=useTemplate --write --unsafe
 ```
 
 ###
@@ -111,7 +76,7 @@ czg https://cz-git.qbb.sh/cli/
 
 ### User accounts
 
-TBD
+TODO
 
 ### Audit logging
 - SQL Trigger + soft delete
@@ -120,7 +85,7 @@ TBD
 
 on:
   push:
-    branches: [tbd]
+    branches: [TODO]
     paths:
       - 'services/auth-service/**'
       - 'shared/**'
@@ -130,7 +95,7 @@ on:
 - actions/checkout@v6
 - actions/setup-node@v6
 
-## WIP
+## TODO
 - JSON in env, refactor to use something else
 // Define a unique symbol under a namespace
 // globalThis.__myApp = globalThis.__myApp || {};
@@ -141,7 +106,7 @@ on:
 - remove barrel index.js files...
 
 - auto generate project folders?
-- change TBD, WIP etc. to TODO
+- change TODO, TODO etc. to TODO
 
 TO view large bundle sizes
 ```
@@ -161,7 +126,18 @@ plugins: [
 - workflow might need to be tested when structure changes
 - note the exports properties for ES Modules projects
 - avoid using creating barrel index.js files except for single class
-- TBD create globalThis namespace called ?
+- TODO create globalThis namespace called ?
 - global values
   - __logger - imported from common/node/logger, to avoid console.log use in node runtime apps
   - __config - imported from common/node/config 
+
+## Rules
+- See [.editorconfig] on code formatting baseline
+- Use `TODO` to comment code in progress. do not
+- Use git merge with squash
+- For node runtime applications
+  - import `common/node/logger`
+    - use the global logger `logger`, do not use `console.*` for backend
+  - import `common/node/config`
+    - `.config.json` values will be available globally via `config`
+    - `.env` values will be loaded to process.env

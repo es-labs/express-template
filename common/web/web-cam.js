@@ -67,7 +67,7 @@ class WebCam extends HTMLElement {
     // captures: []
 
     this.slotNode = {
-      // TBD change ['button-snap'] to 'button-snap'
+      // TODO change ['button-snap'] to 'button-snap'
       'button-snap': this.shadowRoot.querySelector('#snap'),
       'button-unsnap': this.shadowRoot.querySelector('#unsnap'),
     };
