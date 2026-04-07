@@ -29,10 +29,10 @@
   "scripts": {
     "git:hash": "git rev-parse --verify --short HEAD",
     "git:branch": "git rev-parse --abbrev-ref HEAD",
-    "lint": "biome lint common/apps common/iso common/node common/webs common/scripts",
+    "lint": "biome lint apps webs scripts common/iso common/node common/schemas common/web common/vue",
     "lint:fix": "biome lint --only=useTemplate --write --unsafe common/node",
-    "format": "biome format --write common/apps common/iso common/node common/webs common/scripts",
-    "check": "biome check --write common/apps common/iso common/node common/webs common/scripts",
+    "format": "biome format --write apps webs scripts common/iso common/node common/schemas common/web common/vue",
+    "check": "biome check --write apps webs scripts common/iso common/node common/schemas common/web common/vue",
     "ci": "biome ci .",
     "docs:generate": "node scripts/generate-openapi.js",
     "docs:validate-swagger": "swagger-cli validate docs/openapi/openapi.merged.yaml",

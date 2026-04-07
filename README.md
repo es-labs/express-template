@@ -33,17 +33,17 @@ git pull upstream <branch or tag> --no-rebase
 
 ## Documentation On Common Codes and Schemas
 
-[Read Here](docs/install-common)
+[Read Here](docs/install-common.md)
 
 
 ## UNDER REFACTORING ##
 
 Need to tidy up documentation.
 
-- [docs/NOTES.md]() - notes
-- [docs/HOOKS.md]() - git hooks
-- [docs/BRANCHING.md]() - branch naming and merge strategy, changelog and release using semver
-- [.github/CONTRIBUTING.md]() - to setup the Git Hooks
+- [docs/NOTES.md](docs/NOTES.md) - notes
+- [docs/HOOKS.md](docs/HOOKS.md) - git hooks
+- [docs/BRANCHING.md](docs/BRANCHING.md) - branch naming and merge strategy, changelog and release using semver
+- [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) - to setup the Git Hooks
 
 ---
 
@@ -54,7 +54,7 @@ Need to tidy up documentation.
 
 ### Deploy To Container Registry
 
-[.github/workflows/deploy-cr.yml](deploy-cr.yml)
+[.github/workflows/deploy-cr.yml](.github/workflows/deploy-cr.yml)
 
 - selectable inputs
   - git repo branch / tag
@@ -74,7 +74,9 @@ Need to tidy up documentation.
 Publish a package to NPM
 
 - Reference Workflow
-  - [.github/workflows/deploy-npm.yml](deploy-npm.yml)
+
+[.github/workflows/deploy-npm.yml](.github/workflows/deploy-npm.yml)
+
 - Github Secrets
   - NPM_AUTH_TOKEN
 - Selectable Inputs
@@ -85,7 +87,8 @@ Publish a package to NPM
 
 Build VueJS project and deploy to Object Store
 
-[.github/workflows/deploy-bucket.yml]()
+[.github/workflows/deploy-bucket.yml](.github/workflows/deploy-bucket.yml)
+
 - Selectable Inputs
   - Cloud Provider (oss, s3)
   - git repo branch / tag

@@ -34,7 +34,7 @@ Login using one of the following:
 npx playwright install chromium
 npx playwright test --browser=chromium
 
-cd apps
+cd webs/vue-sample
 npm run test:e2e
 ```
 
