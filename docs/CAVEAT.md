@@ -1,8 +1,0 @@
-- to fix dependency design issue between common/* projects
-- workflow might need to be tested when structure changes
-- note the exports properties for ES Modules projects
-- avoid using creating barrel index.js files except for single class
-- TBD create globalThis namespace called ?
-- global values
-  - __logger - imported from common/node/logger, to avoid console.log use in node runtime apps
-  - __config - imported from common/node/config 

@@ -1,3 +1,8 @@
+### Merge Strategy
+
+USE git merge! + squash commit As explained by AI
+git rebase best for large open source projects
+
 ### branch tags used
 
 - feat/scope/<...>

@@ -1,26 +1,20 @@
 ## Install & Run & Test Sample Backend
 
 ```bash
-# clone repo
-git clone https://github.com/es-labs/express-template.git
-cd express-template
 npm i
 cd apps/app-sample
 npm run start
-# OR to run eslint checks - linux
-npm run lint
 ```
 
 Local development sample sqlite DB `apps/app-sample/dev.sqlite3` already created and populated
 
-If need to **migrate** and **seed**, refer to `dbdeploy` package in `tools` workspace of [https://github.com/es-labs/express-template]()
+If need to **migrate** and **seed**, refer to `scripts/dbdeploy` workspace
 
 **Visit the following URLs**
 
 - http://127.0.0.1:3000/api/healthcheck - app is running normally
 - http://127.0.0.1:3000 - Website served by Express with functional samples and demos
-- http://127.0.0.1:3000/docs - OpenAPI documentation
-- http://127.0.0.1:3000/native/index.html -
+- http://127.0.0.1:3000/native/index.html - unbundled VueJS website sample
 
 **NOTES**
 
@@ -51,8 +45,10 @@ docker run -p 3000:3000 express-template
 
 ---
 
-## Project Structure & Features
-
-See [apps/README.md]()
-
 Features include SAML. OIDC, OAuth, Fido2 login, Push Notifications
+
+## Creating A New Node JS Backend Or Service
+
+- Make a copy of the `app-sample` folder in the `apps` folder and rename it (kebab using case)
+- edit the .env and .config.json files as needed (for production, env should be injected from secrets)
+- TODO MCP and WS routes

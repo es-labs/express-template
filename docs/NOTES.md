@@ -81,12 +81,8 @@ Scenario 4: Open Source Project
 
 ### linting auto fix
 
-useArrowFunction - safe
-useConst - safe
-useOptionalChain
-useTemplate
-useNodejsImportProtocol
-noConsole (set to warn first, convert using logger, then set back to error)
+safe - useArrowFunction, useConst
+unsafe - useTemplate, useNodejsImportProtocol, useOptionalChain,  
 
 ```
 npx biome <format/lint/check> common apps webs scripts
@@ -144,3 +140,28 @@ on:
 - safeJSON
 - remove barrel index.js files...
 
+- auto generate project folders?
+- change TBD, WIP etc. to TODO
+
+TO view large bundle sizes
+```
+import { visualizer } from 'rollup-plugin-visualizer';
+
+plugins: [
+  vue(),
+  visualizer({
+    open: true,
+    filename: 'dist/stats.html'
+  })
+]
+```
+
+## CAVEATS!
+- to fix dependency design issue between common/* projects
+- workflow might need to be tested when structure changes
+- note the exports properties for ES Modules projects
+- avoid using creating barrel index.js files except for single class
+- TBD create globalThis namespace called ?
+- global values
+  - __logger - imported from common/node/logger, to avoid console.log use in node runtime apps
+  - __config - imported from common/node/config 
