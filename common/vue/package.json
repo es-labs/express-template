@@ -8,9 +8,9 @@
   "main": "index.js",
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
-    "@common/iso": "../iso",
-    "@common/web": "../web",
-    "@sentry/vue": "^10.46.0",
+    "@common/iso": "file:../iso",
+    "@common/web": "file:../web",
+    "@sentry/vue": "^10.47.0",
     "ant-design-vue": "^4.2.6",
     "pinia": "^3.0.4",
     "vue": "^3.3.8",

@@ -69,6 +69,7 @@ git push --no-verify
 ```
 
 ## Reporting Issues
+* Do not use public GitHub issues for security vulnerabilities. Follow the private reporting instructions in [SECURITY.md](./SECURITY.md).
 * The issue list of this repo is **exclusively** for Bug Reports and Feature Requests.
 * Bug reproductions should be as **concise** as possible.
 * **Search** for your issue, it _may_ have been answered.

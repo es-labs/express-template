@@ -34,8 +34,8 @@
     "test:e2e": "start-server-and-test start http://localhost:8080 test"
   },
   "dependencies": {
-    "@common/node": "file:../../common/node",
     "@common/iso": "file:../../common/iso",
+    "@common/node": "file:../../common/node",
     "@json2csv/plainjs": "^7.0.6",
     "csv-parse": "^6.2.1",
     "fido2-lib": "^3.5.9",

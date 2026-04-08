@@ -1,4 +1,6 @@
-> Add your readme content here, edit or remove the ones below
+## Description
+
+Project Related Documentation Here
 
 ---
 
@@ -41,52 +43,7 @@ Refer to following files for SPA sample (uses fido2-lib in backend)
 
 ## Project Structure
 
-```
-+- .github/ : github related CICD and automations
-+- apps : custom apps are here in this folder
-|  +- app-auth/ : authentication implementations... Oauth, SAML, OIDC, and own rollout
-|  +- app-sample/ : sample custom application (prefixed with app-)
-|  |  +- controllers/
-|  |  +- deploy/ : deployment folder (see README.md within the deploy folder)
-|  |  +- models/
-|  |  +- openapi/ : OpenAPI yaml files
-|  |  +- public/ : for serving static files - website
-|  |  |  +- demo-express/
-|  |  |  +- vue-nobundler/
-|  |  +- routes/ : application REST API & websocket setup
-|  |  +- tables/ : configurable table & crud
-|  |  +- tests/ : Jest tests for custom application
-|  |  +- uploads/ : for file uploads
-|  |  +- dev.sqlite3 : sqlite DB with schema and data
-|  |  +- test.http : rest API commands testing VSCode plugin (Rest Client - humao.rest-client)
-|  |  +- test.py: run python from express
-|  +- app-t4t/ : universal database interface application
-|  +- .env.dev : on dev server
-|  +- .env.development : on local dev machine
-|  +- .env.sample
-|  +- .gitignore
-|  +- apploader.js
-|  +- package.json : for app libraries
-|  +- README.md
-+- git-hooks/ : pre-commit and other hooks here
-+- middlewares/ : common middlewares
-+- router/ : common route / controller & services
-+- tests/ : Jest tests for expressjs
-+- .dockerignore
-+- .editorconfig
-+- .gitignore
-+- app.js : the express app boilerplate
-+- CHANGELOG.md
-+- deploy.sh: TODO deployment script
-+- Dockerfile
-+- ecosystem.config.js: for pm2
-+- env.js
-+- eslint.config.js
-+- index.js
-+- LICENCE
-+- package.json
-+- README.md
-```
+TODO
 
 ## Relational Database Schema
 

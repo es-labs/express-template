@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Report a Security Vulnerability
+    url: https://github.com/es-labs/express-template/security/policy
+    about: Review the security policy and use a private reporting channel instead of opening a public issue.
   - name: Questions and Discussions
     url: https://github.com/es-labs/express-template/discussions
     about: Use GitHub Discussions for general questions, design discussion, and support requests.

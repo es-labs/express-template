@@ -73,10 +73,6 @@ npx biome lint common apps webs scripts --only=useTemplate --write --unsafe
 - common/web -frontend plainJS (allow console, remove in prod)
 - common/scripts
 
-### comitting
-
-- [czg](https://cz-git.qbb.sh/cli/)
--[conventional commit]()
 
 ### Github Related To Read
 
@@ -96,16 +92,19 @@ globalThis.__myApp[_logger] = myLogger;
 
 Currently we choose to do so without namespace.
 
-## DB
+### TODO
 
-### User accounts
+- JSON in env, refactor to use something else
+  - have issue with services where there is nested JSON
+- safeJSON
+- remove barrel index.js files...
+- auto generate project folders?
 
-TODO
-
-### Audit logging
-- SQL Trigger + soft delete
-  - mutable / immutable tables
-- or something else?
+- User accounts ? what is this? TODO
+- Audit logging
+  - SQL Trigger + soft delete
+    - mutable / immutable tables
+  - or something else?
 
 on:
   push:
@@ -119,14 +118,6 @@ on:
 - actions/checkout@v6
 - actions/setup-node@v6
 
-## TODO
-- JSON in env, refactor to use something else
-  - have issue with services where there is nested JSON
-- safeJSON
-- remove barrel index.js files...
-
-- auto generate project folders?
-- change TODO, TODO etc. to TODO
 
 TO view large bundle sizes
 ```
@@ -141,23 +132,9 @@ plugins: [
 ]
 ```
 
-## CAVEATS!
+### CAVEATS!
 - to fix dependency design issue between common/* projects
 - workflow might need to be tested when structure changes
-- note the exports properties for ES Modules projects
-- avoid using creating barrel index.js files except for single class
-- TODO create globalThis namespace called ?
-- global values
-  - __logger - imported from common/node/logger, to avoid console.log use in node runtime apps
-  - __config - imported from common/node/config 
-
-## Rules
-- See [.editorconfig] on code formatting baseline
-- Use `TODO` to comment code in progress. do not
-- Use git merge with squash
-- For node runtime applications
-  - import `common/node/logger`
-    - use the global logger `logger`, do not use `console.*` for backend
-  - import `common/node/config`
-    - `.config.json` values will be available globally via `config`
-    - `.env` values will be loaded to process.env
+- use named exports, unless single class or function then use export default
+- do not create barrel index.js files
+- do not use named exports and export default in same file

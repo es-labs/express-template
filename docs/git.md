@@ -1,40 +1,60 @@
 ## Workflow
 
-### Merge Strategy
+TODO - MOVE THIS TO CONTRIBUTING.md
 
-- USE git merge! + squash commit As explained by AI
-- git rebase best for large open source projects
+### Base Rules
+- TODO - See branch summary on code flows
+  - create a release branch from main branch if there is none
+  - checkout new branch from a release branch for work
+- See [.editorconfig] on code formatting baseline
+- Use `TODO` for work in progress as well as planned work
+- Use git merge with squash commit
+  - TBD...
+- For node runtime applications
+  - import `common/node/logger`
+    - use the global logger `logger`, do not use `console.*`
+  - import `common/node/config`
+    - `.config.json` values will be available globally via `config`
+    - `.env` values will be loaded to process.env
+- Use `biome` for formatting and linting
+- commiting
+  - based on [conventional commit](https://www.conventionalcommits.org/)
+  - use only feat, fix, chore
+  - chore for (build, chore, ci, docs, style, refactor, perf, test, revert)
+  - format is type(scope): <...details>
+  - prepend ! before : for breaking changes
+  - Tool used is [czg](https://cz-git.qbb.sh/cli/) with AI optional
 
 ### branch tags used
 
 - <feat/fix/chore>/scope/<...>
-- release/<current release version>, release/<next release version>
+- rel/<current release version>, rel/<next release version>
 - hotfix/<current release version>/<...>
 - tag/<patch version>
 - main
 
-### Branch Summary & Flow
+### Branch & Tag Summary & Flow
 
 | Branch | Branch from | Merge to | Notes |
 |---|---|---|---|
-| `release/1.0` | `main` | `main` when production ready | Active dev branch |
-| `feat/fix/chore` | `release/1.0` | `release/1.0` via PR | Day-to-day work |
-| `hotfix/scope/name` | `main` | `main` + `release/1.0` + `release/2.0` | Emergency only |
-| `tag: v1.0.0` | `release/1.0` after merge to main | — | Full release tag |
-| `tag: v1.0.1` | `release/1.0` after hotfix merges in | — | Patch tag, then release/1.0 → main |
-| `release/1.1` | `main` after v1.0.0 tag | `main` when ready | Cut from stable tag |
+| `rel/1.0` | `main` | `main` when production ready | Active dev branch |
+| `feat/fix/chore` | `rel/1.0` | `rel/1.0` via PR | Day-to-day work |
+| `hotfix/scope/name` | `main` | `main` + `rel/1.0` + `rel/2.0` | Emergency only |
+| `tag: v1.0.0` | `rel/1.0` after merge to main | — | Full release tag |
+| `tag: v1.0.1` | `rel/1.0` after hotfix merges in | — | Patch tag, then rel/1.0 → main |
+| `rel/1.1` | `main` after `v1.0.0` tag | `main` when ready | Cut from stable tag |
 
-The consistent rule is: **tags always come from `release/*`**, never directly from `main`. Main is the destination, not the source of truth for what shipped.
+The consistent rule is: **tags always come from `rel/*`**, never directly from `main`. Main is the destination, not the source of truth for what shipped.
 
 ### Hotfix & Backport Flow
 
 ```
-hotfix/payment-crash (check out from release/v1.0)
-  → merge to main                     (keeps main stable)
-  → merge to release/1.0
-      → tag v1.0.1 here               (patch tag on release/1.0)
-      → DO NOT DO THIS! DANGEROUS! merge release/1.0 to main     (main now has the patch)
-  → cherry-pick to release/2.0        (backport)
+hotfix/payment-crash (check out from rel/v1.0)
+  → merge to main (keeps main stable)
+  → merge to rel/1.0
+      → tag v1.0.1 here (patch tag on rel/1.0)
+      → DO NOT DO THIS! DANGEROUS! merge rel/1.0 to main (main now has the patch)
+  → cherry-pick to rel/2.0 (backport)
 ```
 
 ---
