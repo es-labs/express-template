@@ -26,7 +26,7 @@ jobs:
   commit-lint:
     name: Commit Message Format
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -35,12 +35,24 @@ jobs:
 
       - name: Check commit messages
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          PUSH_HEAD_SHA: ${{ github.sha }}
         run: |
           PATTERN='^(feat|fix|chore)(\([^)]+\))?!?: .{1,}$'
           FAILED=0
-          git log --format="%s" "$BASE_SHA".."$HEAD_SHA" > /tmp/commit_msgs.txt
+
+          if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
+            RANGE="$PR_BASE_SHA..$PR_HEAD_SHA"
+            git log --format="%s" "$RANGE" > /tmp/commit_msgs.txt
+          elif [[ "$PUSH_BEFORE_SHA" == '0000000000000000000000000000000000000000' ]]; then
+            git log --format="%s" -n 1 "$PUSH_HEAD_SHA" > /tmp/commit_msgs.txt
+          else
+            RANGE="$PUSH_BEFORE_SHA..$PUSH_HEAD_SHA"
+            git log --format="%s" "$RANGE" > /tmp/commit_msgs.txt
+          fi
+
           while IFS= read -r msg; do
             case "$msg" in
               Merge\ *|fixup!\ *|squash!\ *) continue ;;
