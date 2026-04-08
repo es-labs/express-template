@@ -62,8 +62,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, toRaw, onMounted, computed } from 'vue';
 import { SettingOutlined } from '@ant-design/icons-vue';
+import { computed, onMounted, reactive, ref, toRaw } from 'vue';
 
 onMounted(async () => {});
 const formRef = ref();

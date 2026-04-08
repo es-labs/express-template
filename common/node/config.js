@@ -1,11 +1,10 @@
-import path from 'node:path';
 import fs from 'node:fs';
+import path from 'node:path';
 import { loadEnvFile } from 'node:process';
 
 // 1. TODO create namespace for glbalThis
 // 2. Load optional structured, non-sensitive config into globalThis.__config.
 // 3. Keep secrets and scalar values in process.env.
-
 
 // Merge json configs into process.env - Object.assign(process.env, config);
 // Caveats: JSON cannot be nested, only flat key-value pairs, Coerces all values to string
@@ -34,11 +33,8 @@ const loadJsonConfigFile = filePath => {
 // Load and Parse the JSON, let error throw
 // To improve with deep freeze and validation if needed
 const parsed = JSON.parse(fs.readFileSync(`${envFilePath}.json`, 'utf8').trim());
-const __config = Object.freeze(
-  (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {}
-);
+const __config = Object.freeze(parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {});
 
 globalThis.__config = __config;
+
 export { __config };
-
-

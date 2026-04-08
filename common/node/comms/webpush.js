@@ -24,7 +24,7 @@ const send = async (subscription, payload, options = { TTL: 60 }) => {
 
 const getPubKey = () => vapidKeys.publicKey;
 
-export { send, getPubKey };
+export { getPubKey, send };
 
 // // sw.js
 // self.addEventListener('push', (event) => {

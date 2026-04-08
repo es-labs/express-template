@@ -1,4 +1,5 @@
 import { useMainStore } from '../store';
+
 // TODO import { http } from '@common/vue/plugins/fetch'
 const { VITE_API_URL } = import.meta.env;
 

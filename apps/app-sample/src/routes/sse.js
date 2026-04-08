@@ -1,4 +1,5 @@
 import express from 'express';
+
 let clients = [];
 
 function sendEventsToAll(data) {

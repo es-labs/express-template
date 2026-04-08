@@ -1,5 +1,5 @@
-import preRoute from '@common/node/express/preRoute';
 import postRoute from '@common/node/express/postRoute';
+import preRoute from '@common/node/express/preRoute';
 import apiRoutes from './routes/index.js';
 
 const { app, express, server } = preRoute();

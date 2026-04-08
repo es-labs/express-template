@@ -47,4 +47,4 @@ const get = service => services[service]?.get() || null;
 
 const list = () => servicesConfig;
 
-export { start, stop, get, list };
+export { get, list, start, stop };

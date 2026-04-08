@@ -1,10 +1,12 @@
 // own authentication
-import jwt from 'jsonwebtoken';
+
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 // import * as otplib from 'otplib';
 import { verify } from 'otplib';
 
-import { getSecret, createToken, setTokensToHeader, authFns } from '../../../auth/index.js';
+import { authFns, createToken, getSecret, setTokensToHeader } from '../../../auth/index.js';
+
 const {
   COOKIE_HTTPONLY,
   AUTH_USER_FIELD_LOGIN,
@@ -96,4 +98,4 @@ const otp = async (req, res) => {
   return res.status(401).json({ message: 'Error token revoked' });
 };
 
-export { logout, refresh, login, otp };
+export { login, logout, otp, refresh };

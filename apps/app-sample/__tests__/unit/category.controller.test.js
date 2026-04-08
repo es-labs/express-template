@@ -1,10 +1,10 @@
 import '@common/node/config'; // setup env vars
-// TODO testing websockets using native node testing
-import { describe, it, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert';
-import httpMocks from 'node-mocks-http';
+// TODO testing websockets using native node testing
+import { after, before, beforeEach, describe, it } from 'node:test';
 // import newCategory from '../mock-data/new-category.json';
 import * as Services from '@common/node/services';
+import httpMocks from 'node-mocks-http';
 import CategoryController from '../../src/controllers/category.js';
 
 let services;

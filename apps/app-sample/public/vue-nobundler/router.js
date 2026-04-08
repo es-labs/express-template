@@ -1,6 +1,6 @@
 import { statex } from './store.js';
-import Dashboard from './views/dashboard.js';
 import Admin from './views/admin.js';
+import Dashboard from './views/dashboard.js';
 import SignIn from './views/signin.js';
 
 const { createRouter, createWebHistory } = VueRouter;

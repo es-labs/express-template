@@ -1,9 +1,9 @@
 // TODO not used yet
 import {
-  S3Client,
-  S3ServiceException,
   // This command supersedes the ListObjectsCommand and is the recommended way to list objects.
   paginateListObjectsV2,
+  S3Client,
+  S3ServiceException,
 } from '@aws-sdk/client-s3';
 
 /**

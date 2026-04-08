@@ -1,8 +1,9 @@
 // https://www.npmjs.com/package/ws
 // NOTE: if --forcedExit --detectOpenHandles in JEST test, will cause error
 // TODO: automated testing for websockets
-import WebSocket, { WebSocketServer } from 'ws';
+
 import https from 'node:https';
+import WebSocket, { WebSocketServer } from 'ws';
 
 // NOSONAR
 // function heartbeat() {

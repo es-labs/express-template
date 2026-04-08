@@ -3,12 +3,12 @@ import { describe, it } from 'node:test';
 import {
   dateStrAddDay,
   dateStrAddDayISO,
-  getLocaleDateTimeTzISO,
+  getDayOfWeek,
   getLocaleDateISO,
+  getLocaleDateTimeTzISO,
   getLocaleTimeISO,
   getTzOffsetISO,
   getYmdhmsUtc,
-  getDayOfWeek,
 } from '../datetime.js';
 
 describe.skip('datetime.js', () => {

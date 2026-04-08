@@ -274,4 +274,4 @@ const test = async () => {
 //   } while (nextContinuationToken)
 // }
 // listBucketInventory()
-export { countBucketObjects, listObjects, putObject, getObject, deleteObjects, getSignedUrl, getUploadURL };
+export { countBucketObjects, deleteObjects, getObject, getSignedUrl, getUploadURL, listObjects, putObject };

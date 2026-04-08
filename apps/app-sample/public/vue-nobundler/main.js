@@ -6,10 +6,11 @@ import '/esm/bwc-combobox.js';
 import '/esm/bwc-fileupload.js';
 import '/esm/bwc-table.js';
 import '/esm/bwc-t4t-form.js';
+
 // import { sleep }from '/esm/sleep.js'
 
-import router from './router.js';
 import App from './app.js';
+import router from './router.js';
 
 // set baseurl here - need config
 // set cors settings - need config

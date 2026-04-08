@@ -3,11 +3,11 @@ import { describe, it } from 'node:test';
 
 import {
   arrayToCSVRow,
+  csvToJson,
   jsonToCSVHeader,
   jsonToCSVRow,
   jsonToCsv,
   parseAndValidateCsv,
-  csvToJson,
 } from '../csv-utils.js';
 
 describe.skip('csv-utils.js', () => {

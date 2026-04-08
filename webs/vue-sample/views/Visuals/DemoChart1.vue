@@ -4,7 +4,7 @@
 
 <script setup>
 import Chart from 'chart.js/auto';
-import { reactive, onMounted } from 'vue';
+import { onMounted, reactive } from 'vue';
 
 let chart = null;
 

@@ -37,14 +37,13 @@
 </template>
 
 <script setup>
-// :key="$route.fullPath" // this is causing problems
-import { onMounted, onUnmounted, onBeforeUnmount, ref, reactive, computed } from 'vue';
-import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue';
-import { useMainStore } from '../store.js';
-import { SECURE_ROUTES } from '../setups/routes.js';
-import { onLogin, onLogout } from '../setups/events.js';
-
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
 import idleTimer from '@common/web/idle';
+// :key="$route.fullPath" // this is causing problems
+import { computed, onBeforeUnmount, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onLogin, onLogout } from '../setups/events.js';
+import { SECURE_ROUTES } from '../setups/routes.js';
+import { useMainStore } from '../store.js';
 
 const store = useMainStore();
 // const loading = store.loading

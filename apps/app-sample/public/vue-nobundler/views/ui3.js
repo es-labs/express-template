@@ -11,6 +11,7 @@ const template = /*html*/ `
 `;
 
 import * as t4t from '/esm/t4t-fe.js';
+
 const { onMounted, reactive } = Vue;
 
 export default {

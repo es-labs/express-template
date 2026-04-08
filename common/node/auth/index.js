@@ -208,15 +208,15 @@ const authRefresh = async (req, res) => {
 };
 
 export {
-  setup,
   authFns,
+  authRefresh,
+  authUser,
+  bcrypt,
+  createToken,
   // findUser, updateUser,
   getSecret,
-  createToken,
   setTokensToHeader,
-  authUser,
-  authRefresh,
-  bcrypt,
+  setup,
 };
 
 // do refresh token check from backend ?

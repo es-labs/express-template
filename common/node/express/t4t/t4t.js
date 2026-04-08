@@ -1,10 +1,11 @@
-import express from 'express';
 // const path = require('path')
 import fs from 'node:fs';
+import express from 'express';
 import yaml from 'js-yaml';
 import multer from 'multer';
-import * as svc from '../../services';
 import { memoryUpload } from '../../express/upload';
+import * as svc from '../../services';
+
 const {
   TABLE_CONFIGS_FOLDER_PATH,
   TABLE_CONFIGS_CSV_SIZE,
@@ -14,8 +15,10 @@ const {
   TABLE_USER_ROLE_KEY,
   TABLE_ORG_ID_KEY,
 } = process.env;
-import { noAuthFunc, processJson, roleOperationMatch } from './t4t-utils.js';
+
 import base from './t4t-base.js';
+import { noAuthFunc, processJson, roleOperationMatch } from './t4t-utils.js';
+
 const custom = {};
 // const custom = TABLE_CUSTOM_PATH ? (await import(TABLE_CUSTOM_PATH)).default : { };
 // const custom = TABLE_CUSTOM_PATH ? require(TABLE_CUSTOM_PATH) : { }

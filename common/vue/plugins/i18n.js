@@ -1,7 +1,7 @@
 // i18n.js
 // Improvement use polyglot,  lazy load language?
 
-import { ref, provide, inject } from 'vue';
+import { inject, provide, ref } from 'vue';
 
 const _createI18n = config => ({
   locale: ref(config.locale),

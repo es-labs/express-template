@@ -22,15 +22,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, onUnmounted } from 'vue';
-import { useMainStore } from '../store.js';
-import { useRoute } from 'vue-router';
-import { useMediaQuery } from '../../../common/plugins/useMediaQuery.js';
-
-import parseJwt from '../../../common/web/parse-jwt.js';
-
 import { http } from '@common/vue/plugins/fetch.js';
 import { useI18n } from '@common/vue/plugins/i18n.js';
+import { onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { useMediaQuery } from '../../../common/plugins/useMediaQuery.js';
+import parseJwt from '../../../common/web/parse-jwt.js';
+import { useMainStore } from '../store.js';
 
 const { VITE_REFRESH_URL, MODE } = import.meta.env;
 const store = useMainStore();

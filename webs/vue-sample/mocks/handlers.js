@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { HttpResponse, http } from 'msw';
 
 export default [
   http.get('http://127.0.0.1:8080/api/msw/test', () => {

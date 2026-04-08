@@ -1,9 +1,9 @@
-import serveIndex from 'serve-index';
 import history from 'connect-history-api-fallback';
+import serveIndex from 'serve-index';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 
 const postRoute = (app, express) => {
-  let { UPLOAD_STATIC=null, WEB_STATIC=null } = globalThis.__config;
+  const { UPLOAD_STATIC = null, WEB_STATIC = null } = globalThis.__config;
   // app.set('case sensitive routing', true)
 
   // Upload URL, Should use Signed URL and get from cloud storage instead

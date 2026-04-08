@@ -1,19 +1,17 @@
 // ? set globals here
 // ? caution - avoid name clashes with native JS libraries, other libraries, other globals
-import helmet from 'helmet';
-import cors from 'cors';
-import pathToRegexp from 'path-to-regexp';
-import cookieParser from 'cookie-parser';
 
 import http from 'node:http';
 import https from 'node:https';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express from 'express';
-
-import * as services from '../services/index.js';
+import helmet from 'helmet';
+import pathToRegexp from 'path-to-regexp';
 import * as authService from '../auth/index.js';
-
-import { healthRouter } from './health/router.js';
 import { loggerMiddleware } from '../logger/index.js';
+import * as services from '../services/index.js';
+import { healthRouter } from './health/router.js';
 
 const preRoute = () => {
   const { NODE_ENV } = process.env;

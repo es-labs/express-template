@@ -9,4 +9,4 @@ export const isEmptyObject = value => value && Object.keys(value).length === 0 &
 export const isValidObject = value => value && typeof value === 'object' && value.constructor === Object;
 
 // backward compatiibility
-export const emptyObjects = isEmptyObject
+export const emptyObjects = isEmptyObject;

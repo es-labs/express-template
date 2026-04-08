@@ -5,7 +5,9 @@ const template = /*html*/ `
   <h3 v-for="n of 20">Test {{ n }}</h3>
 </div>
 `;
+
 import { statex } from '../store.js';
+
 const { onMounted } = Vue;
 
 export default {

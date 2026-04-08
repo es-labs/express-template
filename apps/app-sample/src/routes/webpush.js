@@ -1,9 +1,9 @@
-import express from 'express';
 import {
   // authUser,
   authFns,
 } from '@common/node/auth';
 import * as webpush from '@common/node/comms/webpush';
+import express from 'express';
 
 logger.info('WARNING Auth bypass in webpush.js');
 

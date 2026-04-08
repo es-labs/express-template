@@ -1,11 +1,11 @@
-import express from 'express';
 import * as auth from '@common/node/auth';
+import express from 'express';
 // import * as own from '@common/express/controller/auth/own';
 // import * as oauth from '@common/express/controller/auth/oauth';
 // import * as oidc from '@common/express/controller/auth/oidc';
 // import * as saml from '@common/express/controller/auth/saml';
 
-import { own, oauth, oidc, saml } from '@common/node/express/controller/auth';
+import { oauth, oidc, own, saml } from '@common/node/express/controller/auth';
 
 export const myauthRoute = express
   .Router()

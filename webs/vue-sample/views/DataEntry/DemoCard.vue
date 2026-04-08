@@ -28,8 +28,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
-import { SettingOutlined, EditOutlined, EllipsisOutlined } from '@ant-design/icons-vue';
+import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons-vue';
+import { onMounted, reactive, ref } from 'vue';
 
 const formState = reactive({
   fieldA: '',

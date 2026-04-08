@@ -1,4 +1,5 @@
-import { useMainStore, useAppStore } from '../store.js';
+import { useAppStore, useMainStore } from '../store.js';
+
 // TODO import { ws } from '@common/vue/plugins/ws.js'
 const { VITE_WS_URL } = import.meta.env;
 

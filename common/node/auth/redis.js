@@ -11,13 +11,13 @@ const findUser = () => {};
 const updateUser = () => {};
 
 export {
-  setTokenService,
-  setUserService,
-  setRefreshTokenStoreName,
-  setAuthUserStoreName,
-  setRefreshToken,
+  findUser,
   getRefreshToken,
   revokeRefreshToken,
-  findUser,
+  setAuthUserStoreName,
+  setRefreshToken,
+  setRefreshTokenStoreName,
+  setTokenService,
+  setUserService,
   updateUser,
 };

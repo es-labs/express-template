@@ -1,12 +1,12 @@
 import express from 'express';
+import * as auth from './auth.js';
 import base from './base.js';
 import categories from './categories.js';
-import webhooks from './webhooks.js';
+import fido from './fido.js';
 import sse from './sse.js';
 import tests from './tests.js';
+import webhooks from './webhooks.js';
 import webpush from './webpush.js';
-import fido from './fido.js';
-import * as auth from './auth.js';
 
 const router = express.Router();
 

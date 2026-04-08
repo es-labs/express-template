@@ -101,15 +101,13 @@
 </template>
 
 <script setup>
-// v-model:fileList="form1.files"
-import { useAppStore } from '../../store.js';
-import { useRouter } from 'vue-router';
-
-import { ref, reactive, toRaw, watch, onMounted, computed, onBeforeUnmount } from 'vue';
 import { InboxOutlined } from '@ant-design/icons-vue';
-
 import { http } from '@common/vue/plugins/fetch.js';
 import { ws } from '@common/vue/plugins/ws.js';
+import { computed, onBeforeUnmount, onMounted, reactive, ref, toRaw, watch } from 'vue';
+import { useRouter } from 'vue-router';
+// v-model:fileList="form1.files"
+import { useAppStore } from '../../store.js';
 
 const { VITE_API_URL } = import.meta.env;
 

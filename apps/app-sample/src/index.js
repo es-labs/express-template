@@ -2,6 +2,7 @@ import '@common/node/logger'; // Initialize global loggers
 import '@common/node/config'; // setup env - TODO: handle vault in production
 
 import { server } from './app.js';
+
 // import * as z from "zod";
 // const Player = z.object({
 //   username: z.string(),

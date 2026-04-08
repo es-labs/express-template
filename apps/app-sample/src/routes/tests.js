@@ -1,13 +1,14 @@
-import path from 'node:path';
-import fs from 'node:fs';
 import { spawn } from 'node:child_process';
-import express from 'express';
-import PdfKit from 'pdfkit';
-import * as services from '@common/node/services';
+import fs from 'node:fs';
+import path from 'node:path';
 import { sleep } from '@common/iso/sleep';
 import { storageUpload } from '@common/node/express/upload';
+import * as services from '@common/node/services';
+import express from 'express';
 
-const { UPLOAD_STATIC=null } = globalThis.__config;
+// import PdfKit from 'pdfkit';
+
+const { UPLOAD_STATIC = null } = globalThis.__config;
 
 export default express
   .Router()
@@ -117,4 +118,4 @@ export default express
       message: 'Uploaded',
       body: req.body,
     });
-  })
+  });

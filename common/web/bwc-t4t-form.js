@@ -16,8 +16,8 @@
 //
 // requires bwc-combobox, debounce, autocomplete
 import './bwc-combobox.js';
-import { debounce } from './util.js';
 import { autocomplete } from './t4t-fe.js';
+import { debounce } from './util.js';
 
 const bulma = {
   // the keys are from t4t cols.<col>.ui.tag

@@ -202,10 +202,10 @@ const jsonToCsv = (_json, delimCol = DELIM_COL, delimRow = DELIM_ROW, ignoreColu
 
 export {
   arrayToCSVRow,
+  csvToJson,
   jsonToCSVHeader,
   jsonToCSVRow,
   jsonToCsv,
   parseAndValidateCsv,
   parseCSV, // to array of arrays, non validating
-  csvToJson,
 };

@@ -17,13 +17,13 @@ const findUser = async where => knex(AUTH_USER_STORE_NAME).where(where).first();
 const updateUser = async (where, payload) => knex(AUTH_USER_STORE_NAME).where(where).first().update(payload);
 
 export {
-  setTokenService,
-  setUserService,
-  setRefreshTokenStoreName,
-  setAuthUserStoreName,
-  setRefreshToken,
+  findUser,
   getRefreshToken,
   revokeRefreshToken,
-  findUser,
+  setAuthUserStoreName,
+  setRefreshToken,
+  setRefreshTokenStoreName,
+  setTokenService,
+  setUserService,
   updateUser,
 };

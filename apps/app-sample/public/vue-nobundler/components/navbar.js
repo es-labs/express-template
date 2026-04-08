@@ -7,7 +7,9 @@ const template = /*html*/ `
   <a class="button is-light" @click="logout">Logout</a>
 </div>
 `;
+
 import { statex } from '../store.js';
+
 const { onMounted } = Vue;
 const { useRouter } = VueRouter;
 

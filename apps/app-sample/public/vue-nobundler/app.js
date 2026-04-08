@@ -1,5 +1,5 @@
-import Secure from './layouts/secure.js';
 import Public from './layouts/public.js';
+import Secure from './layouts/secure.js';
 import { statex } from './store.js';
 
 const { onMounted, computed } = Vue;

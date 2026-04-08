@@ -1,5 +1,5 @@
-import express from 'express';
 import { authUser } from '@common/node/auth';
+import express from 'express';
 import categoryController from '../controllers/category.js';
 
 export default express

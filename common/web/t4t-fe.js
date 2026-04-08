@@ -1,4 +1,5 @@
 import Fetch from './fetch.js';
+
 let tableName = '';
 let parentFilter = null;
 let config = null;
@@ -163,18 +164,18 @@ async function autocomplete(search, col, record, parentColVal = '') {
 }
 
 export {
-  setFetch,
-  setTableName,
-  setParentFilter,
-  setUrlPrefix,
-  getConfig,
+  autocomplete,
+  create,
+  download,
   find,
   findOne,
-  create,
-  update,
-  remove,
-  upload,
-  download,
-  autocomplete,
+  getConfig,
   processData,
+  remove,
+  setFetch,
+  setParentFilter,
+  setTableName,
+  setUrlPrefix,
+  update,
+  upload,
 };

@@ -1,9 +1,9 @@
 import '@common/vue';
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
 import Antd from 'ant-design-vue';
-import router from './router.js';
+import { createPinia } from 'pinia';
+import { createApp } from 'vue';
 import App from './App.vue';
+import router from './router.js';
 
 import './style/main.css'; // app overall custom style
 import './msw.js'; // msw
@@ -13,6 +13,7 @@ import createSentry from './sentry.js'; // sentry
 import '@common/web/bwc-loading-overlay'; // our own web components
 
 import { version } from './package.json' with { type: 'json' };
+
 console.log(`V${version}`);
 
 const app = createApp(App);

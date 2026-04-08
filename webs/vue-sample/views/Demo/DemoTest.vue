@@ -48,12 +48,11 @@
 </template>
 
 <script setup>
-// NOSONAR unref, toRef, toRefs, isRef, isProxy, isReactive, isReadonly, defineComponent, getCurrentInstance, reactive, readonly, watch, watchEffect
-import { onMounted, onUpdated, onUnmounted, onBeforeUnmount, ref, computed, reactive, onBeforeUpdate } from 'vue';
-import { useMainStore } from '../../store.js';
 import { http } from '@common/vue/plugins/fetch.js';
-
+// NOSONAR unref, toRef, toRefs, isRef, isProxy, isReactive, isReadonly, defineComponent, getCurrentInstance, reactive, readonly, watch, watchEffect
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, onUnmounted, onUpdated, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useMainStore } from '../../store.js';
 
 const list = reactive([1, 2, 3]);
 const divs = ref([]);

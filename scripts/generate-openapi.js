@@ -4,31 +4,30 @@
 // Generates docs/openapi/openapi.merged.yaml from Zod v4 schemas at common/schemas/*.schema.js.
 // Uses zod-openapi — no monkey-patching, no separate registry object.
 //
-import { writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname, relative } from 'node:path';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
 import { createDocument } from 'zod-openapi';
 
 // Importing schemas makes them available to createDocument via .meta({ id })
 import {
-  RegisterBodySchema,
-  LoginBodySchema,
-  TokenResponseSchema,
-  MessageResponseSchema,
   ErrorResponseSchema,
+  LoginBodySchema,
+  MessageResponseSchema,
+  RegisterBodySchema,
+  TokenResponseSchema,
 } from '../common/schemas/auth.schema.js';
 
 // Import error schema explicitly so it is included as a reusable component
 import '../common/schemas/error.schema.js';
 
-import { PaymentSchema, CreatePaymentBodySchema, PaymentParamsSchema } from '../common/schemas/payment.schema.js';
-
 import {
+  NotificationParamsSchema,
   NotificationSchema,
   SendNotificationBodySchema,
-  NotificationParamsSchema,
 } from '../common/schemas/notification.schema.js';
+import { CreatePaymentBodySchema, PaymentParamsSchema, PaymentSchema } from '../common/schemas/payment.schema.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
