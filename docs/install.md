@@ -23,6 +23,9 @@ xcode-select --version
 ```
 brew install podman
 podman machine init && podman machine start && podman info
+
+sudo /opt/homebrew/Cellar/podman/5.8.1/bin/podman-mac-helper install
+podman machine stop; podman machine start
 ```
 
 ### nvm, node and npm

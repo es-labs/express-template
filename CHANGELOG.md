@@ -37,26 +37,19 @@ Always finding new things to implement / improve in this list!
 - [migrate] use @es-labs/jslib
 - [feat] - structure for microservice
 - [github] - github actions deployment to containers
+- [feat] add commitizen, add husky (or native git hooks), add semantic-release?
+- [feat] AI assisted commits and PRs
 
 ### 0.0.8 [in progress]
-- [feat] add commitizen, add husky (or native git hooks), add semantic-release?
-- https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization
-- [feat] AI assisted commits and PRs
 - [feat] AI assisted release
 - [github] - github actions approval gates
 - [feat] - sample MCP server
 - [feat] - sample WebSocket service
 - [fix] - close websockets (otherwise has force kill)
-- [migrate] use NodeJS native test
-
-
-### Planned
 - [feat] audit log / per service? - implicit - trigger for mutable & explicit - for adding to immutable
 - [feat] AI code review
 - [feat] continuous document and test updates using AI skill
-- [feat] copilot to generate JSDocs
-- [feat] copilot to generate API Docs
-- [feat] copilot to generate NodeJS native Unit & Integration Tests 
+- [feat] copilot to generate JSDocs? API Docs? Native Unit & Integration Test
 - [next-in-pipeline] re-implement MQ with redis pubsub?
 - [frontend] aria
 - [iaac-cicd] terraform, Kubernetes

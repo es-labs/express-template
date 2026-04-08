@@ -74,10 +74,10 @@ npx biome lint common apps webs scripts --only=useTemplate --write --unsafe
 - common/scripts
 
 
-### Github Related To Read
+### Github Related Readings
 
 - https://github.com/settings/security_analysis
-
+- https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization
 
 ### Handling Globals
 
@@ -99,13 +99,11 @@ Currently we choose to do so without namespace.
 - safeJSON
 - remove barrel index.js files...
 - auto generate project folders?
-
 - User accounts ? what is this? TODO
 - Audit logging
   - SQL Trigger + soft delete
     - mutable / immutable tables
   - or something else?
-
 on:
   push:
     branches: [TODO]
@@ -117,7 +115,6 @@ on:
 
 - actions/checkout@v6
 - actions/setup-node@v6
-
 
 TO view large bundle sizes
 ```
