@@ -6,6 +6,46 @@ Repository-wide coding and runtime conventions now live in [docs/conventions.md]
 
 This document keeps the repo's git workflow reference, branch/tag patterns, hooks notes, and merge-strategy discussion.
 
+## Release Automation
+
+Release automation is handled by the `release-please` job in [.github/workflows/hooks-ci.yml](../.github/workflows/hooks-ci.yml).
+
+- The existing handwritten changelog stays grouped under version `0.1.0` in [CHANGELOG.md](../CHANGELOG.md).
+- The workflow runs `release-please-action` directly with `release-type: simple`.
+- The workflow requires a GitHub App installation token.
+- Troubleshooting lives in [release-troubleshooting.md](./release-troubleshooting.md).
+
+### How It Works
+
+1. A commit lands on `main` or `rel/*`.
+2. The `release-please` job scans merged Conventional Commits since the last release.
+3. If releasable commits exist, it opens or updates a release PR.
+4. When that release PR is merged, `release-please` updates [CHANGELOG.md](../CHANGELOG.md), creates the release tag, and publishes the GitHub release.
+
+### Releasable Commits
+
+- `feat`, `fix`, and `deps` trigger a release PR.
+- `chore` can appear in the changelog if a release is already happening, but `chore` by itself does not trigger a release PR.
+- To force a release version manually, add a `Release-As: x.y.z` footer to the commit body.
+
+### GitHub App Token Setup
+
+Use a GitHub App instead of a PAT if you want release PRs and release-created events to trigger downstream workflows.
+
+1. Create the GitHub App under GitHub Settings → Developer settings → GitHub Apps → New GitHub App.
+2. Disable webhooks and grant these repository permissions:
+   - `Contents`: Read and write
+   - `Pull requests`: Read and write
+   - `Issues`: Read and write
+   - `Metadata`: Read-only
+3. Install the app on this repository.
+4. Add the app ID to variable `RELEASE_PLEASE_APP_ID` and the PEM private key to secret `RELEASE_PLEASE_APP_PRIVATE_KEY`.
+5. If your repository or organization restricts workflow-created PRs, enable the setting that allows GitHub Actions to create and approve pull requests.
+
+Once configured, the workflow step uses [actions/create-github-app-token](https://github.com/actions/create-github-app-token) to mint a short-lived installation token and passes it to `release-please`.
+
+If the variable or secret is missing, the workflow fails early instead of falling back to `GITHUB_TOKEN`.
+
 ### branch tags used
 
 - <feat/fix/chore>/scope/<...>
@@ -43,90 +83,35 @@ hotfix/payment-crash (check out from rel/v1.0)
 ## Hooks Usage
 
 ```bash
-# to remove hooks in git
+# remove hooks path
 git config --local --unset-all core.hooksPath
-# set git hooks path explicitly
+# set hooks path explicitly
 git config --local core.hooksPath .githooks
-# or implicitly set it when using npm `prepare` script
+# or let npm prepare configure it during npm install
 ```
 
-### Minimal Hooks
+This repository uses native hooks from `.githooks/`.
 
-Pre-commit:  
-✅ ESLint (staged files)  
-✅ Prettier (auto-fix)  
-✅ Type check  
-✅ Commit message validation  
-  
-Pre-push:  
-✅ Full test suite  
-✅ Build  
-✅ Security audit  
+- Pre-commit runs Biome checks on affected directories and schema validation tests where applicable.
+- Pre-push runs workspace tests and schema validation checks.
+- `npm install` also runs `npm prepare`, which configures the hooks path automatically.
 
-### Complete (Production)
+To skip hooks temporarily:
 
-Pre-commit:  
-✅ ESLint (staged files)  
-✅ Prettier (auto-fix)  
-✅ Type check (quick)  
-✅ Spell check  
-✅ Debug code detection  
-✅ Commit message validation  
-  
-Pre-push:  
-✅ Full test suite with coverage  
-✅ Build verification  
-✅ Security audit  
-✅ Bundle size analysis  
-✅ Integration tests  
-✅ Merge conflict check  
+```bash
+git commit --no-verify
+git push --no-verify
+```
 
-CI/CD:  
-✅ All above checks  
-✅ E2E tests  
-✅ Coverage reporting  
-✅ Performance monitoring  
-✅ Deployment  
-
-
-### Summary Table
-
-|Task|Pre-Commit|Pre-Push|CI/CD|
-|----|----------|--------|-----|
-|Lint|✅ Staged only|✅ Full|✅ Full|
-|Format|✅ Auto-fix|⚠️ Optional|✅ Check|
-|Type check|✅ Quick|✅ Full|✅ Full|
-|Tests|❌ No|✅ Unit|✅ All|
-|Build|❌ No|✅ Yes|✅ Yes|
-|Security|❌ No|✅ Audit|✅ Scan|
-|Bundle size|❌ No|✅ Check|✅ Track|
-|Integration tests|❌ No|✅ Yes|✅ Yes|
-|E2E tests|❌ No|❌ No|✅ Yes|
-|Coverage|❌ No|⚠️ Optional|✅ Report|
-
+For the exact hook behavior, see [.github/CONTRIBUTING.md](../.github/CONTRIBUTING.md).
 
 ## Rebase Or Merge
 
-Scenario 1: Large Team (50+ developers)
-- Strategy: Squash merge to main
-- Reason: Keeps history clean, easier to track PRs
-- GitHub setting: Default to squash merge
-- Branch protection: Require PR reviews before merge
+Use the repo workflow rather than a per-team merge style.
 
-**RECOMMENDED** Scenario 2: Monorepo with Multiple Teams 
-- Strategy: Merge commits with meaningful messages
-- Reason: Need to track which team merged what
-- Command: git merge --no-ff
-- Message: "Merge PR #123: Feature X (Team A)"
+- Day-to-day feature and fix PRs should use squash merge.
+- Open those PRs from `feat/*`, `fix/*`, or `chore/*` into the active `rel/*` branch.
+- Reserve `hotfix/*` branches for urgent fixes that start from `main`, merge to `main`, and are then backported to active `rel/*` branches.
+- Use cherry-pick for hotfix backports when the same fix must land in multiple release branches.
 
-Scenario 3: Microservices
-- Strategy: Squash merge per service
-- Reason: Each service is independent, one commit = one deploy
-- Per-service branch protection with squash merge
-
-Scenario 4: Open Source Project
-- Strategy: Rebase + merge
-- Reason: Linear history, clean for contributors
-- Setting: Allow rebase merge in GitHub
-- Enforce: Require commits to be signed
-
+This keeps release history predictable for `release-please` and matches the contributor workflow in [.github/CONTRIBUTING.md](../.github/CONTRIBUTING.md).

@@ -57,6 +57,25 @@ npm install -g czg
 
 Use the repository commit conventions in [docs/conventions.md](../docs/conventions.md) for allowed commit types and breaking-change notation.
 
+When choosing a scope in `czg`:
+
+- Prefer a real workspace scope such as `apps/...`, `common/...`, or `webs/...` when the change is limited to one workspace.
+- Use `docs` for documentation-only changes.
+- Use `ci` for workflow, hook, or automation changes.
+- Use `repo` for root-level or cross-cutting changes that do not fit a single workspace.
+
+### Changelog updates
+
+Changelog and tag automation are handled by the `release-please` job in [hooks-ci.yml](./workflows/hooks-ci.yml).
+
+- Release PRs and changelog updates are created from Conventional Commits on `main` and `rel/*`.
+- Existing handwritten notes remain grouped under `0.1.0`.
+- The workflow requires `RELEASE_PLEASE_APP_ID` and `RELEASE_PLEASE_APP_PRIVATE_KEY` for the GitHub App installation token.
+
+Important limitation: `release-please` only opens a release PR when the branch contains releasable commits such as `feat`, `fix`, or `deps`. `chore` commits can appear in release notes, but `chore` alone does not trigger a release. To force a release version, add `Release-As: x.y.z` to the commit body.
+
+Setup details live in [docs/git.md](../docs/git.md), and troubleshooting lives in [docs/release-troubleshooting.md](../docs/release-troubleshooting.md).
+
 ### pre-push hook
 
 Runs automatically on every `git push`:

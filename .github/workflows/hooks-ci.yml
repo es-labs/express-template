@@ -1,15 +1,25 @@
-name: TODO - Hooks CI - Enable by changing branch from [TODO] to [main]
+name: Hooks CI
 
 on:
   push:
-    branches: [TODO]
-    paths:
-      - 'common/**'
-      - 'apps/**'
-      - 'webs/**'
-      - 'scripts/**'
+    branches:
+      - main
+      - rel/**
+    # paths:
+    #   - 'common/**'
+    #   - 'apps/**'
+    #   - 'webs/**'
+    #   - 'scripts/**'
   pull_request:
-    branches: [TODO]
+    branches:
+      - main
+      - rel/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   # ── Commit message format check (mirrors commit-msg hook) ────────────────
@@ -28,17 +38,18 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^)]+\))?!?: .{1,}'
+          PATTERN='^(feat|fix|chore)(\([^)]+\))?!?: .{1,}$'
           FAILED=0
           git log --format="%s" "$BASE_SHA".."$HEAD_SHA" > /tmp/commit_msgs.txt
           while IFS= read -r msg; do
             case "$msg" in
-              Merge\ *|Revert\ *|fixup!\ *|squash!\ *) continue ;;
+              Merge\ *|fixup!\ *|squash!\ *) continue ;;
             esac
             if ! echo "$msg" | grep -Eq "$PATTERN"; then
               echo "::error::Non-conventional commit message: $msg"
               echo "  Expected: type(scope): description"
-              echo "  Types:    feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert"
+              echo "  Types:    feat|fix|chore"
+              echo "  Note:     use chore for docs|style|refactor|perf|test|build|ci|revert changes"
               echo "  Tip:      use 'npx czg' locally to generate a valid message."
               FAILED=1
             fi
@@ -118,3 +129,43 @@ jobs:
             echo "Running schema tests for $dir"
             npm run test:schemas -- "$dir"
           done
+
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    env:
+      RELEASE_PLEASE_APP_ID: ${{ vars['RELEASE_PLEASE_APP_ID'] }}
+      RELEASE_PLEASE_APP_PRIVATE_KEY: ${{ secrets['RELEASE_PLEASE_APP_PRIVATE_KEY'] }}
+    steps:
+      - name: Validate GitHub App configuration
+        run: |
+          if [[ -z "$RELEASE_PLEASE_APP_ID" ]]; then
+            echo "Missing Actions variable: RELEASE_PLEASE_APP_ID"
+            exit 1
+          fi
+          if [[ -z "$RELEASE_PLEASE_APP_PRIVATE_KEY" ]]; then
+            echo "Missing Actions secret: RELEASE_PLEASE_APP_PRIVATE_KEY"
+            exit 1
+          fi
+
+      - name: Create GitHub App token
+        id: app_token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ env.RELEASE_PLEASE_APP_ID }}
+          private-key: ${{ env.RELEASE_PLEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ steps.app_token.outputs.token }}
+          target-branch: ${{ github.ref_name }}
+          release-type: simple

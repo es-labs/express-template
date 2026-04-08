@@ -35,7 +35,6 @@
     "check": "biome check --write apps webs scripts common/iso common/node common/schemas common/web common/vue",
     "ci": "biome ci .",
     "docs:generate": "node scripts/generate-openapi.js",
-    "docs:validate-swagger": "swagger-cli validate docs/openapi/openapi.merged.yaml",
     "docs:validate": "npx redocly lint docs/openapi/openapi.merged.yaml",
     "docs:make-html": "npx @redocly/cli build-docs docs/openapi/openapi.merged.yaml --output index.html",
     "prepare": "git config core.hooksPath .githooks || echo 'Can not set git hooks'",

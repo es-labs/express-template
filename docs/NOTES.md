@@ -22,8 +22,8 @@ This document is for
 - automation
   - non-critical
     - commit messages - czg
-    - changelog - TODO
-    - release - TODO (semver release)
+    - changelog - release-please workflow
+    - release - release-please workflow
     - code review AI - TODO
   - api documentation
   - unit and integration test generation

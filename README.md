@@ -1,8 +1,8 @@
 ## Read Me First - Requires Node.js 24 or Higher
 
-> Contributors: read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) before opening issues or pull requests.
-> Developers: read [docs/conventions.md](docs/conventions.md) before making code changes.
-> For template design principles, visit this [link](https://github.com/ais-one/cookbook?tab=readme-ov-file#1---important---read-me-first)
+- Contributors: read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) before opening issues or pull requests.
+- Developers: read [docs/conventions.md](docs/conventions.md) before making code changes.
+- For template design principles, see this [reference](https://github.com/ais-one/cookbook?tab=readme-ov-file#1---important---read-me-first).
 
 ## Template Maintenance
 
@@ -23,13 +23,22 @@ git pull upstream <branch or tag> --no-rebase
 # There may be some template related merge conflicts to resolve.
 ```
 
+3 - Refresh the changelog from Conventional Commits
+
+Release automation is handled by the `release-please` job inside [hooks-ci.yml](.github/workflows/hooks-ci.yml).
+
+- It opens or updates a release PR from Conventional Commits on `main` and `rel/*`.
+- Existing handwritten changelog entries remain grouped under `0.1.0`.
+- Setup and workflow details live in [docs/git.md](docs/git.md).
+- Troubleshooting lives in [docs/release-troubleshooting.md](docs/release-troubleshooting.md).
+
+Important limitation: `release-please` creates release PRs from releasable commits such as `feat`, `fix`, and `deps`. A branch with only `chore` commits will not produce a release PR unless you force a release with a `Release-As:` footer in the commit body.
+
 ## Description
 
 This repository is a monorepo template for building full-stack JavaScript applications with Node.js, Express, and Vue.
 
-It combines backend application examples in `apps/`, frontend application examples in `webs/`, and shared reusable code in `common/` so teams can start new services and web apps from a consistent structure instead of assembling the stack from scratch.
-
-The repository is designed as a practical starting point for API services, browser applications, and supporting platform code, with workspace-based package management, shared schemas and utilities, sample authentication flows, OpenAPI tooling, Docker support, GitHub Actions workflows, and MCP server examples.
+It combines backend examples in `apps/`, frontend examples in `webs/`, and shared reusable code in `common/` so teams can start from a consistent structure instead of assembling the stack from scratch. It includes workspace-based package management, shared schemas and utilities, sample authentication flows, OpenAPI tooling, Docker support, GitHub Actions workflows, and MCP server examples.
 
 Use it when you want a single repository that can host:
 
@@ -45,8 +54,6 @@ Use it when you want a single repository that can host:
 
 Use these documents depending on the part of the repository you are working on:
 
-> Before opening an issue or pull request, read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md). It defines the contributor workflow for this repository, including setup, hooks, issue reporting, commit expectations, and pull request rules.
-
 - [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) - contributor setup, hooks, issue reporting, and pull request guidance
 - [docs/git.md](docs/git.md) - git workflow, release flow, tags, and merge strategy
 - [docs/conventions.md](docs/conventions.md) - coding, tooling, commit, and runtime conventions
@@ -54,12 +61,11 @@ Use these documents depending on the part of the repository you are working on:
 
 ## General Contents
 
-- apps: backend applications workspaces
-- common: shared JavaScript used by `apps` and `webs`
-  - TODO: packages that can be uploaded to npm and then installed (OPTIONAL)
-- docs: documentation
-- scripts: deployment and documentation scripts
-- webs: frontend applications using Vue and vanilla JavaScript workspaces
+- `apps`: backend application workspaces
+- `common`: shared JavaScript used by `apps` and `webs`
+- `docs`: project documentation
+- `scripts`: deployment and documentation scripts
+- `webs`: frontend application workspaces
 
 
 ## Project Guides
