@@ -62,11 +62,11 @@ jobs:
           echo "app: ${{ github.event.inputs.app }}"
           echo "bucket: ${{ github.event.inputs.bucket }}"
       - name: Setup NodeJS
-        uses: actions/setup-node@v3 # v4
+        uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
       - name: Checkout ${{ github.event.inputs.tag }}
-        uses: actions/checkout@v3 # v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.tag }}
       - name: Install & Build
@@ -105,7 +105,7 @@ jobs:
           name: my-build
           path: ${{ github.workspace }}/webs/${{ github.event.inputs.app }}/dist
       - name: Setup AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.ACCESS_KEY_SECRET }}
@@ -124,7 +124,7 @@ jobs:
           name: my-build
           path: ${{ github.workspace }}/webs/${{ github.event.inputs.app }}/dist
       - name: Configure AWS CLI for OSS
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
@@ -162,9 +162,9 @@ jobs:
       contents: read
       packages: write 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       # Setup .npmrc file to publish to GitHub Packages
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v6
         with:
           node-version: '24.x'
           registry-url: 'https://npm.pkg.github.com'

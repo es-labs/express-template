@@ -52,13 +52,13 @@ jobs:
       - name: Selected Branch/tag
         run: echo "Selected Branch = ${{ github.event.inputs.tag }}"
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.tag }}
       - name: Set up Node.js
-        uses: actions/setup-node@v3
-        # with:
-        #   node-version: 18 // lts
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
       - name: Install Dependencies
         run: npm install
       - name: Run Lint
@@ -93,13 +93,13 @@ jobs:
       - name: Selected Branch/tag
         run: echo ${{ github.ref_name }}
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         # with:
         #   ref: ${{ github.event.inputs.tag }}
       - name: Set up Node.js
-        uses: actions/setup-node@v3
-        # with:
-        #   node-version: 18 // lts
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
       - name: Install Dependencies
         run: npm install
       - name: Run Lint

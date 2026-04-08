@@ -42,7 +42,7 @@ jobs:
           echo "env (dev/prd): ${{ github.event.inputs.app_env }}"
           echo "timeout (s): ${{ github.event.inputs.timeout_s }}"
       - name: Add checkout plugin
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.tag_gr }}
       - name: Update Function

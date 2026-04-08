@@ -25,7 +25,11 @@ const workspaceScopes = [
 
 /** @type {import('czg').UserConfig} */
 export default {
-  prompt: {
-    scopes: ['NA', ...workspaceScopes],
-  },
+  types: [
+    { value: 'feat', name: 'feat:     A user-visible feature' },
+    { value: 'fix', name: 'fix:      A user-visible bug fix' },
+    { value: 'chore', name: 'chore:    Docs, CI, test, refactor, or maintenance work' },
+  ],
+  defaultType: 'feat',
+  scopes: ['NA', ...workspaceScopes],
 }

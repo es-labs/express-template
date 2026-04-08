@@ -19,13 +19,14 @@ case "$COMMIT_MSG" in
 esac
 
 # Conventional Commits pattern: type(scope?)[!]: description
-PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^)]+\))?!?: .{1,}'
+PATTERN='^(feat|fix|chore)(\([^)]+\))?!?: .{1,}'
 
 if ! echo "$COMMIT_MSG" | grep -Eq "$PATTERN"; then
   print_error "Commit message does not follow Conventional Commits format."
   print_error "  Got:      $COMMIT_MSG"
   print_info  "  Expected: type(scope): description"
-  print_info  "  Types:    feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert"
+  print_info  "  Types:    feat|fix|chore"
+  print_info  "  Note:     use chore for docs|style|refactor|perf|test|build|ci|revert changes"
   print_info  "  Tip:      use 'npx czg' to generate a valid message interactively."
   exit 1
 fi

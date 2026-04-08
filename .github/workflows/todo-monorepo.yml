@@ -10,7 +10,7 @@ jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Test
         run: npm test --workspace=services/auth-service
       - name: Deploy
