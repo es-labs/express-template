@@ -11,7 +11,6 @@ import { loadEnvFile } from 'node:process';
 // Caveats: JSON cannot be nested, only flat key-value pairs, Coerces all values to string
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'; // default to development if NODE_ENV is not set
 const envFilePath = path.resolve(process.cwd(), '.env');
-const jsonConfigPath = path.resolve(process.cwd(), 'config/runtime.json');
 
 if (process.env.NODE_ENV === 'development') {
   // will throw if file doesn't exist, only use for development

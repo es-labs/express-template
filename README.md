@@ -1,11 +1,8 @@
-## Read Me FIRST! - Requires NodeJS Version 24 or higher
+## Read Me First - Requires Node.js 24 or Higher
 
-> Do NOT edit this README. 
->
-> For template design principles, see [https://github.com/ais-one/cookbook#important---read-me-first]()
->
 > Contributors: read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) before opening issues or pull requests.
 > Developers: read [docs/conventions.md](docs/conventions.md) before making code changes.
+> For template design principles, visit this [link](https://github.com/ais-one/cookbook?tab=readme-ov-file#1---important---read-me-first)
 
 ## Template Maintenance
 
@@ -58,11 +55,11 @@ Use these documents depending on the part of the repository you are working on:
 ## General Contents
 
 - apps: backend applications workspaces
-- common: common javascript used by `apps` or `webs`
+- common: shared JavaScript used by `apps` and `webs`
   - TODO: packages that can be uploaded to npm and then installed (OPTIONAL)
 - docs: documentation
-- scripts: deploy, documentation scripts
-- webs: frontend applications using VueJS/vanillaJS workspaces
+- scripts: deployment and documentation scripts
+- webs: frontend applications using Vue and vanilla JavaScript workspaces
 
 
 ## Project Guides
@@ -81,4 +78,4 @@ Use the following guides depending on what you want to build or extend in this r
 
 - [Deploy backend to container registry](.github/workflows/deploy-cr.yml)
 - [Publish a package to npm](.github/workflows/deploy-npm.yml)
-- [Deploy frontend (VueJS) to object store](.github/workflows/deploy-bucket.yml)
+- [Deploy frontend (Vue) to object store](.github/workflows/deploy-bucket.yml)

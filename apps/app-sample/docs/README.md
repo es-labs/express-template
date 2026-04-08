@@ -1,49 +1,53 @@
 ## Description
 
-Project Related Documentation Here
+This document describes the sample Express application in `apps/app-sample`, including configuration, feature demos, and the main API surface used as a reference implementation for new services.
 
 ---
 
 ## Configuration (Environment Files)
 
 - `.env` for secrets and simple scalar values (should be in `vault` service for production)
-- `.runtime.json` for non-sensitive structured values in JSON, loaded into namespace `globalThis._xt`
-- namespace uses Javascript Symbol and is created when node/common/config is imported
+- `.env.json` for non-sensitive structured values in JSON, loaded into `globalThis.__config`
 
 ## Some Features
 
 ### SAML, OIDC, OAuth
 
-- SAML & OIDC: requires [Keycloak](docker-devenv/keycloak/README.md) to be setup and express server to be run
-- You can test out on [sso.html](http://127.0.0.1:3000/sso.html). The file source is [apps/app-sample/public/demo-express/sso.html]()
-- for SAML and OIDC... credentials is `test` / `test`, redirect to the keycloak IDP
-- for OAUTH **requires setup of github account and configs**
-- Refer to the following file [router/auth.js]()
+- SAML and OIDC require [Keycloak](https://github.com/ais-one/cookbook/blob/main/docker-devenv/keycloak/README.md) to be set up and the Express server to be running.
+- You can test it on [sso.html](http://127.0.0.1:3000/sso.html). The file source is [apps/app-sample/public/demo-express/sso.html](../public/demo-express/sso.html).
+- For SAML and OIDC, the sample credentials are `test` / `test`, which redirect to the Keycloak IdP.
+- OAuth requires GitHub account setup and related configuration.
+- See [apps/app-sample/src/routes/auth.js](../src/routes/auth.js).
 
-### Fido2 - TO TEST
+### FIDO2
 
-Refer to following files for SPA sample (uses fido2-lib in backend)
+Refer to the following files for the SPA sample, which uses `fido2-lib` in the backend:
 
-- [apps/app-sample/public/demo-express/fido.html]()
-  - you might need to use nip service for a "pseudo-domain" to test locally
-  - take note of and use the private IP on your local machine
-- [apps/app-sample/routes/fido.js]()
-- you will need Windows Hello or similar service on OSX
+- [apps/app-sample/public/demo-express/fido.html](../public/demo-express/fido.html)
+  - You might need to use a nip.io-style service for a pseudo-domain during local testing.
+  - Take note of and use the private IP on your local machine.
+- [apps/app-sample/src/routes/fido.js](../src/routes/fido.js)
+- You will need Windows Hello or a similar platform authenticator on macOS.
 
 ### Push Notification
 
-- ensure that you enable permissions for the browser
-- sometimes the notifications may be blocked by company policy, you may get a push event, but no notification pops-up
-- Refer to following files for SPA sample
-  - [apps/app-sample/routes/webpush.js]()
-  - [apps/app-sample/public/demo-express/pn.html]()
-- Uses Webpush, Webpush is easier (sample config uses Webpush and runs on http://127.0.0.1:3000)
+- Ensure that browser notification permissions are enabled.
+- Notifications may be blocked by company policy; you may receive a push event without a visible notification.
+- Refer to the following files for the SPA sample:
+  - [apps/app-sample/src/routes/webpush.js](../src/routes/webpush.js)
+  - [apps/app-sample/public/demo-express/pn.html](../public/demo-express/pn.html)
+- The sample uses Web Push and runs on `http://127.0.0.1:3000`.
 - Click the following buttons in order (see their output in console.log and screen):
   - (1) Subscribe PN, (2) Send And Receive Test PN, (3) Unsubscribe PN
 
 ## Project Structure
 
-TODO
+- `src/index.js` starts the application and loads runtime configuration.
+- `src/app.js` wires shared middleware, routes, and application setup.
+- `src/routes/` contains feature and API route modules such as auth, FIDO2, categories, tests, and web push.
+- `public/demo-express/` contains browser-based demo pages for features such as SSO, FIDO2, and push notifications.
+- `__tests__/` contains unit and integration tests for the sample service.
+- `config/`, `schemas/`, and `docs/` contain application-specific configuration, schema, and documentation artifacts.
 
 ## Relational Database Schema
 

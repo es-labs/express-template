@@ -26,7 +26,7 @@ Read this document before making code changes. Use [.github/CONTRIBUTING.md](../
 
 - Node runtime applications must import `common/node/logger` and use the global `logger` instead of `console.*`.
 - Node runtime applications must import `common/node/config` for application config loading.
-- `.config.json` values are for non-sensitive structured settings and are exposed globally through `config`.
+- `.env.json` values are for non-sensitive structured settings and are exposed globally through `globalThis.__config`.
 - `.env` values are loaded into `process.env`.
 
 ## Configuration And Secrets Standard
