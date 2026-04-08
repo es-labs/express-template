@@ -3,6 +3,9 @@
 > Do NOT edit this README. 
 >
 > For template design principles, see [https://github.com/ais-one/cookbook#important---read-me-first]()
+>
+> Contributors: read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) before opening issues or pull requests.
+> Developers: read [docs/conventions.md](docs/conventions.md) before making code changes.
 
 ## Template Maintenance
 
@@ -40,6 +43,18 @@ Use it when you want a single repository that can host:
 - deployment, documentation, and database helper scripts
 - sample implementations for features such as SAML, OIDC, OAuth, OTP, FIDO2, and push notifications
 
+
+## Documentation Map
+
+Use these documents depending on the part of the repository you are working on:
+
+> Before opening an issue or pull request, read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md). It defines the contributor workflow for this repository, including setup, hooks, issue reporting, commit expectations, and pull request rules.
+
+- [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) - contributor setup, hooks, issue reporting, and pull request guidance
+- [docs/git.md](docs/git.md) - git workflow, release flow, tags, and merge strategy
+- [docs/conventions.md](docs/conventions.md) - coding, tooling, commit, and runtime conventions
+- [docs/NOTES.md](docs/NOTES.md) - internal notes, caveats, and open questions
+
 ## General Contents
 
 - apps: backend applications workspaces
@@ -62,66 +77,8 @@ Use the following guides depending on what you want to build or extend in this r
   Reference the reusable modules in `common/` for Node, browser, Vue, isomorphic utilities, and shared `zod` schemas.
 
 
-## UNDER REFACTORING ##
+## CI/CD
 
-Need to tidy up documentation.
-
-- [docs/NOTES.md](docs/NOTES.md) - notes
-- [docs/HOOKS.md](docs/HOOKS.md) - git hooks
-- [docs/git.md](docs/git.md) - the workflow, branch naming and merge strategy, changelog and release using semver
-- [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) - to setup the Git Hooks
-
----
-
-
-## CI/CD & Cloud Deployment Using Github Actions
-
-**NOTE** secrets will not be in repo for CI/CD, those should be put in VAULT
-
-### Deploy To Container Registry
-
-[.github/workflows/deploy-cr.yml](.github/workflows/deploy-cr.yml)
-
-- selectable inputs
-  - git repo branch / tag
-  - container image tag
-  - path to dockerfile
-  - environment (development, staging, production)
-- Github Secrets
-  - CR_USERNAME: container registry login username (for deployment)
-  - CR_PASSWORD: container registry login password (for deployment)
-- Github Variables
-  - CR_HOST: container registry host (for deployment)
-  - CR_NS: container registry namespace (for deployment)
-  - CR_IMAGENAME: The image name. If not specified, the repository name will be used
-
-### common/jslib - TODO
-
-Publish a package to NPM
-
-- Reference Workflow
-
-[.github/workflows/deploy-npm.yml](.github/workflows/deploy-npm.yml)
-
-- Github Secrets
-  - NPM_AUTH_TOKEN
-- Selectable Inputs
-  - git repo branch / tag
-  - project to publish (currently only jslib)
-
-### Deploying To Object Store
-
-Build VueJS project and deploy to Object Store
-
-[.github/workflows/deploy-bucket.yml](.github/workflows/deploy-bucket.yml)
-
-- Selectable Inputs
-  - Cloud Provider (oss, s3)
-  - git repo branch / tag
-  - application name
-  - bucket name
-  - environment (development, staging, production)
-- Github Secrets
-  - ACCESS_KEY_ID
-  - ACCESS_KEY_SECRET
-  - OSS_HOST (if required)
+- [Deploy backend to container registry](.github/workflows/deploy-cr.yml)
+- [Publish a package to npm](.github/workflows/deploy-npm.yml)
+- [Deploy frontend (VueJS) to object store](.github/workflows/deploy-bucket.yml)

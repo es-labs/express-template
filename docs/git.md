@@ -1,29 +1,10 @@
 ## Workflow
 
-TODO - MOVE THIS TO CONTRIBUTING.md
+Contributor-facing branch, pull request, and merge guidance now lives in [.github/CONTRIBUTING.md](../.github/CONTRIBUTING.md).
 
-### Base Rules
-- TODO - See branch summary on code flows
-  - create a release branch from main branch if there is none
-  - checkout new branch from a release branch for work
-- See [.editorconfig] on code formatting baseline
-- Use `TODO` for work in progress as well as planned work
-- Use git merge with squash commit
-  - TBD...
-- For node runtime applications
-  - import `common/node/logger`
-    - use the global logger `logger`, do not use `console.*`
-  - import `common/node/config`
-    - `.config.json` values will be available globally via `config`
-    - `.env` values will be loaded to process.env
-- Use `biome` for formatting and linting
-- commiting
-  - based on [conventional commit](https://www.conventionalcommits.org/)
-  - use only feat, fix, chore
-  - chore for (build, chore, ci, docs, style, refactor, perf, test, revert)
-  - format is type(scope): <...details>
-  - prepend ! before : for breaking changes
-  - Tool used is [czg](https://cz-git.qbb.sh/cli/) with AI optional
+Repository-wide coding and runtime conventions now live in [docs/conventions.md](./conventions.md).
+
+This document keeps the repo's git workflow reference, branch/tag patterns, hooks notes, and merge-strategy discussion.
 
 ### branch tags used
 

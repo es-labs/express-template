@@ -1,3 +1,5 @@
+## Apps to install for development (MacOS)
+
 ### Brew
 
 ```bash

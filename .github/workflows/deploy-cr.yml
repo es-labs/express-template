@@ -5,16 +5,21 @@
 # Supported Container Registries: AWS, Alicloud, Digital Ocean
 #
 # Setup the following secrets
-# - CR_USERNAME
-# - CR_PASSWORD
+# - CR_USERNAME: container registry login username (for deployment)
+# - CR_PASSWORD: container registry login password (for deployment)
 # Setup the following vars
-# - CR_HOST
-# - CR_NS
-# - CR_IMAGENAME
-# Specify the following during build
+# - CR_HOST: container registry host (for deployment)
+# - CR_NS: container registry namespace (for deployment)
+# - CR_IMAGENAME: The image name. If not specified, the repository name will be used
+# Specify the following inputs
 # - tag_gr
 # - env (development, statging, production) - MIGHT NOT BE NEEDED
-#
+#   - git repo branch / tag
+#   - container image tag
+#   - path to dockerfile
+#   - environment (development, staging, production)
+
+
 name: IN USE - Container Registry deployment
 
 on:

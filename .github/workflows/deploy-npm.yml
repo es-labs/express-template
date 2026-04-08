@@ -1,3 +1,9 @@
+# - Github Secrets
+#   - NPM_AUTH_TOKEN
+# - Selectable Inputs
+#   - git repo branch / tag
+#   - project to publish (currently only jslib)
+
 name: IN USE - Publish Package to npmjs
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
