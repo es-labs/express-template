@@ -38,6 +38,7 @@
     "docs:validate": "npx redocly lint docs/openapi/openapi.merged.yaml",
     "docs:make-html": "npx @redocly/cli build-docs docs/openapi/openapi.merged.yaml --output index.html",
     "prepare": "git config core.hooksPath .githooks || echo 'Can not set git hooks'",
+    "test:schemas": "node scripts/test-schemas.js",
     "test:workspace": "npm run test --workspace=apps/app-sample",
     "test:workspaces": "npm run test --workspaces",
     "test:cover-only": "node --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info --test __tests__/**/*.spec.js",
