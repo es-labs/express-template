@@ -1,0 +1,2 @@
+- should we use [testcontainers](https://testcontainers.com/guides/getting-started-with-testcontainers-for-nodejs/), data is not persisted
+= [pglite](https://pglite.dev/) supports only pg but can persist data, number of connections is limited to 1 though, but you get pg plugins

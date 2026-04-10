@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1026.0",
+    "@electric-sql/pglite": "^0.4.4",
     "@node-saml/node-saml": "^5.1.0",
     "@scalar/express-api-reference": "^0.9.6",
     "ali-oss": "^6.23.0",
@@ -48,6 +49,7 @@
     "jsonwebtoken": "^9.0.3",
     "keyv": "^5.6.0",
     "knex": "^3.2.9",
+    "knex-pglite": "^0.14.0",
     "multer": "^2.1.1",
     "mysql": "^2.18.1",
     "otplib": "^13.4.0",
