@@ -4,6 +4,7 @@ Hello and thank you for your interest in helping make express-template better. P
 ## Important Information
 * For general questions, please join [Our Discussion Board](https://github.com/es-labs/express-template/discussions).
 * For repository-wide coding and runtime conventions, see [docs/conventions.md](../docs/conventions.md).
+* Install packages from root level only, if it is used by workspace, name the workspace
 
 ## Git Hooks Setup
 
