@@ -1,4 +1,4 @@
-name: CI / CD Pipeline
+name: TODO - CI / CD Pipeline with Manual Approval
 
 on:
   push:

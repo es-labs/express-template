@@ -1,4 +1,4 @@
-name: Auth Service — CI/CD
+name: TODO - Auth Service — CI/CD
 
 on:
   push:
@@ -134,3 +134,44 @@ jobs:
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}          # if using Kubernetes
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}        # if using SSH deploy
+  tofix-test-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Test
+        run: npm test --workspace=services/auth-service
+      - name: Deploy
+        run: ./scripts/deploy.sh auth-service
+
+# ```
+# You'd replicate this per service:
+# ```
+# .github/
+#   workflows/
+#     deploy-auth-service.yml       # triggers on services/auth-service/**
+#     deploy-payment-service.yml    # triggers on services/payment-service/**
+#     deploy-notification-service.yml
+# ```
+
+# ## Recommended monorepo structure
+# ```
+# my-monorepo/
+# ├── services/
+# │   ├── auth-service/
+# │   │   ├── src/
+# │   │   ├── package.json
+# │   │   └── Dockerfile
+# │   ├── payment-service/
+# │   │   ├── src/
+# │   │   ├── package.json
+# │   │   └── Dockerfile
+# │   └── notification-service/
+# ├── shared/
+# │   ├── utils/
+# │   └── types/
+# ├── .github/
+# │   └── workflows/
+# │       ├── deploy-auth-service.yml
+# │       ├── deploy-payment-service.yml
+# │       └── deploy-notification-service.yml
+# └── package.json                  # root workspace config (if using npm workspaces)
