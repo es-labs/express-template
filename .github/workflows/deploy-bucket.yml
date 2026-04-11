@@ -61,16 +61,14 @@ jobs:
           echo "environment: ${{ github.event.inputs.env }}"
           echo "app: ${{ github.event.inputs.app }}"
           echo "bucket: ${{ github.event.inputs.bucket }}"
-      - name: Setup NodeJS
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
       - name: Checkout ${{ github.event.inputs.tag }}
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.tag }}
-      - name: Install & Build
-        run: npm i && cd webs/${{ github.event.inputs.app }} && npm run build --mode ${{ github.event.inputs.env }}
+      - name: Set up workspace
+        uses: ./.github/actions/setup-node-npm-install
+      - name: Build
+        run: cd webs/${{ github.event.inputs.app }} && npm run build --mode ${{ github.event.inputs.env }}
         # run: npm run build # will create a dist folder (TODO build environment??)
       - name: upload artifact
         uses: actions/upload-artifact@v4
@@ -164,13 +162,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       # Setup .npmrc file to publish to GitHub Packages
-      - uses: actions/setup-node@v6
+      - uses: ./.github/actions/setup-node-npm-install
         with:
-          node-version: '24.x'
+          node-version: '24.13.0'
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
           scope: '@octocat'
-      - run: npm ci
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

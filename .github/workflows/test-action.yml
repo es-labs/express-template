@@ -26,15 +26,16 @@ jobs:
         with:
           ref: main
       - name: Testing Using Local Action
-        uses: ./.github/myactions/make-tag
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: ./.github/actions/make-tag
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: ./.github/actions/setup-node-npm-install
         with:
           node-version: ${{ matrix.node-version }}
+          install: 'false'
       - name: Run commands 
         run: |
-          echo `node -v`
+          echo $(node -v)
           echo $SECRET_KEY
           echo The secrets ${{ secrets.CR_USERNAME }}
           echo The vars ${{ vars.CR_HOST }}
-          echo The ENV ${{ env.COMMIT_SHORT_SHA }}
+          echo The ENV $COMMIT_SHORT_SHA

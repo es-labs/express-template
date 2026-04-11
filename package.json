@@ -23,8 +23,8 @@
     "express"
   ],
   "engines": {
-    "node": ">=24",
-    "npm": ">=11"
+    "node": "24.13.0",
+    "npm": "11.6.2"
   },
   "scripts": {
     "git:hash": "git rev-parse --verify --short HEAD",
