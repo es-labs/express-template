@@ -11,16 +11,17 @@ This document keeps the repo's git workflow reference, branch/tag patterns, hook
 Release automation is handled by the `release-please` job in [.github/workflows/hooks-ci.yml](../.github/workflows/hooks-ci.yml).
 
 - The existing handwritten changelog stays grouped under version `0.1.0` in [CHANGELOG.md](../CHANGELOG.md).
-- The workflow runs `release-please-action` directly with `release-type: simple`.
+- The workflow runs `release-please-action` in manifest mode using [release-please-config.json](../release-please-config.json) and [.release-please-manifest.json](../.release-please-manifest.json).
+- Releases are tracked per workspace for `apps/*` and `webs/*`.
 - The workflow requires a GitHub App installation token.
 - Troubleshooting lives in [release-troubleshooting.md](./release-troubleshooting.md).
 
 ### How It Works
 
 1. A commit lands on `main` or `rel/*`.
-2. The `release-please` job scans merged Conventional Commits since the last release.
-3. If releasable commits exist, it opens or updates a release PR.
-4. When that release PR is merged, `release-please` updates [CHANGELOG.md](../CHANGELOG.md), creates the release tag, and publishes the GitHub release.
+2. The `release-please` job scans merged Conventional Commits for each configured workspace.
+3. If releasable commits exist for one or more workspaces, it opens or updates workspace-scoped release PRs.
+4. When release PRs are merged, `release-please` updates changelogs, creates workspace-scoped tags, and publishes GitHub releases.
 
 ### Releasable Commits
 
@@ -50,6 +51,7 @@ If the variable or secret is missing, the workflow fails early instead of fallin
 
 - <feat/fix/chore>/scope/<...>
 - rel/<current release version>, rel/<next release version>
+  - can add -rc.1, -beta.1 suffixes as needed
 - hotfix/<current release version>/<...>
 - tag/<patch version>
 - main
@@ -115,3 +117,74 @@ Use the repo workflow rather than a per-team merge style.
 - Use cherry-pick for hotfix backports when the same fix must land in multiple release branches.
 
 This keeps release history predictable for `release-please` and matches the contributor workflow in [.github/CONTRIBUTING.md](../.github/CONTRIBUTING.md).
+
+---
+
+## Branch Protection Rules
+
+Edit branch protection rules in **Settings** → **Branches** → **Add branch protection rule** to prevent merges when CI checks fail.
+
+### Protection for `main` and `rel/*`
+
+Create two rules:
+
+1. **Pattern:** `main`
+2. **Pattern:** `rel/*`
+
+For each pattern, enable:
+
+| Setting | Action |
+|---------|--------|
+| **Require a pull request before merging** | Enable. Require 1 approval. Dismiss stale approvals on new commits. |
+| **Require status checks to pass** | Enable. Require branches to be up to date. |
+| | Add required checks: `Commit Message Format`, `Biome Checks`, `Schema Validation Tests`, `Unit Tests`, `Integration Tests`, `E2E Tests` |
+| **Require conversation resolution before merging** | Enable. |
+| **Include administrators** | Enable. Prevents bypass by repo admins. |
+
+### CI Action Shape
+
+- [baseline](hooks-ci-base.yml)
+- [standard](hooks-ci-standard.yml)
+
+```yaml
+
+# Full — release tags or main merge
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+jobs:
+  full:
+    steps:
+      - everything above
+
+```
+
+
+The required check names match the job `name:` fields in [.github/workflows/hooks-ci.yml](../.github/workflows/hooks-ci.yml):
+
+```yaml
+jobs:
+  commit-lint:
+    name: Commit Message Format       # ← Required check
+  biome:
+    name: Biome Checks                # ← Required check
+  schema-tests:
+    name: Schema Validation Tests     # ← Required check
+  unit-tests:
+    name: Unit Tests                  # ← Required check
+  integration-tests:
+    name: Integration Tests           # ← Required check
+  e2e-tests:
+    name: E2E Tests                   # ← Required check
+```
+
+> **Note:** Unit and integration tests run for touched workspaces only, identified by the `detect-touched-workspaces` action. E2E tests run for touched `webs/*` workspaces only and execute the workspace `test` script.
+
+### Result
+
+Once configured:
+- PRs show red X if any required check fails.
+- Merges are blocked until all checks pass and approvals are met.
+- The branch protection rules apply uniformly across day-to-day work (`rel/*` branches), production merges (`main`), and emergency hotfixes.

@@ -1,7 +1,10 @@
 name: Hooks CI
 
 on:
+  # on any push (but not to main or rel/* branches - add branch protection to prevent this)
   push:
+  # on PRs to main or rel/** branches
+  pull_request:
     branches:
       - main
       - rel/**
@@ -10,10 +13,8 @@ on:
     #   - 'apps/**'
     #   - 'webs/**'
     #   - 'scripts/**'
-  pull_request:
-    branches:
-      - main
-      - rel/**
+  # release:
+  #   types: [published]
   workflow_dispatch:
 
 permissions:
@@ -25,118 +26,100 @@ jobs:
   # ── Commit message format check (mirrors commit-msg hook) ────────────────
   commit-lint:
     name: Commit Message Format
-    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event_name == 'push'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Check commit messages
-        env:
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PUSH_BEFORE_SHA: ${{ github.event.before }}
-          PUSH_HEAD_SHA: ${{ github.sha }}
-        run: |
-          PATTERN='^(feat|fix|chore)(\([^)]+\))?!?: .{1,}$'
-          FAILED=0
-
-          if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
-            RANGE="$PR_BASE_SHA..$PR_HEAD_SHA"
-            git log --format="%s" "$RANGE" > /tmp/commit_msgs.txt
-          elif [[ "$PUSH_BEFORE_SHA" == '0000000000000000000000000000000000000000' ]]; then
-            git log --format="%s" -n 1 "$PUSH_HEAD_SHA" > /tmp/commit_msgs.txt
-          else
-            RANGE="$PUSH_BEFORE_SHA..$PUSH_HEAD_SHA"
-            git log --format="%s" "$RANGE" > /tmp/commit_msgs.txt
-          fi
-
-          while IFS= read -r msg; do
-            case "$msg" in
-              Merge\ *|fixup!\ *|squash!\ *) continue ;;
-            esac
-            if ! echo "$msg" | grep -Eq "$PATTERN"; then
-              echo "::error::Non-conventional commit message: $msg"
-              echo "  Expected: type(scope): description"
-              echo "  Types:    feat|fix|chore"
-              echo "  Note:     use chore for docs|style|refactor|perf|test|build|ci|revert changes"
-              echo "  Tip:      use 'npx czg' locally to generate a valid message."
-              FAILED=1
-            fi
-          done < /tmp/commit_msgs.txt
-          exit $FAILED
+    uses: ./.github/workflows/ci-commit-lint.yml
 
   # ── Biome checks (mirrors pre-commit hook) ───────────────────────────────
-  biome:
+  format-lint:
     name: Biome Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Set up workspace
-        uses: ./.github/actions/setup-node-npm-install
-
-      - name: Biome CI – common/iso
-        if: hashFiles('common/iso/**') != ''
-        run: npx biome ci common/iso
-
-      - name: Biome CI – common/node
-        if: hashFiles('common/node/**') != ''
-        run: npx biome ci common/node
-
-      - name: Biome CI – common/vue
-        if: hashFiles('common/vue/**') != ''
-        run: npx biome ci common/vue
-
-      - name: Biome CI – common/web
-        if: hashFiles('common/web/**') != ''
-        run: npx biome ci common/web
-
-      - name: Biome CI – apps
-        if: hashFiles('apps/**') != ''
-        run: npx biome ci apps
-
-      - name: Biome CI – webs
-        if: hashFiles('webs/**') != ''
-        run: npx biome ci webs
-
-      - name: Biome CI – scripts
-        if: hashFiles('scripts/**') != ''
-        run: npx biome ci scripts
+    uses: ./.github/workflows/ci-format-lint.yml
 
   # ── Schema validation tests (mirrors pre-push hook) ──────────────────────
   schema-tests:
     name: Schema Validation Tests
-    needs: biome
+    needs: format-lint
+    uses: ./.github/workflows/ci-tests-schema.yml
+
+  # ── Unit tests for impacted workspaces ────────────────────────────────────
+  unit-tests:
+    name: Unit Tests
+    uses: ./.github/workflows/ci-tests-unit.yml
+
+
+  # ── Integration tests
+  integration-tests:
+    name: Integration Tests
+    if: github.event_name == 'pull_request'
+    needs: unit-tests
+    uses: ./.github/workflows/ci-tests-integration.yml
+
+  # ── build: not needed, as there is no compiled code, frontend build is done during deployment
+
+  # ── coverage-check: TODO
+
+  # ── E2E tests
+  e2e-tests:
+    name: E2E Tests
+    if: github.event_name == 'pull_request'
+    needs: integration-tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: ./.github/actions/checkout
+
+      - name: Detect touched paths
+        id: touched
+        uses: ./.github/actions/detect-touched-workspaces
 
       - name: Set up workspace
         uses: ./.github/actions/setup-node-npm-install
 
-      - name: Schema tests – common/schemas
-        if: hashFiles('common/schemas/**') != ''
-        run: npm run test:schemas -- common/schemas
-
-      - name: Schema tests – apps/*/schemas
+      - name: Run e2e tests for touched web workspaces
+        if: steps.touched.outputs.has-impacted-workspaces == 'true'
+        shell: bash
         run: |
-          for dir in apps/*/schemas; do
-            [ -d "$dir" ] || continue
-            echo "Running schema tests for $dir"
-            npm run test:schemas -- "$dir"
-          done
+          set -euo pipefail
+          HAS_WEB_WORKSPACE=false
+
+          while IFS= read -r workspace; do
+            [ -n "$workspace" ] || continue
+            case "$workspace" in
+              webs/*)
+                HAS_WEB_WORKSPACE=true
+                if node -e "const p=require('./${workspace}/package.json'); process.exit(p.scripts&&p.scripts['test']?0:1)" 2>/dev/null; then
+                  echo "Running e2e tests for workspace: $workspace"
+                  npm run test --workspace="$workspace"
+                else
+                  echo "No test script in workspace: $workspace – skipping"
+                fi
+                ;;
+            esac
+          done <<< "${{ steps.touched.outputs.impacted-workspaces }}"
+
+          if [ "$HAS_WEB_WORKSPACE" = false ]; then
+            echo "No touched web workspaces detected – skipping e2e tests"
+          fi
+
+      - name: No impacted workspaces
+        if: steps.touched.outputs.has-impacted-workspaces != 'true'
+        run: echo "No impacted workspaces detected – skipping e2e tests"
+
+  # ── Security scan (npm audit + secrets scan) ────────────────────────────
+  security:
+    name: Security Scan
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/ci-security.yml
 
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
     needs:
-      - biome
+      - format-lint
       - schema-tests
+      - unit-tests
+      - integration-tests
+      - e2e-tests
+      - security
     if: github.event_name == 'push'
     env:
       RELEASE_PLEASE_APP_ID: ${{ vars['RELEASE_PLEASE_APP_ID'] }}
@@ -157,7 +140,7 @@ jobs:
         id: app_token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ env.RELEASE_PLEASE_APP_ID }}
+          client-id: ${{ env.RELEASE_PLEASE_APP_ID }}
           private-key: ${{ env.RELEASE_PLEASE_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: |
@@ -172,4 +155,14 @@ jobs:
         with:
           token: ${{ steps.app_token.outputs.token }}
           target-branch: ${{ github.ref_name }}
-          release-type: simple
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+# steps for full CI
+# - docker-build-and-scan
+# - sast
+# - license-check
+# - deploy-staging
+# - smoke-test
+# - deploy-production
+# - generate-changelog

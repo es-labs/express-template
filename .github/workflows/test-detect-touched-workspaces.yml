@@ -1,0 +1,103 @@
+name: Test Detect Touched Workspaces
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_sha:
+        description: Optional base SHA to compare from.
+        required: false
+        default: ''
+      head_sha:
+        description: Optional head SHA to compare to.
+        required: false
+        default: ''
+      diff_filter:
+        description: Optional git diff filter.
+        required: false
+        default: ACMRT
+
+jobs:
+  test-detect-touched-workspaces:
+    name: Detect Touched Workspaces
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: ./.github/actions/checkout
+
+      - name: Run touched workspace detection
+        id: touched
+        uses: ./.github/actions/detect-touched-workspaces
+        with:
+          base-sha: ${{ inputs.base_sha }}
+          head-sha: ${{ inputs.head_sha }}
+          diff-filter: ${{ inputs.diff_filter }}
+
+      - name: Print detection outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          print_block() {
+            local title="$1"
+            local value="$2"
+            echo ""
+            echo "### $title"
+            if [[ -n "$value" ]]; then
+              printf '%s\n' "$value"
+            else
+              echo "<empty>"
+            fi
+          }
+
+          echo "Diff range: ${{ steps.touched.outputs.diff-range }}"
+          echo "Has changed files: ${{ steps.touched.outputs.has-changed-files }}"
+          echo "Has impacted workspaces: ${{ steps.touched.outputs.has-impacted-workspaces }}"
+          echo "Has schema dirs: ${{ steps.touched.outputs.has-schema-dirs }}"
+          echo "Has biome targets: ${{ steps.touched.outputs.has-biome-targets }}"
+
+          print_block "Changed files" "${{ steps.touched.outputs.changed-files }}"
+          print_block "Impacted workspaces" "${{ steps.touched.outputs.impacted-workspaces }}"
+          print_block "Schema dirs" "${{ steps.touched.outputs.schema-dirs }}"
+          print_block "Biome targets" "${{ steps.touched.outputs.biome-targets }}"
+
+      - name: Write workflow summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "## Detect touched workspaces"
+            echo ""
+            echo "- Diff range: ${{ steps.touched.outputs.diff-range }}"
+            echo "- Has changed files: ${{ steps.touched.outputs.has-changed-files }}"
+            echo "- Has impacted workspaces: ${{ steps.touched.outputs.has-impacted-workspaces }}"
+            echo "- Has schema dirs: ${{ steps.touched.outputs.has-schema-dirs }}"
+            echo "- Has biome targets: ${{ steps.touched.outputs.has-biome-targets }}"
+            echo ""
+            echo "### Changed files"
+            if [[ -n "${{ steps.touched.outputs.changed-files }}" ]]; then
+              printf '%s\n' "${{ steps.touched.outputs.changed-files }}"
+            else
+              echo "<empty>"
+            fi
+            echo ""
+            echo "### Impacted workspaces"
+            if [[ -n "${{ steps.touched.outputs.impacted-workspaces }}" ]]; then
+              printf '%s\n' "${{ steps.touched.outputs.impacted-workspaces }}"
+            else
+              echo "<empty>"
+            fi
+            echo ""
+            echo "### Schema dirs"
+            if [[ -n "${{ steps.touched.outputs.schema-dirs }}" ]]; then
+              printf '%s\n' "${{ steps.touched.outputs.schema-dirs }}"
+            else
+              echo "<empty>"
+            fi
+            echo ""
+            echo "### Biome targets"
+            if [[ -n "${{ steps.touched.outputs.biome-targets }}" ]]; then
+              printf '%s\n' "${{ steps.touched.outputs.biome-targets }}"
+            else
+              echo "<empty>"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

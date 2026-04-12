@@ -33,7 +33,7 @@ This document is for
 - biome vs prettier+eslint
 - zod
   - validation
-  - openapi schema generation
+  - openapi schema generation (zod-openapi)
 - NO Typescript unless it becomes runtime-native
 - testing
   - use native node test runner
@@ -45,6 +45,16 @@ This document is for
 ## precommits
 
 - use biome for formatting and linting
+
+## pushes / PR merges to main and release branches
+
+- run ci before merge
+  - repo-wide format check, no autofix
+  - repo-wide lint check, no autofix
+  - repo-wide schema check, no autofix
+  - repo-wide testing, no autofix
+  - repo-side package audit, no autofix?
+- do not allow PR merge if checks fail
 
 ## Secrets Security
 
@@ -91,43 +101,6 @@ globalThis.__myApp[_logger] = myLogger;
 ```
 
 Currently we choose to do so without namespace.
-
-### TODO
-
-- JSON in env, refactor to use something else
-  - have issue with services where there is nested JSON
-- safeJSON
-- remove barrel index.js files...
-- auto generate project folders?
-- User accounts ? what is this? TODO
-- Audit logging
-  - SQL Trigger + soft delete
-    - mutable / immutable tables
-  - or something else?
-on:
-  push:
-    branches: [TODO]
-    paths:
-      - 'services/auth-service/**'
-      - 'shared/**'
-      - '.github/workflows/deploy-auth-service.yml'
-
-
-- actions/checkout@v6
-- actions/setup-node@v6
-
-TO view large bundle sizes
-```
-import { visualizer } from 'rollup-plugin-visualizer';
-
-plugins: [
-  vue(),
-  visualizer({
-    open: true,
-    filename: 'dist/stats.html'
-  })
-]
-```
 
 ### CAVEATS!
 - to fix dependency design issue between common/* projects

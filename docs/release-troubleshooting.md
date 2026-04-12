@@ -3,7 +3,7 @@
 Use this guide when the `release-please` job does not behave as expected.
 
 - Workflow: [../.github/workflows/hooks-ci.yml](../.github/workflows/hooks-ci.yml)
-- Mode: direct action inputs with `release-type: simple`
+- Mode: manifest config via [../release-please-config.json](../release-please-config.json) and [../.release-please-manifest.json](../.release-please-manifest.json)
 
 ## Quick Checks
 
@@ -89,7 +89,7 @@ Check the commit history since the last release:
 
 This repo currently sets:
 
-- direct `release-please-action` inputs with `release-type: simple`
+- `release-please-action` using `config-file` and `manifest-file` for per-workspace releases under `apps/*` and `webs/*`
 
 If you need an explicit version beyond that, add `Release-As: x.y.z` to the commit body.
 
