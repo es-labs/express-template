@@ -111,3 +111,11 @@ git push --no-verify
 * For changes and feature requests, include a clear description of the problem, the proposed behavior, and any relevant example, request, or UI/API markup.
 * Reference the issue that the PR resolves, for example `Fixes #1234` or `Resolves #6458`.
 
+## CI Change Workflow
+
+1. Make CI changes on a `chore/ci/<name>` branch.
+2. Use commit messages in Conventional Commit format, for example `chore(ci): tighten workflow validation`.
+3. Run `act` locally to validate before pushing.
+4. Push `chore/ci/<name>` to trigger [ci-ci-changes.yml](./workflows/ci-ci-changes.yml). This workflow only runs for changes under `.github/workflows/**` and `.github/actions/**`.
+5. Open a PR from `chore/ci/<name>` to `ci-staging` and confirm the workflow is green end-to-end.
+6. After validation, open a PR from `ci-staging` to `main`.

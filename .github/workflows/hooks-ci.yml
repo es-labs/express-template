@@ -2,17 +2,17 @@ name: Hooks CI
 
 on:
   # on any push (but not to main or rel/* branches - add branch protection to prevent this)
-  push:
+  # push:
   # on PRs to main or rel/** branches
-  pull_request:
-    branches:
-      - main
-      - rel/**
-    # paths:
-    #   - 'common/**'
-    #   - 'apps/**'
-    #   - 'webs/**'
-    #   - 'scripts/**'
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - rel/**
+  #   # paths:
+  #   #   - 'common/**'
+  #   #   - 'apps/**'
+  #   #   - 'webs/**'
+  #   #   - 'scripts/**'
   # release:
   #   types: [published]
   workflow_dispatch:
