@@ -1,19 +1,21 @@
 name: CI Changes
 
 on:
-  # push:
-  #   branches:
-  #     - 'chore/ci/**'
-  #   paths:
-  #     - '.github/workflows/**'
-  #     - '.github/actions/**'
-  # pull_request:
-  #   branches:
-  #     - ci-staging
-  #     - main
-  #   paths:
-  #     - '.github/workflows/**'
-  #     - '.github/actions/**'
+  push:
+    branches:
+      - 'chore/ci/**'
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+      - 'docs/**'
+  pull_request:
+    branches:
+      - ci-staging
+      - main
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
@@ -62,7 +64,7 @@ jobs:
       - name: Checkout
         uses: ./.github/actions/checkout
 
-      - name: Validate changed files are CI-only
+      - name: Validate changed files are CI and docs only
         shell: bash
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
@@ -98,10 +100,10 @@ jobs:
           echo "Changed files:"
           printf '%s\n' "${CHANGED_FILES}"
 
-          INVALID_FILES="$(printf '%s\n' "${CHANGED_FILES}" | grep -Ev '^(\.github/workflows/|\.github/actions/)' || true)"
+          INVALID_FILES="$(printf '%s\n' "${CHANGED_FILES}" | grep -Ev '^(\.github/workflows/|\.github/actions/|docs/)' || true)"
 
           if [[ -n "${INVALID_FILES}" ]]; then
-            echo "Only .github/workflows/** and .github/actions/** may change in this workflow."
+            echo "Only .github/workflows/**, .github/actions/**, and docs/** may change in this workflow."
             printf '%s\n' "${INVALID_FILES}"
             exit 1
           fi
