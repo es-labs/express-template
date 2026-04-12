@@ -18,7 +18,7 @@ when DB could be shared between packages
 
 ## Quick Create DB
 
-For [express-template](https://github.com/es-labs/express-template) app-sample
+For [express-template](https://github.com/es-labs/express-template) sample-api
 
 ```bash
 npx knex --knexfile dbs/express-template-db/knexfile.js migrate:up
@@ -26,7 +26,7 @@ npx knex --knexfile dbs/express-template-db/knexfile.js migrate:up # run a secon
 npx knex --knexfile dbs/express-template-db/knexfile.js seed:run
 ```
 
-Then copy the created file for sqlite DB over to the project `apps\app-sample` folders
+Then copy the created file for sqlite DB over to the project `apps\sample-api` folders
 
 ## Starting A New DB Deploy
 

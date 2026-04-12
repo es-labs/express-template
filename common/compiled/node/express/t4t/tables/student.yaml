@@ -73,7 +73,7 @@ cols:
         accept: image/*,.pdf,.txt
         maxCount: 1 # ant design vue a-upload
       multer:
-        folder: apps/app-sample/uploads/avatar
+        folder: apps/sample-api/uploads/avatar
         options:
           limits:
             files: 1
@@ -97,7 +97,7 @@ cols:
             files: 1
             fileSize: 10000000
       multer:
-        folder: apps/app-sample/uploads/kyc
+        folder: apps/sample-api/uploads/kyc
         options:
           limits:
             files: 2

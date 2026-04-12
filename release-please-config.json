@@ -7,16 +7,16 @@
       "component": "template-core",
       "release-type": "node"
     },
-    "apps/app-mcp": {
-      "component": "apps-app-mcp",
+    "apps/sample-mcp": {
+      "component": "apps-sample-mcp",
       "release-type": "node"
     },
-    "apps/app-mcp2": {
-      "component": "apps-app-mcp2",
+    "apps/sample-api": {
+      "component": "apps-sample-api",
       "release-type": "node"
     },
-    "apps/app-sample": {
-      "component": "apps-app-sample",
+    "apps/shared-sample": {
+      "component": "apps-shared-sample",
       "release-type": "node"
     },
     "webs/vue-minimal": {

@@ -2,11 +2,11 @@
 
 ```bash
 npm i
-cd apps/app-sample
+cd apps/sample-api
 npm run start
 ```
 
-Local development sample sqlite DB `apps/app-sample/dev.sqlite3` already created and populated
+Local development sample sqlite DB `apps/sample-api/dev.sqlite3` already created and populated
 
 If you need to **migrate** and **seed**, refer to the `scripts/dbdeploy` workspace.
 
@@ -25,7 +25,7 @@ If you need to **migrate** and **seed**, refer to the `scripts/dbdeploy` workspa
 Unit & Integration Tests:
 
 - To run unit and integration tests for the **/api/categories** endpoint. E2E testing is still in progress.
-- To run the full test set, change `describe.only(...)` to `describe(...)` in the test scripts under `apps/app-sample/tests`.
+- To run the full test set, change `describe.only(...)` to `describe(...)` in the test scripts under `apps/sample-api/tests`.
 
 See package.json
 
@@ -39,7 +39,7 @@ npm run test
 For running with Docker or Podman:
 
 ```bash
-docker build -t express-template --target production --build-arg APP_NAME=app-sample --build-arg API_PORT=3000 .
+docker build -t express-template --target production --build-arg APP_NAME=sample-api --build-arg API_PORT=3000 .
 docker run -p 3000:3000 express-template
 ```
 
@@ -49,6 +49,6 @@ Features include SAML, OIDC, OAuth, FIDO2 login, and push notifications.
 
 ## Creating A New Node.js Backend Or Service
 
-- Make a copy of the `app-sample` folder in the `apps` folder and rename it using kebab-case.
+- Make a copy of the `sample-api` folder in the `apps` folder and rename it using kebab-case.
 - Edit the `.env` and `.env.json` files as needed. For production, inject secrets from environment variables or a secret manager.
 - TODO MCP and WS routes

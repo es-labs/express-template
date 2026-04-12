@@ -12,9 +12,8 @@ A monorepo template for building full-stack JavaScript applications with Node.js
 
 ```
 apps/              # backend Express services (npm workspace)
-  app-sample/      # sample app — copy and rename, do not develop here directly
-  app-mcp/         # MCP server example
-  app-mcp2/        # MCP server example 2
+  sample-api/      # sample app — copy and rename, do not develop here directly
+  sample-mcp/        # MCP server example 2
 common/            # shared reusable code (npm workspaces)
   iso/             # isomorphic utilities (runs in Node and browser)
   node/            # Node.js modules, Express middleware and services
@@ -46,7 +45,7 @@ chmod +x .githooks/setup.sh && ./.githooks/setup.sh
 # git config core.hooksPath .githooks
 
 # 4. run the sample backend
-cd apps/app-sample && npm run start
+cd apps/sample-api && npm run start
 
 # 5. run the minimal Vue frontend
 cd webs/vue-minimal && npm run dev
@@ -63,7 +62,7 @@ npm run check          # biome check with auto-fix (lint + format)
 npm run ci             # biome ci (used in CI/CD)
 
 # testing
-npm run test:workspace      # run tests in apps/app-sample
+npm run test:workspace      # run tests in apps/sample-api
 npm run test:workspaces     # run tests in all workspaces
 
 # openapi docs
@@ -86,10 +85,10 @@ npm outdated -ws                        # check outdated packages across all wor
 
 ## Creating a new backend service
 
-- Copy `apps/app-sample` to a new folder in `apps/` using kebab-case naming
+- Copy `apps/sample-api` to a new folder in `apps/` using kebab-case naming
 - Edit `.env` and `.env.json` in the new folder as needed
 - Inject secrets from environment variables or a secret manager — never commit secrets
-- Do not develop directly in `app-sample`
+- Do not develop directly in `sample-api`
 
 ## Creating a new frontend app
 
@@ -193,7 +192,7 @@ git pull upstream <branch or tag> --no-rebase
 ```bash
 docker build -t express-template \
   --target production \
-  --build-arg APP_NAME=app-sample \
+  --build-arg APP_NAME=sample-api \
   --build-arg API_PORT=3000 .
 
 docker run -p 3000:3000 express-template

@@ -11,7 +11,7 @@ GET {{url}}/health
 GET {{url}}/health/ready
 
 ### Service Endpoint Check
-GET {{url}}/api/app-sample/healthcheck
+GET {{url}}/api/sample-api/healthcheck
 
 ### HTTP Testing
 GET https://randomuser.me/api/
