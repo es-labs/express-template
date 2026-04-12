@@ -8,7 +8,7 @@ This document keeps the repo's git workflow reference, branch/tag patterns, hook
 
 ## Release Automation
 
-Release automation is handled by the `release-please` job in [.github/workflows/hooks-ci.yml](../.github/workflows/hooks-ci.yml).
+Release automation is handled by the `release-please` job in [.github/workflows/ci.yml](../.github/workflows/ci.yml).
 
 - The existing handwritten changelog stays grouped under version `0.1.0` in [CHANGELOG.md](../CHANGELOG.md).
 - The workflow runs `release-please-action` in manifest mode using [release-please-config.json](../release-please-config.json) and [.release-please-manifest.json](../.release-please-manifest.json).
@@ -162,7 +162,7 @@ jobs:
 ```
 
 
-The required check names match the job `name:` fields in [.github/workflows/hooks-ci.yml](../.github/workflows/hooks-ci.yml):
+The required check names match the job `name:` fields in [.github/workflows/ci.yml](../.github/workflows/ci.yml):
 
 ```yaml
 jobs:

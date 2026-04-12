@@ -27,12 +27,13 @@
     "npm": "11.6.2"
   },
   "scripts": {
+    "clean:all": "rm -rf node_modules package-lock.json && npm -ws exec -- rm -rf node_modules package-lock.json",
     "git:hash": "git rev-parse --verify --short HEAD",
     "git:branch": "git rev-parse --abbrev-ref HEAD",
-    "lint": "biome lint apps webs scripts common/iso common/node common/schemas common/web common/vue",
-    "lint:fix": "biome lint --only=useTemplate --write --unsafe common/node",
-    "format": "biome format --write apps webs scripts common/iso common/node common/schemas common/web common/vue",
-    "check": "biome check --write apps webs scripts common/iso common/node common/schemas common/web common/vue",
+    "lint": "biome lint apps webs scripts common/vanilla/iso common/compiled/node common/schemas common/vanilla/web common/compiled/vue",
+    "lint:fix": "biome lint --only=useTemplate --write --unsafe common/compiled/node",
+    "format": "biome format --write apps webs scripts common/vanilla/iso common/compiled/node common/schemas common/vanilla/web common/compiled/vue",
+    "check": "biome check --write apps webs scripts common/vanilla/iso common/compiled/node common/schemas common/vanilla/web common/compiled/vue",
     "ci": "biome ci .",
     "docs:generate": "node scripts/generate-openapi.js",
     "docs:validate": "npx redocly lint docs/openapi/openapi.merged.yaml",
@@ -58,7 +59,8 @@
   },
   "workspaces": [
     "apps/*",
-    "common/*",
+    "common/vanilla/*",
+    "common/compiled/*",
     "webs/*"
   ]
 }

@@ -30,10 +30,10 @@ run_biome_check() {
   fi
 }
 
-echo "$STAGED" | grep -q '^common/iso/'   && run_biome_check common/iso
-echo "$STAGED" | grep -q '^common/node/'  && run_biome_check common/node
-echo "$STAGED" | grep -q '^common/vue/'   && run_biome_check common/vue
-echo "$STAGED" | grep -q '^common/web/'   && run_biome_check common/web
+echo "$STAGED" | grep -q '^common/vanilla/iso/'    && run_biome_check common/vanilla/iso
+echo "$STAGED" | grep -q '^common/compiled/node/'  && run_biome_check common/compiled/node
+echo "$STAGED" | grep -q '^common/compiled/vue/'   && run_biome_check common/compiled/vue
+echo "$STAGED" | grep -q '^common/vanilla/web/'    && run_biome_check common/vanilla/web
 echo "$STAGED" | grep -q '^apps/'         && run_biome_check apps
 echo "$STAGED" | grep -q '^webs/'         && run_biome_check webs
 echo "$STAGED" | grep -q '^scripts/'      && run_biome_check scripts

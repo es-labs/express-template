@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import '../../../../common/web/sign-pad';
+import '../../../../common/vanilla/web/sign-pad';
 import { onMounted, ref } from 'vue';
 
 const imageDataUrl = ref('');

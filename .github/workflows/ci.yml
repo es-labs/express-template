@@ -1,20 +1,16 @@
-name: Hooks CI
+## Main repository CI workflow.
+## Runs only for changes in apps/**, webs/**, common/**, and scripts/**.
+## Excludes chore/ci branches because CI meta changes are handled by ci-meta.yml.
+name: CI
 
 on:
-  # on any push (but not to main or rel/* branches - add branch protection to prevent this)
   # push:
-  # on PRs to main or rel/** branches
+  #   branches-ignore:
+  #     - 'chore/ci/**'
   # pull_request:
   #   branches:
   #     - main
   #     - rel/**
-  #   # paths:
-  #   #   - 'common/**'
-  #   #   - 'apps/**'
-  #   #   - 'webs/**'
-  #   #   - 'scripts/**'
-  # release:
-  #   types: [published]
   workflow_dispatch:
 
 permissions:
@@ -23,45 +19,65 @@ permissions:
   pull-requests: write
 
 jobs:
-  # ── Commit message format check (mirrors commit-msg hook) ────────────────
+  detect-scope:
+    name: Detect Change Scope
+    runs-on: ubuntu-latest
+    outputs:
+      has-common-scripts: ${{ steps.scope.outputs.has_common_scripts }}
+      has-apps-webs: ${{ steps.scope.outputs.has_apps_webs }}
+      has-supported-scope: ${{ steps.scope.outputs.has_supported_scope }}
+    steps:
+      - name: Checkout
+        uses: ./.github/actions/checkout
+
+      - name: Detect changed scope
+        id: scope
+        uses: ./.github/actions/detect-change-scope
+        with:
+          allowed-paths-regex: apps/|webs/|common/|scripts/
+          fail-on-invalid: 'true'
+          invalid-scope-message: This workflow only accepts changes in apps/**, webs/**, common/**, and scripts/**.
+
   commit-lint:
     name: Commit Message Format
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
-    uses: ./.github/workflows/ci-commit-lint.yml
+    needs: detect-scope
+    if: needs.detect-scope.outputs.has-supported-scope == 'true' && (github.event_name == 'pull_request' || github.event_name == 'push')
+    uses: ./.github/workflows/call-commit-lint.yml
 
-  # ── Biome checks (mirrors pre-commit hook) ───────────────────────────────
   format-lint:
     name: Biome Checks
-    uses: ./.github/workflows/ci-format-lint.yml
+    needs: detect-scope
+    if: needs.detect-scope.outputs.has-supported-scope == 'true'
+    uses: ./.github/workflows/call-format-lint.yml
 
-  # ── Schema validation tests (mirrors pre-push hook) ──────────────────────
   schema-tests:
     name: Schema Validation Tests
-    needs: format-lint
-    uses: ./.github/workflows/ci-tests-schema.yml
+    needs:
+      - detect-scope
+      - format-lint
+    if: needs.detect-scope.outputs.has-supported-scope == 'true'
+    uses: ./.github/workflows/call-tests-schema.yml
 
-  # ── Unit tests for impacted workspaces ────────────────────────────────────
   unit-tests:
     name: Unit Tests
-    uses: ./.github/workflows/ci-tests-unit.yml
+    needs: detect-scope
+    if: needs.detect-scope.outputs.has-apps-webs == 'true'
+    uses: ./.github/workflows/call-tests-unit.yml
 
-
-  # ── Integration tests
   integration-tests:
     name: Integration Tests
-    if: github.event_name == 'pull_request'
-    needs: unit-tests
-    uses: ./.github/workflows/ci-tests-integration.yml
+    needs:
+      - detect-scope
+      - unit-tests
+    if: needs.detect-scope.outputs.has-apps-webs == 'true' && github.event_name == 'pull_request'
+    uses: ./.github/workflows/call-tests-integration.yml
 
-  # ── build: not needed, as there is no compiled code, frontend build is done during deployment
-
-  # ── coverage-check: TODO
-
-  # ── E2E tests
   e2e-tests:
     name: E2E Tests
-    if: github.event_name == 'pull_request'
-    needs: integration-tests
+    needs:
+      - detect-scope
+      - integration-tests
+    if: needs.detect-scope.outputs.has-apps-webs == 'true' && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -90,37 +106,38 @@ jobs:
                   echo "Running e2e tests for workspace: $workspace"
                   npm run test --workspace="$workspace"
                 else
-                  echo "No test script in workspace: $workspace – skipping"
+                  echo "No test script in workspace: $workspace - skipping"
                 fi
                 ;;
             esac
           done <<< "${{ steps.touched.outputs.impacted-workspaces }}"
 
           if [ "$HAS_WEB_WORKSPACE" = false ]; then
-            echo "No touched web workspaces detected – skipping e2e tests"
+            echo "No touched web workspaces detected - skipping e2e tests"
           fi
 
       - name: No impacted workspaces
         if: steps.touched.outputs.has-impacted-workspaces != 'true'
-        run: echo "No impacted workspaces detected – skipping e2e tests"
+        run: echo "No impacted workspaces detected - skipping e2e tests"
 
-  # ── Security scan (npm audit + secrets scan) ────────────────────────────
   security:
     name: Security Scan
-    if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/ci-security.yml
+    needs: detect-scope
+    if: needs.detect-scope.outputs.has-supported-scope == 'true' && github.event_name == 'pull_request'
+    uses: ./.github/workflows/call-security.yml
 
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
     needs:
+      - detect-scope
       - format-lint
       - schema-tests
       - unit-tests
       - integration-tests
       - e2e-tests
       - security
-    if: github.event_name == 'push'
+    if: needs.detect-scope.outputs.has-supported-scope == 'true' && github.event_name == 'push'
     env:
       RELEASE_PLEASE_APP_ID: ${{ vars['RELEASE_PLEASE_APP_ID'] }}
       RELEASE_PLEASE_APP_PRIVATE_KEY: ${{ secrets['RELEASE_PLEASE_APP_PRIVATE_KEY'] }}
@@ -157,12 +174,3 @@ jobs:
           target-branch: ${{ github.ref_name }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-
-# steps for full CI
-# - docker-build-and-scan
-# - sast
-# - license-check
-# - deploy-staging
-# - smoke-test
-# - deploy-production
-# - generate-changelog

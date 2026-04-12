@@ -27,7 +27,7 @@ import { useI18n } from '@common/vue/plugins/i18n.js';
 import { onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMediaQuery } from '../../../common/plugins/useMediaQuery.js';
-import parseJwt from '../../../common/web/parse-jwt.js';
+import parseJwt from '../../../common/vanilla/web/parse-jwt.js';
 import { useMainStore } from '../store.js';
 
 const { VITE_REFRESH_URL, MODE } = import.meta.env;

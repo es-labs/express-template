@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@common/vue": "file:../../common/vue",
+    "@common/vue": "file:../../common/compiled/vue",
     "null": "^2.0.0",
     "redoc": "^2.5.2"
   }

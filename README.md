@@ -25,7 +25,7 @@ git pull upstream <branch or tag> --no-rebase
 
 3 - Refresh the changelog from Conventional Commits
 
-Release automation is handled by the `release-please` job inside [hooks-ci.yml](.github/workflows/hooks-ci.yml).
+Release automation is handled by the `release-please` job inside [ci.yml](.github/workflows/ci.yml).
 
 - It opens or updates a release PR from Conventional Commits on `main` and `rel/*`.
 - Existing handwritten changelog entries remain grouped under `0.1.0`.

@@ -48,8 +48,8 @@ WORKDIR /app
 
 # Copy workspace manifests first for better layer caching
 COPY package.json package-lock.json ./
-COPY common/node/package.json ./common/node/
-COPY common/iso/package.json ./common/iso/
+COPY common/compiled/node/package.json ./common/compiled/node/
+COPY common/vanilla/iso/package.json ./common/vanilla/iso/
 COPY common/schemas/ ./common/schemas/
 COPY apps/${APP_NAME}/package.json ./apps/${APP_NAME}/
 
@@ -66,16 +66,16 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules/
 
 COPY package.json package-lock.json ./
-COPY common/node/package.json ./common/node/
-COPY common/iso/package.json ./common/iso/
+COPY common/compiled/node/package.json ./common/compiled/node/
+COPY common/vanilla/iso/package.json ./common/vanilla/iso/
 COPY common/schemas/ ./common/schemas/
 COPY apps/${APP_NAME}/package.json ./apps/${APP_NAME}/
 
 # Install devDependencies on top of the already-copied prod modules
 RUN npm ci
 
-COPY common/node/ ./common/node/
-COPY common/iso/ ./common/iso/
+COPY common/compiled/node/ ./common/compiled/node/
+COPY common/vanilla/iso/ ./common/vanilla/iso/
 COPY common/schemas/ ./common/schemas/
 COPY apps/${APP_NAME}/ ./apps/${APP_NAME}/
 
@@ -92,8 +92,8 @@ WORKDIR /app
 
 # Copy production node_modules (hoisted by npm workspaces) and source
 COPY --from=deps  /app/node_modules                    ./node_modules/
-COPY --from=build /app/common/node                     ./common/node/
-COPY --from=build /app/common/iso                      ./common/iso/
+COPY --from=build /app/common/compiled/node            ./common/compiled/node/
+COPY --from=build /app/common/vanilla/iso              ./common/vanilla/iso/
 COPY --from=build /app/common/schemas                  ./common/schemas/
 COPY --from=build /app/apps/${APP_NAME}                ./apps/${APP_NAME}/
 

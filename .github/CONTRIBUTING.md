@@ -67,7 +67,7 @@ When choosing a scope in `czg`:
 
 ### Changelog updates
 
-Changelog and tag automation are handled by the `release-please` job in [hooks-ci.yml](./workflows/hooks-ci.yml).
+Changelog and tag automation are handled by the `release-please` job in [ci.yml](./workflows/ci.yml).
 
 - Release PRs and changelog updates are created from Conventional Commits on `main` and `rel/*`.
 - Existing handwritten notes remain grouped under `0.1.0`.
@@ -116,6 +116,6 @@ git push --no-verify
 1. Make CI changes on a `chore/ci/<name>` branch.
 2. Use commit messages in Conventional Commit format, for example `chore(ci): tighten workflow validation`.
 3. Run `act` locally to validate before pushing.
-4. Push `chore/ci/<name>` to trigger [ci-ci-changes.yml](./workflows/ci-ci-changes.yml). This workflow only runs for changes under `.github/workflows/**` and `.github/actions/**`.
+4. Push `chore/ci/<name>` to trigger [ci-meta.yml](./workflows/ci-meta.yml). This workflow only runs for changes under `.github/workflows/**` and `.github/actions/**`.
 5. Open a PR from `chore/ci/<name>` to `ci-staging` and confirm the workflow is green end-to-end.
 6. After validation, open a PR from `ci-staging` to `main`.
