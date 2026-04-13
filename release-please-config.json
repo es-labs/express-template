@@ -19,12 +19,12 @@
       "component": "apps-shared-sample",
       "release-type": "node"
     },
-    "webs/vue-minimal": {
-      "component": "webs-vue-minimal",
+    "apps/sample-vue-minimal": {
+      "component": "apps-sample-vue-minimal",
       "release-type": "node"
     },
-    "webs/vue-sample": {
-      "component": "webs-vue-sample",
+    "apps/sample-vue-full": {
+      "component": "apps-sample-vue-full",
       "release-type": "node"
     }
   }

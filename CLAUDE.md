@@ -2,7 +2,7 @@
 
 ## Project overview
 
-A monorepo template for building full-stack JavaScript applications with Node.js, Express, and Vue. It combines backend services in `apps/`, frontend apps in `webs/`, and shared reusable code in `common/`. Designed as an updateable template — custom code is isolated so upstream template updates can be merged cleanly.
+A monorepo template for building full-stack JavaScript applications with Node.js, Express, and Vue. It combines backend and frontend apps in `apps/`, and shared reusable code in `common/`. Designed as an updateable template — custom code is isolated so upstream template updates can be merged cleanly.
 
 - Node.js 24+ required, npm 11+ required
 - Fully ES Modules — no CommonJS
@@ -11,18 +11,17 @@ A monorepo template for building full-stack JavaScript applications with Node.js
 ## Repository structure
 
 ```
-apps/              # backend Express services (npm workspace)
-  sample-api/      # sample app — copy and rename, do not develop here directly
-  sample-mcp/        # MCP server example 2
+apps/              # backend and frontend apps (npm workspace)
+  sample-api/      # sample backend app — copy and rename, do not develop here directly
+  sample-mcp/        # MCP server example
+  sample-vue-full/   # full-featured sample Vue app (port 8081)
+  sample-vue-minimal/ # minimal Vue app (port 8080)
 common/            # shared reusable code (npm workspaces)
   iso/             # isomorphic utilities (runs in Node and browser)
   node/            # Node.js modules, Express middleware and services
   schemas/         # shared zod schemas
   web/             # browser-only utilities and web components
   vue/             # Vue-specific shared modules
-webs/              # frontend Vue + Vite apps (npm workspace)
-  vue-minimal/     # minimal Vue app (port 8080)
-  vue-sample/      # full-featured sample Vue app (port 8081)
 docs/              # project documentation
 scripts/           # DB deployment, OpenAPI generation tooling
   dbdeploy/        # database migration and seed scripts
@@ -48,7 +47,7 @@ chmod +x .githooks/setup.sh && ./.githooks/setup.sh
 cd apps/sample-api && npm run start
 
 # 5. run the minimal Vue frontend
-cd webs/vue-minimal && npm run dev
+cd apps/sample-vue-minimal && npm run dev
 ```
 
 ## Common commands
@@ -92,7 +91,7 @@ npm outdated -ws                        # check outdated packages across all wor
 
 ## Creating a new frontend app
 
-- Copy `webs/vue-sample` to a new folder in `webs/` using kebab-case naming
+- Copy `apps/sample-vue-full` to a new folder in `apps/` using kebab-case naming
 - Edit `.env` and `.env.development` as needed
 - Routes use kebab-case and support up to 1 submenu level
 

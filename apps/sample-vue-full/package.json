@@ -1,12 +1,13 @@
 {
-  "name": "vue-minimal",
+  "name": "sample-vue-full",
   "version": "0.0.0",
   "description": "",
   "type": "module",
   "scripts": {
     "dev": "vite --mode development",
+    "dev:mocked": "vite --config apps/vite.config.js --mode mocked",
     "build": "vite build --mode production",
-    "lint": "biome check --config-path ../biome.json",
+    "lint": "biome check",
     "test": "echo \"Remember to run frontend and backend before test...\" && playwright test"
   },
   "keywords": [],
@@ -14,7 +15,10 @@
   "license": "ISC",
   "dependencies": {
     "@common/vue": "file:../../common/compiled/vue",
-    "null": "^2.0.0",
-    "redoc": "^2.5.2"
+    "chart.js": "^4.5.1",
+    "leaflet": "^1.9.4"
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }

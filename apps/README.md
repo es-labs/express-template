@@ -1,7 +1,7 @@
 ## Read Me FIRST!
 
 **Important notes** - **TO UPDATE!**
-- DO NOT develop custom code using `webs/vue-sample` or `webs/vue-minimal`. Rename it or copy it to another folder name
+- DO NOT develop custom code using `apps/sample-vue-full` or `apps/sample-vue-minimal`. Rename it or copy it to another folder name
 - do note any conflicts to resolve when merging from upstream
 
 ---
@@ -10,8 +10,8 @@
 
 ```bash
 npm i
-cd webs/vue-sample
-npm run dev # run 1st sample web application in <project root>/webs/vue-sample
+cd apps/sample-vue-full
+npm run dev # run 1st sample web application in <project root>/apps/sample-vue-full
 ```
 
 # Visit `http://127.0.0.1:8080` to view application
@@ -34,7 +34,7 @@ Login using one of the following:
 npx playwright install chromium
 npx playwright test --browser=chromium
 
-cd webs/vue-sample
+cd apps/sample-vue-full
 npm run test:e2e
 ```
 
@@ -52,7 +52,7 @@ npm run local:mocked # run locally with mock service worker (many other API call
 Setting up your custom frontend
 
 **Notes:**
-- `webs/vue-sample` is a sample skeleton that can be used as scaffolding
+- `apps/sample-vue-full` is a sample skeleton that can be used as scaffolding
   - `ROUTES` property
     - use kebab-case, will be converted to Capital Case in menu display
     - only up to 1 submenu level
@@ -62,7 +62,7 @@ Setting up your custom frontend
       - '~/xxx.js' from **<project>/src** folder
       - '/xxx.js' from **<project>** folder
 - **IMPORTANT NOTE** When you create a new application
-  - create it in the `webs` folder
+  - create it in the `apps` folder
 
 
 

@@ -4,7 +4,7 @@ export default async function prepare() {
     console.log('MSW NOTE: run once only unless you need to generate again - npx msw init public/');
     console.log('MSW NOTE: if you touch MSW and its related code, you need to do empty cache and hard reload');
     console.log('MSW starting');
-    const { worker } = await import('../apps/vue-sample/mocks/browser');
+    const { worker } = await import('./mocks/browser');
     return worker.start({
       onUnhandledRequest(request, print) {
         // Do not print warnings on unhandled requests to Sentry.

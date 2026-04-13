@@ -2,7 +2,7 @@
 
 ```bash
 npm i
-cd webs/vue-minimal
+cd apps/sample-vue-minimal
 npm run dev
 ```
 
@@ -10,7 +10,7 @@ Visit `http://127.0.0.1:8080` on browser to view application
 
 ## Install & Run Sample Vue Application
 
-Run a more extensive sample, in `webs/vue-sample`, and view on `http://127.0.0.1:8081`
+Run a more extensive sample, in `apps/sample-vue-full`, and view on `http://127.0.0.1:8081`
 
 **Note For Login**
 
@@ -30,7 +30,7 @@ Login using one of the following:
 npx playwright install chromium
 npx playwright test --browser=chromium
 
-cd webs/vue-sample
+cd apps/sample-vue-full
 npm run test:e2e
 ```
 
@@ -44,11 +44,11 @@ npm run local:mocked # run locally with mock service worker (many other API call
 
 ## Creating A New Web or Vue Frontend
 
-- Make a copy of the `vue-sample` folder in the `webs` folder and rename it using kebab-case.
+- Make a copy of the `sample-vue-full` folder in the `apps` folder and rename it using kebab-case.
 - Edit the `.env` and `.env.development` files as needed.
   - `.env` is common to all environments for the app
   - `.env.[MODE]` indicates the environment file to use (command to use: npx vite build --mode $1). default is `development`
-- `webs/vue-sample` is a sample skeleton that can be used as scaffolding
+- `apps/sample-vue-full` is a sample skeleton that can be used as scaffolding
   - `ROUTES` property
     - Use kebab-case; it will be converted to capitalized menu labels in the UI.
     - only up to 1 submenu level

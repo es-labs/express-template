@@ -60,7 +60,6 @@
   "workspaces": [
     "apps/*",
     "common/vanilla/*",
-    "common/compiled/*",
-    "webs/*"
+    "common/compiled/*"
   ]
 }

@@ -2,6 +2,8 @@
 
 Internal shared backend workspace for code reused by multiple apps under `apps/*`.
 
+Also include schemas and documents related to this shared backend workspace.
+
 Use this workspace for backend-only code that is not template-wide enough for `common/`.
 
 Suggested folders:
