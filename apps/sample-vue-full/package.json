@@ -7,8 +7,8 @@
     "dev": "vite --mode development",
     "dev:mocked": "vite --config apps/vite.config.js --mode mocked",
     "build": "vite build --mode production",
-    "lint": "biome check",
-    "test": "echo \"Run frontend and backend before playwright test\" && exit 0"
+    "lint": "biome check --config-path ../biome-vue.json",
+    "test:e2e": "echo \"Run frontend and backend before playwright test\" && exit 0"
   },
   "keywords": [],
   "author": "",
