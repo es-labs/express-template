@@ -71,11 +71,15 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     environment:
+      # "production" is a GitHub Environment configured with required reviewers.
+      # Add your authorized users/teams there in:
+      #   Settings → Environments → production → Required reviewers
       # ← configure required reviewers here in GitHub Settings
       name: production
     steps:
       - name: Approval gate
         run: echo "✅ Approved — deploying ${{ needs.build.outputs.image_tag }}"
+
   deploy_to_cr:
     runs-on: ubuntu-latest
     name: Deploying CR
@@ -100,15 +104,3 @@ jobs:
             $DOCKERFILE_PATH || exit 1001
           # docker push $CR_HOST/$CR_NS/$CR_IMAGENAME:${{ github.event.inputs.tag_ci }}
           docker logout
-
-  # request-approval:
-  #   name: Request Deployment Approval
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   environment:
-  #     # ← configure required reviewers here in GitHub Settings
-  #     name: production
-
-  #   steps:
-  #     - name: Approval gate
-  #       run: echo "✅ Approved — deploying auth-service ${{ needs.build.outputs.image_tag }}"

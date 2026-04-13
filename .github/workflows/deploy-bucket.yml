@@ -50,7 +50,7 @@ on:
 # env:
 #   OSS_TYPE: ${{ github.event.inputs.tag || 'main' }}
 jobs:
-  run-build:
+  build:
     name: Install And Build
     runs-on: ubuntu-latest
     steps:
@@ -75,8 +75,23 @@ jobs:
         with:
           name: my-build
           path: ${{ github.workspace }}/apps/${{ github.event.inputs.app }}/dist
+
+  request-approval:
+    name: Request Deployment Approval
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment:
+      # "production" is a GitHub Environment configured with required reviewers.
+      # Add your authorized users/teams there in:
+      #   Settings → Environments → production → Required reviewers
+      # ← configure required reviewers here in GitHub Settings
+      name: production
+    steps:
+      - name: Approval gate
+        run: echo "✅ Approved — deploying ${{ needs.build.outputs.image_tag }}"
+
   deploy-oss: # aliyun OSS
-    needs: run-build
+    needs: request-approval
     if: github.event.inputs.provider == 'oss'
     name: Deploying To Aliyun OSS - Node Version TODO
     runs-on: ubuntu-latest
@@ -93,7 +108,7 @@ jobs:
       - name: Upload the web folder to the chosen OSS bucket
         run: ./ossutil64 --config-file .ossutilconfig cp ${{ github.workspace }}/apps/${{ github.event.inputs.app }}/dist oss://${{ github.event.inputs.bucket }} -r -f
   deploy-s3: # AWS S3
-    needs: run-build
+    needs: request-approval
     if: github.event.inputs.provider == 's3'
     runs-on: ubuntu-latest
     steps:
@@ -112,7 +127,7 @@ jobs:
         run: |
           aws s3 sync dist s3://${{ github.event.inputs.bucket }} --delete
   deploy-oss2: # Alibaba Cloud OSS via AWS CLI
-    needs: run-build
+    needs: request-approval
     if: github.event.inputs.provider == 'oss2'
     runs-on: ubuntu-latest
     steps:
@@ -133,7 +148,7 @@ jobs:
             --delete \
             --endpoint-url https://${{ secrets.OSS_ENDPOINT }}
   deploy-ghp: # Alibaba Cloud OSS via AWS CLI
-    needs: run-build
+    needs: request-approval
     if: github.event.inputs.provider == 'ghp'
     runs-on: ubuntu-latest
     steps:
@@ -155,6 +170,8 @@ jobs:
           git checkout -f ${GITHUB_REF##*/}
           git branch -D gh-pages
   ghsp2-tocheck:
+    needs: request-approval
+    if: github.event.inputs.provider == 'ghp'
     runs-on: ubuntu-latest 
     permissions: 
       contents: read
