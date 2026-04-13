@@ -7,23 +7,23 @@ import { memoryUpload } from '../../express/upload';
 import * as svc from '../../services';
 
 const {
-  TABLE_CONFIGS_FOLDER_PATH,
-  TABLE_CONFIGS_CSV_SIZE,
-  TABLE_CONFIGS_UPLOAD_SIZE,
-  TABLE_CUSTOM_PATH,
-  TABLE_USER_ID_KEY,
-  TABLE_USER_ROLE_KEY,
-  TABLE_ORG_ID_KEY,
-} = process.env;
+  CONFIGS_FOLDER_PATH,
+  CONFIGS_CSV_SIZE,
+  CONFIGS_UPLOAD_SIZE,
+  CUSTOM_PATH,
+  USER_ID_KEY,
+  USER_ROLE_KEY,
+  ORG_ID_KEY,
+} = globalThis.__config?.T4T || {};
 
 import base from './t4t-base.js';
 import { noAuthFunc, processJson, roleOperationMatch } from './t4t-utils.js';
 
 const custom = {};
-// const custom = TABLE_CUSTOM_PATH ? (await import(TABLE_CUSTOM_PATH)).default : { };
-// const custom = TABLE_CUSTOM_PATH ? require(TABLE_CUSTOM_PATH) : { }
+// const custom = CUSTOM_PATH ? (await import(CUSTOM_PATH)).default : { };
+// const custom = CUSTOM_PATH ? require(CUSTOM_PATH) : { }
 const uploadMemory = {
-  limits: { files: 1, fileSize: Number(TABLE_CONFIGS_CSV_SIZE) || 500000 },
+  limits: { files: 1, fileSize: Number(CONFIGS_CSV_SIZE) || 500000 },
 };
 
 const storageUpload = () => {
@@ -57,7 +57,7 @@ const storageUpload = () => {
     },
     limits: {
       // files: 3,
-      fileSize: Number(TABLE_CONFIGS_UPLOAD_SIZE) || 8000000, // TODO
+      fileSize: Number(CONFIGS_UPLOAD_SIZE) || 8000000, // TODO
     },
   });
 };
@@ -73,7 +73,7 @@ const generateTable = async (req, res, next) => {
   const tableKey = req.params.table; // 'books' // its the table name also
 
   // const docPath = path.resolve(new URL(".", import.meta.url).pathname, `./tables/${tableKey}.yaml`)
-  const docPath = `${TABLE_CONFIGS_FOLDER_PATH}${tableKey}.yaml`;
+  const docPath = `${CONFIGS_FOLDER_PATH}${tableKey}.yaml`;
   const doc = yaml.load(fs.readFileSync(docPath, 'utf8'));
   req.table = JSON.parse(JSON.stringify(doc));
 
@@ -130,9 +130,9 @@ const generateTable = async (req, res, next) => {
 
 const routes = options => {
   const authUser = options?.authFunc || noAuthFunc;
-  roleKey = TABLE_USER_ROLE_KEY;
-  idKey = TABLE_USER_ID_KEY;
-  orgIdKey = TABLE_ORG_ID_KEY;
+  roleKey = USER_ROLE_KEY;
+  idKey = USER_ID_KEY;
+  orgIdKey = ORG_ID_KEY;
 
   return express
     .Router()

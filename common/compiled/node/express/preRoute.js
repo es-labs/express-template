@@ -97,12 +97,7 @@ const preRoute = () => {
 
   app.use('/health', healthRouter); // Mount before auth middleware — healthchecks must be unprotected
 
-  const {
-    CORS_OPTIONS, // CORS_ORIGINS no longer in use
-    RES_HEADERS_ADD,
-    HELMET_OPTIONS,
-    COOKIE_SECRET = (parseInt(Date.now() / 28800000) * 28800000).toString(),
-  } = process.env;
+  const { COOKIE_SECRET = (parseInt(Date.now() / 28800000) * 28800000).toString() } = process.env;
 
   // ------ LOGGING ------
   // HTTP request logging middleware with timeout handling

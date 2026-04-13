@@ -3,6 +3,7 @@ import Knex from 'knex';
 export default class StoreKnex {
   constructor(options = globalThis.__config?.KNEXFILE || {}) {
     this._KNEXFILE = options;
+    // this._KNEXFILE.connection = process.env.DB_CONN;
     this._knex = null;
   }
 

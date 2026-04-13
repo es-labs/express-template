@@ -2,10 +2,8 @@
 
 ### TODO
 
-- JSON in env, refactor to use something else
+- **Top Priority** JSON in env, refactor to use something else
   - have issue with services where there is nested JSON
-- reduce size of github actions, should we use workspace triggers?
-
 - safeJSON
 - remove barrel index.js files...
 - auto generate project folders?

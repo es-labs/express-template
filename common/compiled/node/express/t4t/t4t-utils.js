@@ -1,4 +1,4 @@
-const { TABLE_USER_ID_KEY, TABLE_USER_ROLE_KEY, TABLE_ORG_ID_KEY } = process.env;
+const { USER_ID_KEY, USER_ROLE_KEY, ORG_ID_KEY } = globalThis.__config?.T4T || {};
 
 export const noAuthFunc = (req, res, next) => {
   const message = 'no user auth middleware set';
@@ -128,7 +128,7 @@ export const kvDb2Col = (_row, _joinCols, _tableCols) => {
 };
 
 export const setAuditData = (req, op, keys = '', body = '') => ({
-  user: req?.decoded[TABLE_USER_ID_KEY] || '---',
+  user: req?.decoded[USER_ID_KEY] || '---',
   timestamp: new Date(),
   db_name: req.table.db,
   table_name: req.table.name,
