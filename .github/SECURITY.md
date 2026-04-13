@@ -43,7 +43,7 @@ This repository contains template code, sample applications, shared utilities, a
 Please report vulnerabilities that affect:
 
 - Shared libraries under `common/`.
-- Example backend or frontend applications under `apps/` and `webs/`.
+- Example backend or frontend applications under `apps/`.
 - Build, release, CI/CD, or deployment workflows.
 - Security-relevant documentation or configuration that could lead to unsafe deployments.
 

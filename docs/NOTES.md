@@ -12,10 +12,9 @@ This document is for
 - Named exports preferred (default exports for class, config, or a plugin)
 - Use Native as much as viable (test runners, datetime, fetch / xhr, npm, git hooks)
 - npm workspaces (microservices & shared libraries)
-  - apps : microservices or applications
+  - apps : microservices or applications (frontend or backend)
     - default port 3000
   - common/shared code and schemas
-  - webs
   - sripts
 - web frontends ? to include? can be quite heavy
 - use zod for validation and openapi generation...
@@ -69,14 +68,13 @@ safe - useArrowFunction, useConst
 unsafe - useTemplate, useNodejsImportProtocol, useOptionalChain,  
 
 ```
-npx biome <format/lint/check> common apps webs scripts
-npx biome lint common apps webs scripts --only=useTemplate --write --unsafe
+npx biome <format/lint/check> common apps scripts
+npx biome lint common apps scripts --only=useTemplate --write --unsafe
 ```
 
 ### logger usage
 
-- apps/* - use backend logger
-- webs/* - use frontend logger
+- apps/* - use backend logger for backend, frontend logger not implemented
 - common/iso - both (should be simple files remove console.logs)
 - common/node - backend (use backend logger)
 - common/vue -frontend VueJS (allow console, remove in prod)

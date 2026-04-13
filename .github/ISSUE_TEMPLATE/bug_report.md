@@ -18,7 +18,6 @@ Provide a short description of the bug.
 Select all that apply.
 
 - [ ] apps
-- [ ] webs
 - [ ] common/node
 - [ ] common/web
 - [ ] common/vue

@@ -68,13 +68,13 @@ jobs:
       - name: Set up workspace
         uses: ./.github/actions/setup-node-npm-install
       - name: Build
-        run: cd webs/${{ github.event.inputs.app }} && npm run build --mode ${{ github.event.inputs.env }}
+        run: cd apps/${{ github.event.inputs.app }} && npm run build --mode ${{ github.event.inputs.env }}
         # run: npm run build # will create a dist folder (TODO build environment??)
       - name: upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: my-build
-          path: ${{ github.workspace }}/webs/${{ github.event.inputs.app }}/dist
+          path: ${{ github.workspace }}/apps/${{ github.event.inputs.app }}/dist
   deploy-oss: # aliyun OSS
     needs: run-build
     if: github.event.inputs.provider == 'oss'
@@ -85,7 +85,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: my-build
-          path: ${{ github.workspace }}/webs/${{ github.event.inputs.app }}/dist
+          path: ${{ github.workspace }}/apps/${{ github.event.inputs.app }}/dist
       - name: Install Alibaba Cloud OSSUTIL
         run: wget http://gosspublic.alicdn.com/ossutil/1.6.10/ossutil64 && chmod +x ossutil64
       - name: Configure Alibaba Cloud OSSUTIL
@@ -101,7 +101,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: my-build
-          path: ${{ github.workspace }}/webs/${{ github.event.inputs.app }}/dist
+          path: ${{ github.workspace }}/apps/${{ github.event.inputs.app }}/dist
       - name: Setup AWS CLI
         uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -120,7 +120,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: my-build
-          path: ${{ github.workspace }}/webs/${{ github.event.inputs.app }}/dist
+          path: ${{ github.workspace }}/apps/${{ github.event.inputs.app }}/dist
       - name: Configure AWS CLI for OSS
         uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -141,7 +141,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: my-build
-          path: ${{ github.workspace }}/webs/${{ github.event.inputs.app }}/dist
+          path: ${{ github.workspace }}/apps/${{ github.event.inputs.app }}/dist
       - name: Run deploy script
         # remember to change user.name and user.email
         run: |

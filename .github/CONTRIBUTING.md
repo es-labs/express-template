@@ -31,7 +31,7 @@ Runs automatically on every `git commit`:
 
 | Check | Details |
 |-------|---------|
-| **Biome format & lint** | Runs `npx biome check` on each affected directory (`common/iso`, `common/node`, `common/vue`, `common/web`, `apps`, `webs`, `scripts`). Run `npm run check` to auto-fix. |
+| **Biome format & lint** | Runs `npx biome check` on each affected directory (`common/iso`, `common/node`, `common/vue`, `common/web`, `apps`, `scripts`). Run `npm run check` to auto-fix. |
 | **Schema validation tests** | Runs `npm run test:schemas -- <folder>` for each affected schema directory (`common/schema`, `common/schemas`, `apps/*/schema`, `apps/*/schemas`). |
 
 To skip the pre-commit hook temporarily:
@@ -60,7 +60,7 @@ Use the repository commit conventions in [docs/conventions.md](../docs/conventio
 
 When choosing a scope in `czg`:
 
-- Prefer a real workspace scope such as `apps/...`, `common/...`, or `webs/...` when the change is limited to one workspace.
+- Prefer a real workspace scope such as `apps/...` or `common/...` when the change is limited to one workspace.
 - Use `docs` for documentation-only changes.
 - Use `ci` for workflow, hook, or automation changes.
 - Use `repo` for root-level or cross-cutting changes that do not fit a single workspace.

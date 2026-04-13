@@ -38,7 +38,7 @@ Important limitation: `release-please` creates release PRs from releasable commi
 
 This repository is a monorepo template for building full-stack JavaScript applications with Node.js, Express, and Vue.
 
-It combines backend examples in `apps/`, frontend examples in `webs/`, and shared reusable code in `common/` so teams can start from a consistent structure instead of assembling the stack from scratch. It includes workspace-based package management, shared schemas and utilities, sample authentication flows, OpenAPI tooling, Docker support, GitHub Actions workflows, and MCP server examples.
+It combines backend and frontend examples in `apps/` and shared reusable code in `common/` so teams can start from a consistent structure instead of assembling the stack from scratch. It includes workspace-based package management, shared schemas and utilities, sample authentication flows, OpenAPI tooling, Docker support, GitHub Actions workflows, and MCP server examples.
 
 Use it when you want a single repository that can host:
 
@@ -61,11 +61,10 @@ Use these documents depending on the part of the repository you are working on:
 
 ## General Contents
 
-- `apps`: backend application workspaces
-- `common`: shared JavaScript used by `apps` and `webs`
+- `apps`: backend and frontend application workspaces
+- `common`: shared JavaScript used by `apps`
 - `docs`: project documentation
 - `scripts`: deployment and documentation scripts
-- `webs`: frontend application workspaces
 
 
 ## Project Guides

@@ -89,7 +89,7 @@ Check the commit history since the last release:
 
 This repo currently sets:
 
-- `release-please-action` using `config-file` and `manifest-file` for per-workspace releases under `apps/*` and `webs/*`
+- `release-please-action` using `config-file` and `manifest-file` for per-workspace releases under `apps/*`
 
 If you need an explicit version beyond that, add `Release-As: x.y.z` to the commit body.
 

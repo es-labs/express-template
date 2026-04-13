@@ -35,7 +35,6 @@ echo "$STAGED" | grep -q '^common/compiled/node/'  && run_biome_check common/com
 echo "$STAGED" | grep -q '^common/compiled/vue/'   && run_biome_check common/compiled/vue
 echo "$STAGED" | grep -q '^common/vanilla/web/'    && run_biome_check common/vanilla/web
 echo "$STAGED" | grep -q '^apps/'         && run_biome_check apps
-echo "$STAGED" | grep -q '^webs/'         && run_biome_check webs
 echo "$STAGED" | grep -q '^scripts/'      && run_biome_check scripts
 
 if [ $BIOME_FAILED -ne 0 ]; then

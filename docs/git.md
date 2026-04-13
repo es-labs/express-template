@@ -12,7 +12,7 @@ Release automation is handled by the `release-please` job in [.github/workflows/
 
 - The existing handwritten changelog stays grouped under version `0.1.0` in [CHANGELOG.md](../CHANGELOG.md).
 - The workflow runs `release-please-action` in manifest mode using [release-please-config.json](../release-please-config.json) and [.release-please-manifest.json](../.release-please-manifest.json).
-- Releases are tracked per workspace for `apps/*` and `webs/*`.
+- Releases are tracked per workspace for `apps/*`.
 - The workflow requires a GitHub App installation token.
 - Troubleshooting lives in [release-troubleshooting.md](./release-troubleshooting.md).
 
@@ -180,7 +180,7 @@ jobs:
     name: E2E Tests                   # ← Required check
 ```
 
-> **Note:** Unit and integration tests run for touched workspaces only, identified by the `detect-touched-workspaces` action. E2E tests run for touched `webs/*` workspaces only and execute the workspace `test` script.
+> **Note:** Unit and integration tests run for touched workspaces only, identified by the `detect-touched-workspaces` action. [TODO] For frontend, only  E2E tests are run and execute the workspace `test` script.
 
 ### Result
 

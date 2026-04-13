@@ -25,15 +25,11 @@ jobs:
           set -euo pipefail
           while IFS= read -r workspace; do
             [ -n "$workspace" ] || continue
-            case "$workspace" in
-              webs/*)
-                echo "Skipping integration tests for web workspace: $workspace"
-                continue
-                ;;
-            esac
             if node -e "const p=require('./${workspace}/package.json'); process.exit(p.scripts&&p.scripts['test:integration']?0:1)" 2>/dev/null; then
               echo "Running integration tests for workspace: $workspace"
               npm run test:integration --workspace="$workspace"
+            else
+              echo "No test:integration script in workspace: $workspace - skipping"
             fi
           done <<< "${{ steps.touched.outputs.impacted-workspaces }}"
 

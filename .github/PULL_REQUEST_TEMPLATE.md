@@ -13,7 +13,6 @@ Describe what this change does and what problem it resolves.
 Select all that apply.
 
 - [ ] apps
-- [ ] webs
 - [ ] common/node
 - [ ] common/web
 - [ ] common/vue
