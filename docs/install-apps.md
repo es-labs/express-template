@@ -1,14 +1,24 @@
 ## Install & Run & Test Sample Backend
 
+### Install the dependencies
+
 ```bash
 npm i
+```
+
+### Create and populate file-based pglite (serve as pg) database
+
+If sample database at `scripts/dbdeploy/db-sample/dev.db` folder is not present, see [Quick Create DB](scripts/dbdeploy/READMD.md#quick-create-db) to generate one. Due to size, the DB is not commited to git
+
+Local development, run `npm run serve` command in `scripts/dbdeploy` folder to run the database locally
+
+### Run the sample api application
+
+```bash
 cd apps/sample-api
 npm run start
 ```
 
-Local development, run `npm run serve` command in `scripts/dbdeploy` folder to run the database locally
-
-If you need to **migrate** and **seed**, refer to the `scripts/dbdeploy` workspace.
 
 **Visit the following URLs**
 
