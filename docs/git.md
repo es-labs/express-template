@@ -143,44 +143,10 @@ For each pattern, enable:
 
 ### CI Action Shape
 
-- [baseline](hooks-ci-base.yml)
-- [standard](hooks-ci-standard.yml)
+- [standard](../.github/workflows/ci.yml)
+- [ci-changes](../.github/workflows/ci-meta.yml)
 
-```yaml
-
-# Full — release tags or main merge
-on:
-  push:
-    branches: [main]
-  release:
-    types: [published]
-jobs:
-  full:
-    steps:
-      - everything above
-
-```
-
-
-The required check names match the job `name:` fields in [.github/workflows/ci.yml](../.github/workflows/ci.yml):
-
-```yaml
-jobs:
-  commit-lint:
-    name: Commit Message Format       # ← Required check
-  biome:
-    name: Biome Checks                # ← Required check
-  schema-tests:
-    name: Schema Validation Tests     # ← Required check
-  unit-tests:
-    name: Unit Tests                  # ← Required check
-  integration-tests:
-    name: Integration Tests           # ← Required check
-  e2e-tests:
-    name: E2E Tests                   # ← Required check
-```
-
-> **Note:** Unit and integration tests run for touched workspaces only, identified by the `detect-touched-workspaces` action. [TODO] For frontend, only  E2E tests are run and execute the workspace `test` script.
+> **Note:** tests (unit, integration, e2e) are run for touched workspaces only, identified by the `detect-touched-workspaces`, Skip test if npm script for test not found.
 
 ### Result
 

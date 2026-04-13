@@ -8,11 +8,18 @@ This document is for
 - ideas that are not yet stable policy
 
 ### Design
-- Fully ES Modules - JS Compliant
+- Fully ES Modules - JS Standards Compliant
 - Named exports preferred (default exports for class, config, or a plugin)
 - Use Native as much as viable (test runners, datetime, fetch / xhr, npm, git hooks)
 - npm workspaces (microservices & shared libraries)
   - apps : microservices or applications (frontend or backend)
+    - shared-<tenant1>
+    - <tenant1>-<app1>
+    - <tenant1>-<app2>
+    ...
+    - shared-<tenantN>
+    - <tenantN>-<app1>
+    - <tenantN>-<app2>
     - default port 3000
   - common/shared code and schemas
   - sripts
@@ -37,7 +44,9 @@ This document is for
 - testing
   - use native node test runner
   - playwright for e2e testing
-- DB audit logging strategy (triggers + soft delete) -TODO
+- Support postgres as primary RDBMS, mysql as secondary.
+  - DO NOT USE mongoDB
+- DB audit logging [strategy](decs/pg-audit-implementation)
 - jsdoc for typing and autocomplete on IDE ?
 
 

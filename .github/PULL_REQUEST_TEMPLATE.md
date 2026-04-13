@@ -13,13 +13,9 @@ Describe what this change does and what problem it resolves.
 Select all that apply.
 
 - [ ] apps
-- [ ] common/node
-- [ ] common/web
-- [ ] common/vue
-- [ ] common/iso
-- [ ] common/schemas
-- [ ] scripts
+- [ ] common
 - [ ] docs
+- [ ] scripts
 - [ ] CI/CD or GitHub Actions
 
 ## Validation

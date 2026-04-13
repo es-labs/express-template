@@ -21,12 +21,12 @@ when DB could be shared between packages
 For [express-template](https://github.com/es-labs/express-template) sample-api
 
 ```bash
-npx knex --knexfile dbs/express-template-db/knexfile.js migrate:up
-npx knex --knexfile dbs/express-template-db/knexfile.js migrate:up # run a second time as there are 2 files to migrate in the folder...
-npx knex --knexfile dbs/express-template-db/knexfile.js seed:run
+npx knex --knexfile db-sample/knexfile.js migrate:up
+npx knex --knexfile db-sample/knexfile.js migrate:up # run a second time as there are 2 files to migrate in the folder...
+npx knex --knexfile db-sample/knexfile.js seed:run
 ```
 
-Then copy the created file for sqlite DB over to the project `apps\sample-api` folders
+Run the database using `npm run serve` command, the project `apps\sample-api` can then connect to it
 
 ## Starting A New DB Deploy
 
@@ -67,7 +67,3 @@ npx knex --knexfile knex-sample/knexfile.js seed:make initial
 # knex seed:run
 # knex seed:run --specific=seed-filename.js --specific=another-seed-filename.js
 ```
-
-## TODO
-
-How should the knexfile information be handled in the case where database secrets are in a vault or parameters are passed in as environment variables

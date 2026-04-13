@@ -17,8 +17,6 @@ on:
       - 'shared/**'
       - '.github/workflows/deploy-auth-service.yml'
 
-- migrate from sqlite to pglite
-
 - visualize package
 TO view large bundle sizes
 ```

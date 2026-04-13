@@ -18,13 +18,9 @@ Provide a short description of the bug.
 Select all that apply.
 
 - [ ] apps
-- [ ] common/node
-- [ ] common/web
-- [ ] common/vue
-- [ ] common/iso
-- [ ] common/schemas
-- [ ] scripts
+- [ ] common
 - [ ] docs
+- [ ] scripts
 - [ ] CI/CD or GitHub Actions
 
 ## Current Behavior

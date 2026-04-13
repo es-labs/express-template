@@ -71,10 +71,8 @@ Use these documents depending on the part of the repository you are working on:
 
 Use the following guides depending on what you want to build or extend in this repository:
 
-- Backend services: [docs/install-backend.md](docs/install-backend.md)
-  Start from the sample Express application in `apps/` and use it as the baseline for new Node.js services.
-- Frontend applications: [docs/install-frontend.md](docs/install-frontend.md)
-  Use the sample Vue and Vite applications in `webs/` as scaffolding for new browser-based projects.
+- Backend services: [docs/install-apps.md](docs/install-apps.md)
+  Start from the sample Express application in `apps/` and use it as the baseline for new Node.js servicesm or Use the sample Vue and Vite applications as scaffolding for new browser-based projects.
 - Shared code and schemas: [docs/install-common.md](docs/install-common.md)
   Reference the reusable modules in `common/` for Node, browser, Vue, isomorphic utilities, and shared `zod` schemas.
 

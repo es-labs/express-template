@@ -223,7 +223,6 @@ Required GitHub Variables:
 | `.github/CONTRIBUTING.md` | Contributor workflow, hooks, issue reporting, PR rules |
 | `docs/conventions.md` | Coding, tooling, commit, and runtime standards |
 | `docs/git.md` | Git workflow, branch/tag patterns, merge strategy |
-| `docs/install-backend.md` | Backend setup and development guide |
-| `docs/install-frontend.md` | Frontend setup and development guide |
+| `docs/install-apps.md` | Backend and frontend setup and development guide |
 | `docs/install-common.md` | Shared code and workspace reference |
 | `docs/NOTES.md` | Design decisions, caveats, open questions, TODOs |

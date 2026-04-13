@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       has-common-scripts: ${{ steps.scope.outputs.has_common_scripts }}
-      has-apps: ${{ steps.scope.outputs.has_apps_webs }}
+      has-apps: ${{ steps.scope.outputs.has_apps }}
       has-supported-scope: ${{ steps.scope.outputs.has_supported_scope }}
     steps:
       - name: Checkout

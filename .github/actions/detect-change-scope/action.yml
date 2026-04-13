@@ -34,9 +34,9 @@ outputs:
   has_common_scripts:
     description: True when changed files include common/ or scripts/.
     value: ${{ steps.detect.outputs.has_common_scripts }}
-  has_apps_webs:
-    description: True when changed files include apps/ or webs/.
-    value: ${{ steps.detect.outputs.has_apps_webs }}
+  has_apps:
+    description: True when changed files include apps/.
+    value: ${{ steps.detect.outputs.has_apps }}
   has_supported_scope:
     description: True when changed files exist and all are inside allowed scope.
     value: ${{ steps.detect.outputs.has_supported_scope }}
@@ -79,7 +79,7 @@ runs:
         INVALID_FILES=""
         HAS_INVALID_FILES=false
         HAS_COMMON_SCRIPTS=false
-        HAS_APPS_WEBS=false
+        HAS_APPS=false
         HAS_SUPPORTED_SCOPE=false
 
         if [[ -n "${CHANGED_FILES}" ]]; then
@@ -96,7 +96,7 @@ runs:
           fi
 
           if printf '%s\n' "${CHANGED_FILES}" | grep -Eq '^(apps/|webs/)'; then
-            HAS_APPS_WEBS=true
+            HAS_APPS=true
           fi
         fi
 
@@ -110,7 +110,7 @@ runs:
           echo "diff_range=${RANGE}"
           echo "has_invalid_files=${HAS_INVALID_FILES}"
           echo "has_common_scripts=${HAS_COMMON_SCRIPTS}"
-          echo "has_apps_webs=${HAS_APPS_WEBS}"
+          echo "has_apps=${HAS_APPS}"
           echo "has_supported_scope=${HAS_SUPPORTED_SCOPE}"
           echo "changed_files<<__EOF__"
           printf '%s\n' "${CHANGED_FILES}"

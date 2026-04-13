@@ -12,9 +12,8 @@ export default class StoreKnex {
     } else {
       try {
         this._knex = Knex(this._KNEXFILE);
-        // sqlite, may need to use another statement with other sql dbs
         await this._knex
-          .raw('select 1+1 as result')
+          .raw('Select 1')
           .then(() => {
             logger.info('knex CONNECTED');
           })
