@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite --mode development",
     "build": "vite build --mode production",
-    "lint": "biome check",
-    "test": "exit 0"
+    "lint": "biome check --config-path ../biome-vue.json",
+    "test:e2e": "exit 0"
   },
   "keywords": [],
   "author": "",
