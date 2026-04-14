@@ -10,11 +10,12 @@ const services = {};
 
 const start = async (app, server, config = globalThis.__config?.SERVICES_CONFIG || []) => {
   // const serviceTypesAvailable = process.env.SERVICES_TYPES_AVAILABLE.split(',');
+  // if (opts && svc.type === 'knex' && StoreKnex) services[svc.name] = new StoreKnex(svc.options);
   try {
     servicesConfig = config;
     servicesConfig.forEach(svc => {
       const opts = globalThis.__config?.[svc.options];
-      if (opts && svc.type === 'knex' && StoreKnex) services[svc.name] = new StoreKnex(opts);
+      if (opts && svc.type === 'knex' && StoreKnex) services[svc.name] = new StoreKnex(svc.options);
       if (opts && svc.type === 'redis' && StoreRedis) services[svc.name] = new StoreRedis(opts);
       if (opts && svc.type === 'keyv' && StoreKeyV) services[svc.name] = new StoreKeyV(opts);
       if (opts && svc.type === 'ws' && Wss) services[svc.name] = new Wss(opts);

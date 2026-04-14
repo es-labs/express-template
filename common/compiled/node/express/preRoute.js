@@ -157,8 +157,8 @@ const preRoute = () => {
   // express-limiter, compression, use reverse proxy
 
   // ------ body-parser and-cookie parser ------
-  const { BODYPARSER_JSON, BODYPARSER_URLENCODED, BODYPARSER_RAW_ROUTES = '' } = process.env;
-  // look out for... Unexpected token n in JSON at position 0 ... client request body must match request content-type, if applicaion/json, body cannot be null/undefined
+  const { BODYPARSER_JSON, BODYPARSER_URLENCODED, BODYPARSER_RAW_ROUTES = '' } = globalThis.__config;
+  // client request body must match request content-type, if applicaion/json, body cannot be null/undefined
   logger.info('bodyparser setting up');
   try {
     app.use((req, res, next) => {
@@ -167,10 +167,10 @@ const preRoute = () => {
         // raw routes - ignore bodyparser json
         next();
       } else {
-        express.json(globalThis.__config?.BODYPARSER_JSON || { limit: '2mb' })(req, res, next);
+        express.json(BODYPARSER_JSON || { limit: '2mb' })(req, res, next);
       }
     });
-    app.use(express.urlencoded(globalThis.__config?.BODYPARSER_URLENCODED || { extended: true, limit: '2mb' })); // https://stackoverflow.com/questions/29175465/body-parser-extended-option-qs-vs-querystring/29177740#29177740
+    app.use(express.urlencoded(BODYPARSER_URLENCODED || { extended: true, limit: '2mb' })); // https://stackoverflow.com/questions/29175465/body-parser-extended-option-qs-vs-querystring/29177740#29177740
   } catch (e) {
     logger.error('[bodyparser setup error]', e.toString());
     throw e;

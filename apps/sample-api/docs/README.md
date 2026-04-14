@@ -6,8 +6,7 @@ This document describes the sample Express application in `apps/sample-api`, inc
 
 ## Configuration (Environment Files)
 
-- `.env` for secrets and simple scalar values (should be in `vault` service for production)
-- `.env.json` for non-sensitive structured values in JSON, loaded into `globalThis.__config`
+Refer to [docs/conventions.md](../../../docs/conventions.md)
 
 ## Some Features
 

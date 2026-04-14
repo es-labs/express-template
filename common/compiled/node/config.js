@@ -17,23 +17,66 @@ if (process.env.NODE_ENV === 'development') {
   loadEnvFile(envFilePath);
 }
 
-const loadJsonConfigFile = filePath => {
-  if (!fs.existsSync(filePath)) return {};
+const normalizeJsonc = source => {
+  let result = '';
+  let inString = false;
+  let isEscaped = false;
 
-  const raw = fs.readFileSync(filePath, 'utf8').trim();
-  if (!raw) return {};
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
+    const next = source[index + 1];
 
-  const config = JSON.parse(raw);
+    if (inString) {
+      result += char;
+      if (isEscaped) isEscaped = false;
+      else if (char === '\\') isEscaped = true;
+      else if (char === '"') inString = false;
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+      result += char;
+      continue;
+    }
+
+    if (char === '/' && next === '/') {
+      while (index < source.length && source[index] !== '\n') {
+        index += 1;
+      }
+      if (index < source.length) result += '\n';
+      continue;
+    }
+
+    result += char;
+  }
+
+  return result;
+};
+
+const parseJsoncObject = (raw, filePath) => {
+  const normalized = normalizeJsonc(raw).trim();
+  if (!normalized) return {};
+
+  const config = JSON.parse(normalized);
   if (!config || typeof config !== 'object' || Array.isArray(config)) {
     throw new TypeError(`JSON config must be a top-level object: ${filePath}`);
   }
   return config;
 };
 
+const loadJsonConfigFile = filePath => {
+  if (!fs.existsSync(filePath)) return {};
+
+  const raw = fs.readFileSync(filePath, 'utf8').trim();
+  if (!raw) return {};
+
+  return parseJsoncObject(raw, filePath);
+};
+
 // Load and Parse the JSON, let error throw
 // To improve with deep freeze and validation if needed
-const parsed = JSON.parse(fs.readFileSync(`${envFilePath}.json`, 'utf8').trim());
-const __config = Object.freeze(parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {});
+const __config = Object.freeze(loadJsonConfigFile(`${envFilePath}.json`));
 
 globalThis.__config = __config;
 
