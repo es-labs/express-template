@@ -6,7 +6,6 @@
   - have issue with services where there is nested JSON
 - safeJSON
 - remove barrel index.js files...
-- migrate bcryptjs to scrypt
 - add RBAC
 - audit_logs
 on:

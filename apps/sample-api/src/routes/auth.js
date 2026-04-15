@@ -1,6 +1,6 @@
 import * as auth from '@common/node/auth';
-import express from 'express';
 import { oauth, oidc, own, saml } from '@common/node/express/controller/auth';
+import express from 'express';
 
 export const myauthRoute = express
   .Router()

@@ -53,15 +53,19 @@ const login = async (req, res) => {
     const user = await authFns.findUser({
       [AUTH_USER_FIELD_LOGIN]: req.body[AUTH_USER_FIELD_LOGIN],
     });
-    if (!user) return res.status(401).json({ message: 'Incorrect credentials...' });
+    if (!user) return res.status(401).json({ message: 'Incorrect credentials...1' });
+    // console.log(req.body[AUTH_USER_FIELD_PASSWORD]);
+    // console.log(user[AUTH_USER_FIELD_SALT]);
+    // console.log(user[AUTH_USER_FIELD_PASSWORD]);
     if (
       !(await matchScryptHash(
         req.body[AUTH_USER_FIELD_PASSWORD],
         user[AUTH_USER_FIELD_SALT],
         user[AUTH_USER_FIELD_PASSWORD],
       ))
-    )
-      return res.status(401).json({ message: 'Incorrect credentials...' });
+    ) {
+      return res.status(401).json({ message: 'Incorrect credentials...2' });
+    }
     if (user.revoked) return res.status(401).json({ message: 'Revoked credentials' });
     const id = user[AUTH_USER_FIELD_ID_FOR_JWT];
     if (!id) return res.status(401).json({ message: 'Authorization Format Error' });

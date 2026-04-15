@@ -1,12 +1,14 @@
 import crypto from 'node:crypto';
+
 const HASH_KEYLEN = 64;
 
 // const password = 'user-password';
 // const salt = crypto.randomBytes(16).toString('hex'); // Generate unique random salt
 // const keylen = 64; // Length of the resulting derived key
 const setScryptHash = (password, salt) => {
+  const saltBuffer = Buffer.from(salt, 'hex');
   return new Promise((resolve, reject) => {
-    crypto.scrypt(password, salt, HASH_KEYLEN, (err, derivedKey) => {
+    crypto.scrypt(password, saltBuffer, HASH_KEYLEN, (err, derivedKey) => {
       if (err) reject(err);
       resolve(derivedKey.toString('hex'));
     });
@@ -32,4 +34,4 @@ const matchScryptHash = (passwordAttempt, storedSalt, storedHash) => {
   });
 };
 
-export { setScryptHash, matchScryptHash };
+export { matchScryptHash, setScryptHash };

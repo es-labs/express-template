@@ -4,14 +4,14 @@
 // So we implement our own simple logger and http logger middleware.
 const LOG_LEVELS = { error: 0, warn: 1, info: 2, debug: 3 };
 const currentLevel = LOG_LEVELS[process.env.LOG_LEVEL] ?? LOG_LEVELS.info;
-
+const { npm_package_name, npm_package_version } = process.env;
 const log = (level, message, meta = {}) => {
   if (LOG_LEVELS[level] > currentLevel) return; // currentLevel < LOG_LEVELS[level]
   const entry = JSON.stringify({
     timestamp: new Date().toISOString(),
     level,
     message,
-    service: process.env.npm_package_name ?? 'unknown',
+    service: `${npm_package_name}@${npm_package_version}` ?? 'unknown',
     ...meta,
   });
   // biome-ignore lint/suspicious/noConsole: Using console for logging
