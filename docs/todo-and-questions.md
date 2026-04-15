@@ -3,11 +3,10 @@
 ## TODO
 
 - **IN PROGRESS** JSON in env, refactor to use something else
-  - have issue with services where there is nested JSON
-- safeJSON
-- remove barrel index.js files...
 - add RBAC
 - audit_logs
+- safeJSON
+- remove barrel index.js files...
 on:
   push:
     branches: [TODO]
