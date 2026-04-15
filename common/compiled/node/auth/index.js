@@ -4,9 +4,6 @@ import * as keyv from './keyv.js';
 import * as knex from './knex.js';
 import * as redis from './redis.js';
 
-//NOSONAR import uuid from 'uuid/v4'
-//NOSONAR import qrcode from 'qrcode'
-
 let setRefreshToken,
   getRefreshToken,
   revokeRefreshToken,
@@ -18,33 +15,29 @@ let setRefreshToken,
   setAuthUserStoreName;
 
 const {
-  COOKIE_HTTPONLY,
-  COOKIE_SAMESITE,
-  COOKIE_SECURE,
-  COOKIE_MAXAGE,
-  COOKIE_DOMAIN,
+  JWT_ALG,
+  JWT_EXPIRY,
+  JWT_REFRESH_EXPIRY,
+  JWT_REFRESH_STORE = 'keyv',
+  JWT_REFRESH_STORE_NAME,
+} = globalThis.__config.JWT;
+
+const {
   AUTH_REFRESH_URL,
   AUTH_USER_FIELD_LOGIN,
   AUTH_USER_FIELD_PASSWORD,
   AUTH_USER_FIELD_GAKEY,
   AUTH_USER_FIELD_ID_FOR_JWT,
   AUTH_USER_FIELDS_JWT_PAYLOAD = '',
-  JWT_REFRESH_STORE = 'keyv',
   AUTH_USER_STORE,
   AUTH_USER_STORE_NAME,
-  JWT_REFRESH_STORE_NAME,
 
   USE_OTP,
-  JWT_ALG,
-  JWT_EXPIRY,
-  JWT_REFRESH_EXPIRY,
+
   JWT_PRIVATE_KEY,
   JWT_CERTIFICATE,
-  JWT_REFRESH_PRIVATE_KEY,
-  JWT_REFRESH_CERTIFICATE,
+  // refresh token should be a random string stored in DB or Cache, so we can revoke when needed, also handle refresh token reuse detection
   JWT_SECRET,
-  JWT_REFRESH_SECRET,
-  JWT_ALLOW_INSECURE_KEY_SIZES,
 } = process.env;
 
 const authFns = {
@@ -76,13 +69,7 @@ const setup = (tokenService, userService) => {
   if (setAuthUserStoreName) setAuthUserStoreName(AUTH_USER_STORE_NAME);
 };
 
-// SameSite=None; must use with Secure;
-// may need to restart browser, TODO set Max-Age, ALTERNATE use res.cookie, Signed?
-const httpOnlyCookie = () =>
-  `HttpOnly;SameSite=${COOKIE_SAMESITE};` +
-  (COOKIE_SECURE ? 'Secure;' : '') +
-  (COOKIE_MAXAGE ? `MaxAge=${COOKIE_MAXAGE};` : '') +
-  (COOKIE_DOMAIN ? `domain=${COOKIE_DOMAIN};` : '');
+const { COOKIE_OPTS } = globalThis.__config;
 
 //NOSONAR algorithm
 // expiresIn
@@ -95,15 +82,12 @@ const httpOnlyCookie = () =>
 //NOSONAR
 // mode: sign, verify
 // type: access, refresh
-const getSecret = (mode, type) => {
-  if (JWT_ALG.substring(0, 2) === 'RS') {
-    if (mode === 'sign') {
-      return type === 'refresh' ? JWT_REFRESH_PRIVATE_KEY : JWT_PRIVATE_KEY;
-    } else {
-      return type === 'refresh' ? JWT_REFRESH_CERTIFICATE : JWT_CERTIFICATE;
-    }
+const getSecret = mode => {
+  if (JWT_ALG.substring(0, 2) !== 'HS') {
+    if (mode === 'sign') return JWT_PRIVATE_KEY;
+    else return JWT_CERTIFICATE;
   }
-  return type === 'refresh' ? JWT_REFRESH_SECRET : JWT_SECRET;
+  return JWT_SECRET;
 };
 
 // should use:
@@ -128,13 +112,13 @@ const createToken = async user => {
     if (key && user[key] !== undefined) user_meta[key] = user[key];
   }
 
-  options.allowInsecureKeySizes = !!JWT_ALLOW_INSECURE_KEY_SIZES;
+  options.allowInsecureKeySizes = false;
   options.algorithm = JWT_ALG;
   options.expiresIn = JWT_EXPIRY;
-  const access_token = jwt.sign({ id, groups }, getSecret('sign', 'access'), options);
+  const access_token = jwt.sign({ id, groups }, getSecret('sign'), options);
 
   options.expiresIn = JWT_REFRESH_EXPIRY;
-  const refresh_token = jwt.sign({ id }, getSecret('sign', 'refresh'), options); // store only ID in refresh token?
+  const refresh_token = '12345678'; // TODO generate random string
   await setRefreshToken(id, refresh_token); // store in DB or Cache
   return {
     access_token,
@@ -146,13 +130,11 @@ const createToken = async user => {
 const setTokensToHeader = (res, { access_token, refresh_token }) => {
   const _access_token = `Bearer ${access_token}`;
   if (COOKIE_HTTPONLY) {
-    res.setHeader('Set-Cookie', [
-      `Authorization=${_access_token};Path=/;${httpOnlyCookie()}`,
-      `refresh_token=${refresh_token};Path=${AUTH_REFRESH_URL};${httpOnlyCookie()}`, // send only if path contains refresh
-    ]);
+    res.cookie('Authorization', _access_token, { ...COOKIE_OPTS, path: '/' });
+    res.cookie('refresh_token', refresh_token, { ...COOKIE_OPTS, path: AUTH_REFRESH_URL }); // send only if path contains refresh
   } else {
-    res.setHeader('Authorization', `${_access_token}`);
-    res.setHeader('refresh_token', `${refresh_token}`);
+    res.setHeader('Authorization', _access_token);
+    res.setHeader('refresh_token', refresh_token);
   }
 };
 
@@ -166,7 +148,7 @@ const authUser = async (req, res, next) => {
   }
   if (access_token) {
     try {
-      const access_result = jwt.verify(access_token, getSecret('verify', 'access'), { algorithm: [JWT_ALG] }); // and options
+      const access_result = jwt.verify(access_token, getSecret('verify'), { algorithm: [JWT_ALG] }); // and options
       if (access_result) {
         req.decoded = access_result;
         return next();
@@ -189,13 +171,15 @@ const authRefresh = async (req, res) => {
   // get refresh token
   try {
     const refresh_token = req.cookies?.refresh_token || req.header('refresh_token') || req.query?.refresh_token; // check refresh token & user - always stateful
-    const refresh_result = jwt.verify(refresh_token, getSecret('verify', 'refresh'), { algorithm: [JWT_ALG] }); // throw if expired or invalid
-    const { id } = refresh_result;
+    const access_token = req.cookies?.access_token || req.header('access_token') || req.query?.access_token; // check refresh token & user - always stateful
+    const decoded = jwt.decode(access_token);
+    const { id } = decoded;
+    // TODO expiry check
     const refreshToken = await getRefreshToken(id);
     if (String(refreshToken) === String(refresh_token)) {
-      // ok... generate new access token & refresh token?
+      // ok... generate new access token & refresh token
       const user = await findUser({ id });
-      const tokens = await createToken(user); // 5 minute expire for login
+      const tokens = await createToken(user);
       setTokensToHeader(res, tokens);
       return res.status(200).json(tokens);
     } else {

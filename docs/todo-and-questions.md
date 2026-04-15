@@ -2,11 +2,11 @@
 
 ### TODO
 
-- **Top Priority** JSON in env, refactor to use something else
+- **IN PROGRESS** JSON in env, refactor to use something else
   - have issue with services where there is nested JSON
+- **NEXT** ci.yml and ci-meta.yml
 - safeJSON
 - remove barrel index.js files...
-- auto generate project folders?
 on:
   push:
     branches: [TODO]

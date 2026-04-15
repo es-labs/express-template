@@ -97,8 +97,6 @@ const preRoute = () => {
 
   app.use('/health', healthRouter); // Mount before auth middleware — healthchecks must be unprotected
 
-  const { COOKIE_SECRET = (parseInt(Date.now() / 28800000) * 28800000).toString() } = process.env;
-
   // ------ LOGGING ------
   // HTTP request logging middleware with timeout handling
   // handles: socket timeouts, client aborts, close connections, normal responses
@@ -108,7 +106,6 @@ const preRoute = () => {
   });
 
   // ------ SECURITY ------
-  logger.info('helmet setting up');
   try {
     const helmetOptions = globalThis.__config?.HELMET_OPTIONS;
     if (helmetOptions) {
@@ -129,11 +126,9 @@ const preRoute = () => {
   // Access-Control-Allow-Origin=*
   // Access-Control-Allow-Methods=GET,POST,PUT,PATCH,DELETE,OPTIONS
   // Access-Control-Allow-Headers=Content-Type, Authorization
-  logger.info('cors setting up');
   try {
     const corsOptions = globalThis.__config?.CORS_OPTIONS;
     app.use(corsOptions ? cors(corsOptions) : cors()); // default { origin: '*' }
-    logger.info('cors options done');
   } catch (e) {
     logger.error('[cors options error]', e.toString());
     throw e;
@@ -159,7 +154,6 @@ const preRoute = () => {
   // ------ body-parser and-cookie parser ------
   const { BODYPARSER_JSON, BODYPARSER_URLENCODED, BODYPARSER_RAW_ROUTES = '' } = globalThis.__config;
   // client request body must match request content-type, if applicaion/json, body cannot be null/undefined
-  logger.info('bodyparser setting up');
   try {
     app.use((req, res, next) => {
       const rawMatch = BODYPARSER_RAW_ROUTES?.split(',')?.find(route => pathToRegexp.match(route)(req.originalUrl));
@@ -175,10 +169,7 @@ const preRoute = () => {
     logger.error('[bodyparser setup error]', e.toString());
     throw e;
   }
-  logger.info('bodyparser setup done');
-
-  logger.info({ COOKIE_SECRET });
-  app.use(cookieParser(COOKIE_SECRET));
+  app.use(cookieParser()); // need this for httpOnly cookie parsing
 
   // return this // this is undefined...
   return { app, express, server };

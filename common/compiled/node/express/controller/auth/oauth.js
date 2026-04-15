@@ -1,6 +1,6 @@
 import { authFns, createToken, setTokensToHeader } from '../../../auth/index.js';
 
-const { AUTH_ERROR_URL } = process.env;
+const { AUTH_ERROR_URL } = globalThis.__config;
 const OAUTH_OPTIONS = globalThis.__config?.OAUTH_OPTIONS || {};
 // set callback URL on github to <schema://host:port>/api/oauth/callback
 // initiated from browser - window.location.replace('https://github.com/login/oauth/authorize?scope=user:email&client_id=XXXXXXXXXXXXXXXXXXXX')

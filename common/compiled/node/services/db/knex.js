@@ -5,6 +5,7 @@ export default class StoreKnex {
     options.connection = process.env[optionName];
     this._KNEXFILE = options;
     this._knex = null;
+    this.name = optionName;
   }
 
   async open() {
@@ -16,13 +17,13 @@ export default class StoreKnex {
         await this._knex
           .raw('Select 1')
           .then(() => {
-            logger.info('knex CONNECTED');
+            logger.info(`knex CONNECTED(${this.name})`);
           })
           .catch(err => {
-            logger.info(`DB error: ${err.toString()}`);
+            logger.info(`knex ERROR1(${this.name}): ${err.toString()}`);
           });
       } catch (e) {
-        logger.info('knex CONNECT ERROR', e.toString());
+        logger.info(`knex ERROR2(${this.name}): ${e.toString()}`);
       }
     }
   }
@@ -31,7 +32,7 @@ export default class StoreKnex {
   }
   async close() {
     if (this._knex) await this._knex.destroy();
-    logger.info('knex closed');
+    logger.info(`knex CLOSED(${this.name})`);
   }
 }
 

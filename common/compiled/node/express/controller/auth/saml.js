@@ -4,7 +4,8 @@
 import { SAML } from '@node-saml/node-saml';
 import { createToken, setTokensToHeader } from '../../../auth/index.js';
 
-const { SAML_CERTIFICATE, SAML_PRIVATE_KEY, AUTH_ERROR_URL } = process.env;
+const { SAML_CERTIFICATE, SAML_PRIVATE_KEY } = process.env;
+const { AUTH_ERROR_URL } = globalThis.__config;
 const samlJwtMap = globalThis.__config?.SAML_JWT_MAP || null;
 const samlOptions = globalThis.__config?.SAML_OPTIONS || null;
 

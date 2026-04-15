@@ -1,22 +1,46 @@
 // own authentication
-
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs'; // TODO use argon2 or scrypt
 import jwt from 'jsonwebtoken';
-// import * as otplib from 'otplib';
 import { verify } from 'otplib';
+
+/*
+import crypto from 'node:crypto';
+const password = 'user-password';
+const salt = crypto.randomBytes(16).toString('hex'); // Generate unique random salt
+const keylen = 64; // Length of the resulting derived key
+crypto.scrypt(password, salt, keylen, (err, derivedKey) => {
+  if (err) throw err;
+  console.log(derivedKey.toString('hex')); // Stored hash
+});
+*/
+
+/**
+ * Verifies an input password against a stored hash and salt.
+ * @param {string} passwordAttempt - The password provided by the user.
+ * @param {string} storedSalt - Hex-encoded salt retrieved from DB.
+ * @param {string} storedHash - Hex-encoded hash retrieved from DB.
+ */
+/*
+function verifyPassword(passwordAttempt, storedSalt, storedHash) {
+  const keyLength = 64;
+  const salt = Buffer.from(storedSalt, 'hex');
+  const hash = Buffer.from(storedHash, 'hex');
+
+  crypto.scrypt(passwordAttempt, salt, keyLength, (err, derivedKey) => {
+    if (err) throw err;    
+    // Compare buffers safely to prevent side-channel attacks
+    const isMatch = crypto.timingSafeEqual(hash, derivedKey);
+    console.log('Password match:', isMatch);
+  });
+}
+*/
 
 import { authFns, createToken, getSecret, setTokensToHeader } from '../../../auth/index.js';
 
-const {
-  COOKIE_HTTPONLY,
-  AUTH_USER_FIELD_LOGIN,
-  AUTH_USER_FIELD_PASSWORD,
-  AUTH_USER_FIELD_GAKEY,
-  AUTH_USER_FIELD_ID_FOR_JWT,
-  JWT_REFRESH_STORE,
-  USE_OTP,
-  JWT_ALG,
-} = process.env;
+const { COOKIE_HTTPONLY, JWT_ALG } = globalThis.__config.JWT;
+
+const { AUTH_USER_FIELD_LOGIN, AUTH_USER_FIELD_PASSWORD, AUTH_USER_FIELD_GAKEY, AUTH_USER_FIELD_ID_FOR_JWT, USE_OTP } =
+  process.env;
 
 const logout = async (req, res) => {
   let id = null;
@@ -26,7 +50,7 @@ const logout = async (req, res) => {
     access_token = tmp.split(' ')[1];
     const result = jwt.decode(access_token);
     id = result.id;
-    jwt.verify(access_token, getSecret('verify', 'access'), { algorithm: [JWT_ALG] }); // throw if expired or invalid
+    jwt.verify(access_token, getSecret('verify'), { algorithm: [JWT_ALG] }); // throw if expired or invalid
   } catch (e) {
     if (e.name !== 'TokenExpiredError') id = null;
   }
