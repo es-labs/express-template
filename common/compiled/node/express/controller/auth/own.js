@@ -1,46 +1,20 @@
 // own authentication
-import bcrypt from 'bcryptjs'; // TODO use argon2 or scrypt
 import jwt from 'jsonwebtoken';
 import { verify } from 'otplib';
 
-/*
-import crypto from 'node:crypto';
-const password = 'user-password';
-const salt = crypto.randomBytes(16).toString('hex'); // Generate unique random salt
-const keylen = 64; // Length of the resulting derived key
-crypto.scrypt(password, salt, keylen, (err, derivedKey) => {
-  if (err) throw err;
-  console.log(derivedKey.toString('hex')); // Stored hash
-});
-*/
-
-/**
- * Verifies an input password against a stored hash and salt.
- * @param {string} passwordAttempt - The password provided by the user.
- * @param {string} storedSalt - Hex-encoded salt retrieved from DB.
- * @param {string} storedHash - Hex-encoded hash retrieved from DB.
- */
-/*
-function verifyPassword(passwordAttempt, storedSalt, storedHash) {
-  const keyLength = 64;
-  const salt = Buffer.from(storedSalt, 'hex');
-  const hash = Buffer.from(storedHash, 'hex');
-
-  crypto.scrypt(passwordAttempt, salt, keyLength, (err, derivedKey) => {
-    if (err) throw err;    
-    // Compare buffers safely to prevent side-channel attacks
-    const isMatch = crypto.timingSafeEqual(hash, derivedKey);
-    console.log('Password match:', isMatch);
-  });
-}
-*/
-
 import { authFns, createToken, getSecret, setTokensToHeader } from '../../../auth/index.js';
+import { matchScryptHash } from '../../../auth/scrypt.js';
 
 const { COOKIE_HTTPONLY, JWT_ALG } = globalThis.__config.JWT;
 
-const { AUTH_USER_FIELD_LOGIN, AUTH_USER_FIELD_PASSWORD, AUTH_USER_FIELD_GAKEY, AUTH_USER_FIELD_ID_FOR_JWT, USE_OTP } =
-  process.env;
+const {
+  AUTH_USER_FIELD_LOGIN,
+  AUTH_USER_FIELD_SALT,
+  AUTH_USER_FIELD_PASSWORD,
+  AUTH_USER_FIELD_GAKEY,
+  AUTH_USER_FIELD_ID_FOR_JWT,
+  USE_OTP,
+} = process.env;
 
 const logout = async (req, res) => {
   let id = null;
@@ -79,10 +53,15 @@ const login = async (req, res) => {
     const user = await authFns.findUser({
       [AUTH_USER_FIELD_LOGIN]: req.body[AUTH_USER_FIELD_LOGIN],
     });
-    const password = req.body[AUTH_USER_FIELD_PASSWORD];
     if (!user) return res.status(401).json({ message: 'Incorrect credentials...' });
-    if (!bcrypt.compareSync(password, user[AUTH_USER_FIELD_PASSWORD]))
-      return res.status(401).json({ message: 'Incorrect credentials' });
+    if (
+      !(await matchScryptHash(
+        req.body[AUTH_USER_FIELD_PASSWORD],
+        user[AUTH_USER_FIELD_SALT],
+        user[AUTH_USER_FIELD_PASSWORD],
+      ))
+    )
+      return res.status(401).json({ message: 'Incorrect credentials...' });
     if (user.revoked) return res.status(401).json({ message: 'Revoked credentials' });
     const id = user[AUTH_USER_FIELD_ID_FOR_JWT];
     if (!id) return res.status(401).json({ message: 'Authorization Format Error' });

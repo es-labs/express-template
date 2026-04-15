@@ -1,5 +1,5 @@
 ## Main repository CI workflow.
-## Runs only for changes in apps/**, common/**, scripts/**, and root-level files.
+## Fails if .github/workflows/** or .github/actions/** are changed - use ci-meta.yml instead.
 ## Excludes chore/ci branches because CI meta changes are handled by ci-meta.yml.
 name: CI
 
@@ -35,8 +35,9 @@ jobs:
         uses: ./.github/actions/detect-change-scope
         with:
           allowed-paths-regex: ^([^/]+$|apps/|common/|scripts/)
+          disallowed-paths-regex: \.github/(actions|workflows)/
+          invalid-scope-message: .github/workflows/** and .github/actions/** cannot change in this workflow. Use ci-meta.yml instead.
           fail-on-invalid: 'true'
-          invalid-scope-message: This workflow only accepts changes in apps/**, common/**, scripts/**, and root-level files.
 
   commit-lint:
     name: Commit Message Format

@@ -1,5 +1,5 @@
 # CI Meta workflow validates repository meta changes.
-# Scope: .github/workflows/**, .github/actions/**, and docs/**.
+# Scope: .github/workflows/**, .github/actions/**.
 # Branch flow: chore/ci/* -> ci-staging -> main.
 name: CI Meta
 
@@ -10,7 +10,6 @@ on:
   #   paths:
   #     - '.github/workflows/**'
   #     - '.github/actions/**'
-  #     - 'docs/**'
   # pull_request:
   #   branches:
   #     - ci-staging
@@ -18,7 +17,6 @@ on:
   #   paths:
   #     - '.github/workflows/**'
   #     - '.github/actions/**'
-  #     - 'docs/**'
   workflow_dispatch:
 
 permissions:
@@ -71,9 +69,9 @@ jobs:
         id: scope
         uses: ./.github/actions/detect-change-scope
         with:
-          allowed-paths-regex: \.github/workflows/|\.github/actions/|docs/
+          allowed-paths-regex: \.github/workflows/|\.github/actions/
           fail-on-invalid: 'true'
-          invalid-scope-message: Only .github/workflows/**, .github/actions/**, and docs/** may change in this workflow.
+          invalid-scope-message: Only .github/workflows/** and .github/actions/** may change in this workflow.
 
   lint-github-yaml:
     name: Lint Workflow YAML

@@ -1,8 +1,10 @@
-import bcrypt from 'bcryptjs';
+import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import * as keyv from './keyv.js';
 import * as knex from './knex.js';
 import * as redis from './redis.js';
+
+const HASH_KEYLEN = 64;
 
 let setRefreshToken,
   getRefreshToken,
@@ -16,17 +18,15 @@ let setRefreshToken,
 
 const {
   JWT_ALG,
-  JWT_EXPIRY,
-  JWT_REFRESH_EXPIRY,
+  JWT_EXPIRY_SEC = 900,
+  JWT_REFRESH_EXPIRY_SEC = 3600,
   JWT_REFRESH_STORE = 'keyv',
   JWT_REFRESH_STORE_NAME,
+  JWT_REFRESH_TOKEN_BYTE_LEN = 32,
 } = globalThis.__config.JWT;
 
 const {
   AUTH_REFRESH_URL,
-  AUTH_USER_FIELD_LOGIN,
-  AUTH_USER_FIELD_PASSWORD,
-  AUTH_USER_FIELD_GAKEY,
   AUTH_USER_FIELD_ID_FOR_JWT,
   AUTH_USER_FIELDS_JWT_PAYLOAD = '',
   AUTH_USER_STORE,
@@ -81,7 +81,6 @@ const { COOKIE_OPTS } = globalThis.__config;
 
 //NOSONAR
 // mode: sign, verify
-// type: access, refresh
 const getSecret = mode => {
   if (JWT_ALG.substring(0, 2) !== 'HS') {
     if (mode === 'sign') return JWT_PRIVATE_KEY;
@@ -114,11 +113,11 @@ const createToken = async user => {
 
   options.allowInsecureKeySizes = false;
   options.algorithm = JWT_ALG;
-  options.expiresIn = JWT_EXPIRY;
+  options.expiresIn = JWT_EXPIRY_SEC;
   const access_token = jwt.sign({ id, groups }, getSecret('sign'), options);
 
-  options.expiresIn = JWT_REFRESH_EXPIRY;
-  const refresh_token = '12345678'; // TODO generate random string
+  options.expiresIn = JWT_REFRESH_EXPIRY_SEC;
+  const refresh_token = crypto.randomBytes(JWT_REFRESH_TOKEN_BYTE_LEN).toString('base64url');
   await setRefreshToken(id, refresh_token); // store in DB or Cache
   return {
     access_token,
@@ -173,8 +172,10 @@ const authRefresh = async (req, res) => {
     const refresh_token = req.cookies?.refresh_token || req.header('refresh_token') || req.query?.refresh_token; // check refresh token & user - always stateful
     const access_token = req.cookies?.access_token || req.header('access_token') || req.query?.access_token; // check refresh token & user - always stateful
     const decoded = jwt.decode(access_token);
-    const { id } = decoded;
-    // TODO expiry check
+    const { id, iat } = decoded;
+    if (Math.floor(Date.now() / 1000) > iat + JWT_REFRESH_EXPIRY_SEC) {
+      return res.status(401).json({ message: 'Refresh Token Expired' });
+    }
     const refreshToken = await getRefreshToken(id);
     if (String(refreshToken) === String(refresh_token)) {
       // ok... generate new access token & refresh token
@@ -195,7 +196,6 @@ export {
   authFns,
   authRefresh,
   authUser,
-  bcrypt,
   createToken,
   // findUser, updateUser,
   getSecret,

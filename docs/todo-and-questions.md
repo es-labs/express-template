@@ -1,12 +1,14 @@
 
 
-### TODO
+## TODO
 
 - **IN PROGRESS** JSON in env, refactor to use something else
   - have issue with services where there is nested JSON
-- **NEXT** ci.yml and ci-meta.yml
 - safeJSON
 - remove barrel index.js files...
+- migrate bcryptjs to scrypt
+- add RBAC
+- audit_logs
 on:
   push:
     branches: [TODO]
@@ -31,12 +33,8 @@ plugins: [
 
 - revisit biome when vueJS support is available
 
-- chores
-  - updating packages
-  - updating actions
 
-
-### Questions
+## Questions
 
 - should we use [testcontainers](https://testcontainers.com/guides/getting-started-with-testcontainers-for-nodejs/), data is not persisted
 

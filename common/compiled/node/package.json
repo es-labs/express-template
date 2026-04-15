@@ -37,7 +37,6 @@
     "@node-saml/node-saml": "^5.1.0",
     "@scalar/express-api-reference": "^0.9.6",
     "ali-oss": "^6.23.0",
-    "bcryptjs": "^3.0.3",
     "connect-history-api-fallback": "^2.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

@@ -143,8 +143,9 @@ For each pattern, enable:
 
 ### CI Action Shape
 
-- [standard](../.github/workflows/ci.yml)
-- [ci-changes](../.github/workflows/ci-meta.yml)
+Please read the following scripts for more information
+- CI workflow for non-CI file changes [ci.yml](../.github/workflows/ci.yml)
+- CI workflow for CI file changes [ci-meta.yml](../.github/workflows/ci-meta.yml)
 
 > **Note:** tests (unit, integration, e2e) are run for touched workspaces only, identified by the `detect-touched-workspaces`, Skip test if npm script for test not found.
 

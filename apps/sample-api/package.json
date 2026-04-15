@@ -28,7 +28,7 @@
   },
   "scripts": {
     "lint": "biome check --config-path ../biome.json",
-    "start": "node --watch --watch-preserve-output --trace-warnings src/index.js",
+    "start": "node --watch --watch-preserve-output --watch-path=../../common --trace-warnings src/index.js",
     "test:unit": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./src/**/__tests__/unit/*.test.js",
     "test:integration": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./src/**/__tests__/integration/*.test.js",
     "test:schema": "node ../../scripts/test-schemas.js ./schemas",

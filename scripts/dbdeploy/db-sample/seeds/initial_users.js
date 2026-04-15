@@ -2,7 +2,14 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
+
+import crypto from 'node:crypto';
+import { setScryptHash } from '../../../../common/compiled/node/auth/scrypt.js';
+
 export async function seed(knex) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const password = await setScryptHash('test', salt);
+
   // Deletes ALL existing entries
   try {
     await knex('users').del();
@@ -17,7 +24,8 @@ export async function seed(knex) {
       username: 'test',
       email: 'test',
       githubId: null,
-      password: '$2b$12$Rr1kYTVjZ.9Mnz8EpvRHk.EccoXNtt574A5mwvDn97S5Gu2xIMFhO', //NOSONAR
+      salt: salt,
+      password: password,
       gaKey: 'IZDXCUDYNQ4ESMZZNY4HGZSDJRAVGZCO',
       sms: '6596935500',
       smsVerified: 0,
@@ -33,7 +41,8 @@ export async function seed(knex) {
       username: 'ais-one',
       email: 'ais-one',
       githubId: 4284574,
-      password: '$2b$12$Rr1kYTVjZ.9Mnz8EpvRHk.EccoXNtt574A5mwvDn97S5Gu2xIMFhO', //NOSONAR
+      salt: salt,
+      password: password,
       gaKey: 'IZDXCUDYNQ4ESMZZNY4HGZSDJRAVGZCO',
       sms: '6596935500',
       smsVerified: 0,
@@ -49,7 +58,8 @@ export async function seed(knex) {
       username: 'aaronjxz',
       email: 'aaronjxz',
       githubId: null,
-      password: '$2b$12$Rr1kYTVjZ.9Mnz8EpvRHk.EccoXNtt574A5mwvDn97S5Gu2xIMFhO', //NOSONAR
+      salt: salt,
+      password: password,
       gaKey: 'IZDXCUDYNQ4ESMZZNY4HGZSDJRAVGZCO',
       sms: '6596935500',
       smsVerified: 0,

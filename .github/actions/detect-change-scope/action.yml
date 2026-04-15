@@ -5,6 +5,10 @@ inputs:
   allowed-paths-regex:
     description: Regex fragments (without ^$ anchors) for allowed paths, e.g. 'apps/|webs/|common/|scripts/'.
     required: true
+  disallowed-paths-regex:
+    description: Regex for explicitly disallowed paths. Files matching this fail before the allowed-paths check.
+    required: false
+    default: ''
   fail-on-invalid:
     description: If true, fail the step when any changed file is outside allowed scope.
     required: false
@@ -49,6 +53,7 @@ runs:
       shell: bash
       env:
         ALLOWED_PATHS_REGEX: ${{ inputs.allowed-paths-regex }}
+        DISALLOWED_PATHS_REGEX: ${{ inputs.disallowed-paths-regex }}
         FAIL_ON_INVALID: ${{ inputs.fail-on-invalid }}
         INVALID_SCOPE_MESSAGE: ${{ inputs.invalid-scope-message }}
         DIFF_FILTER: ${{ inputs.diff-filter }}
@@ -76,6 +81,16 @@ runs:
         fi
 
         CHANGED_FILES="$(git diff --name-only --diff-filter="${DIFF_FILTER}" "${RANGE}" | sed '/^$/d' | sort -u)"
+
+        if [[ -n "${DISALLOWED_PATHS_REGEX}" && -n "${CHANGED_FILES}" ]]; then
+          DISALLOWED_FILES="$(printf '%s\n' "${CHANGED_FILES}" | grep -E "^(${DISALLOWED_PATHS_REGEX})" || true)"
+          if [[ -n "${DISALLOWED_FILES}" ]]; then
+            echo "${INVALID_SCOPE_MESSAGE}"
+            printf '%s\n' "${DISALLOWED_FILES}"
+            exit 1
+          fi
+        fi
+
         INVALID_FILES=""
         HAS_INVALID_FILES=false
         HAS_COMMON_SCRIPTS=false

@@ -11,6 +11,7 @@ const services = {};
 const start = async (app, server, config = globalThis.__config?.SERVICES_CONFIG || []) => {
   // const serviceTypesAvailable = process.env.SERVICES_TYPES_AVAILABLE.split(',');
   // if (opts && svc.type === 'knex' && StoreKnex) services[svc.name] = new StoreKnex(svc.options);
+console.log('services - start -', config)
   try {
     servicesConfig = config;
     servicesConfig.forEach(svc => {

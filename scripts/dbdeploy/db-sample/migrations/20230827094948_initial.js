@@ -9,9 +9,11 @@ export async function up(knex) {
     table.string('groups');
     table.integer('orgId');
     table.string('username');
-    table.string('email').unique('email');
-    table.integer('githubId').unique('githubId').nullable();
+
+    table.string('email').notNullable();
+    table.integer('githubId').nullable();
     table.string('password'); // hashed
+    table.string('salt');
     table.string('role');
 
     // retry limit
@@ -38,6 +40,9 @@ export async function up(knex) {
     table.string('telegramId');
     table.string('telegramUsername');
     // table.timestamps() // createdAt, updatedAt
+
+    // unique index
+    table.unique(['email'], { indexName: 'users_email_unique' });
   });
   await knex.schema.createTable('country', table => {
     // for testing autocomplete, single select
