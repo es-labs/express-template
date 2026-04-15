@@ -68,10 +68,10 @@ onBeforeUnmount(() => {
   // console.log('signIn onBeforeUnmount')
 });
 
-const _setUser = async (data, decoded) => {
+const _setUser = async (data, user) => {
   // store user
-  await store.doLogin(decoded);
-  // id, groups, access_token, refresh_token
+  await store.doLogin(user);
+  // id, roles, access_token, refresh_token
 };
 
 const login = async () => {
@@ -99,10 +99,10 @@ const login = async () => {
       otpCount = 0;
     } else {
       // logged in
-      const decoded = parseJwt(data.access_token);
+      const user = parseJwt(data.access_token);
       http.setTokens({ access: data.access_token, refresh: data.refresh_token });
       http.setOptions({ refreshUrl: VITE_REFRESH_URL });
-      _setUser(data, decoded);
+      _setUser(data, user);
     }
   } catch (e) {
     // fetch failed
@@ -121,10 +121,10 @@ const otpLogin = async () => {
     http.setOptions({ refreshUrl: VITE_REFRESH_URL });
     const { data } = await http.post('/api/auth/otp', { id: otpId, pin: otp.value });
     // logged in
-    const decoded = parseJwt(data.access_token);
+    const user = parseJwt(data.access_token);
     http.setTokens({ access: data.access_token, refresh: data.refresh_token });
     http.setOptions({ refreshUrl: VITE_REFRESH_URL });
-    _setUser(data, decoded);
+    _setUser(data, user);
   } catch (e) {
     if (e.data.message === 'Token Expired Error') {
       errorMessage.value = 'OTP Expired';

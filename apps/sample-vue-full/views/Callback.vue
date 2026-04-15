@@ -20,18 +20,18 @@ const router = useRouter();
 const hash = ref('No Hash Found');
 
 const _setMockUser = async () => {
-  const decoded = {
+  const user = {
     id: 'Aaa',
-    groups: 'MyGroup,AnotherGroup',
+    roles: ['MyGroup','AnotherGroup'],
   };
   // store user
-  await store.doLogin(decoded);
+  await store.doLogin(user);
 };
 
 onMounted(async () => {
   // NOSONAR const { hash, href, port, hostname, protocol, ...etc } = window.location
   console.log('Callback mounted!', route.hash, route); // deal with hashes here if necessary
-  hash.value = route.hash.substring(1); // <access_token>;<refresh_token>;<groups JSON string>
+  hash.value = route.hash.substring(1); // <access_token>;<refresh_token>;<roles JSON string>
   // verify first, if ok, do login, else send to forbidden // split(';')
 
   if (hash.value === 'mocked') {

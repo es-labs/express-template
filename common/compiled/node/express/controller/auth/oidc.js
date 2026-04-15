@@ -54,8 +54,8 @@ export const auth = async (req, res) => {
     let { access_token, refresh_token, ...user_meta } = data;
     if (OIDC_OPTIONS.REISSUE) {
       const user = jwt.decode(access_token);
-      user.id = user[OIDC_OPTIONS.ID_NAME];
-      user.groups = user.resource_access.account.roles.join(',');
+      user.sub = user[OIDC_OPTIONS.ID_NAME];
+      user.roles = user.resource_access.account.roles; // .join(',');
       // TODO able to detect revoked?
       const tokens = await createToken(user);
       access_token = tokens.access_token;

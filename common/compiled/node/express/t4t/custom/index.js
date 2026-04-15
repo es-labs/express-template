@@ -1,6 +1,5 @@
 import csvParse from 'csv-parse';
 import * as svc from '../../../services';
-import { setAuditData } from '../t4t-utils.js';
 
 // custom function demo
 // when country table is uploaded, state data is also created (csv needs to have sufficient data for state row)
@@ -71,10 +70,6 @@ const upload = async (req, res) => {
         }
       }
       try {
-        if (table.audit) {
-          const audit = setAuditData(req, 'UPLOAD', '', { output });
-          await svc.get(table.conn)('audit_logs').insert(audit);
-        }
         const rv = await Promise.allSettled(writes); // [ { status !== 'fulfilled', reason } ]
         rv.forEach((result, index) => {
           if (result.status !== 'fulfilled') errors.push(`${index + 1},${result.reason}`);

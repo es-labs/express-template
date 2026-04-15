@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 export async function up(knex) {
-  await knex.schema.createTable('audit_logs', table => {
+  await knex.schema.createTable('t4t_audit_logs', table => {
     table.increments('id').primary();
     table.string('user');
     table.datetime('timestamp');
@@ -24,5 +24,5 @@ export async function up(knex) {
  * @returns { Promise<void> }
  */
 export async function down(knex) {
-  await knex.schema.dropTableIfExists('audit_logs');
+  await knex.schema.dropTableIfExists('t4t_audit_logs');
 }

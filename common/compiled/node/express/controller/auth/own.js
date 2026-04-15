@@ -22,8 +22,8 @@ const logout = async (req, res) => {
     let access_token = null;
     const tmp = req.cookies?.Authorization || req.header('Authorization') || req.query?.Authorization;
     access_token = tmp.split(' ')[1];
-    const result = jwt.decode(access_token);
-    id = result.id;
+    const user = jwt.decode(access_token);
+    id = user.sub;
     jwt.verify(access_token, getSecret('verify'), { algorithm: [JWT_ALG] }); // throw if expired or invalid
   } catch (e) {
     if (e.name !== 'TokenExpiredError') id = null;

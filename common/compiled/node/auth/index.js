@@ -90,8 +90,8 @@ const getSecret = mode => {
 };
 
 // should use:
-// sub - for user id (access_token & refresh_token)
-// groups - for user groups (access_token only)
+// sub - for user id
+// roles - for user roles (based on selected token)
 // all other user related information sent on initial login and stored using local storage
 // do not catch exception here, let functions above handle
 const createToken = async user => {
@@ -104,7 +104,7 @@ const createToken = async user => {
   if (!id) throw Error('User ID Not Found');
   if (user.revoked) throw Error('User Revoked');
 
-  const groups = user.groups;
+  const roles = user.roles.split(',');
 
   const keys = AUTH_USER_FIELDS_JWT_PAYLOAD.split(',');
   for (const key of keys) {
@@ -114,7 +114,7 @@ const createToken = async user => {
   options.allowInsecureKeySizes = false;
   options.algorithm = JWT_ALG;
   options.expiresIn = JWT_EXPIRY_SEC;
-  const access_token = jwt.sign({ id, groups }, getSecret('sign'), options);
+  const access_token = jwt.sign({ sub: id, roles }, getSecret('sign'), options);
 
   options.expiresIn = JWT_REFRESH_EXPIRY_SEC;
   const refresh_token = crypto.randomBytes(JWT_REFRESH_TOKEN_BYTE_LEN).toString('base64url');
@@ -149,7 +149,7 @@ const authUser = async (req, res, next) => {
     try {
       const access_result = jwt.verify(access_token, getSecret('verify'), { algorithm: [JWT_ALG] }); // and options
       if (access_result) {
-        req.decoded = access_result;
+        req.user = access_result;
         return next();
       } else {
         return res.status(401).json({ message: 'Access Error' });
@@ -171,8 +171,8 @@ const authRefresh = async (req, res) => {
   try {
     const refresh_token = req.cookies?.refresh_token || req.header('refresh_token') || req.query?.refresh_token; // check refresh token & user - always stateful
     const access_token = req.cookies?.access_token || req.header('access_token') || req.query?.access_token; // check refresh token & user - always stateful
-    const decoded = jwt.decode(access_token);
-    const { id, iat } = decoded;
+    const user = jwt.decode(access_token);
+    const { id, iat } = user;
     if (Math.floor(Date.now() / 1000) > iat + JWT_REFRESH_EXPIRY_SEC) {
       return res.status(401).json({ message: 'Refresh Token Expired' });
     }
@@ -180,6 +180,7 @@ const authRefresh = async (req, res) => {
     if (String(refreshToken) === String(refresh_token)) {
       // ok... generate new access token & refresh token
       const user = await findUser({ id });
+      // TODO user also include tenant and other information
       const tokens = await createToken(user);
       setTokensToHeader(res, tokens);
       return res.status(200).json(tokens);

@@ -4,8 +4,8 @@ import { useMainStore } from '../store';
 const { VITE_API_URL } = import.meta.env;
 
 // const permissions = {
-//   // g1 = route groups, g2 = user groups
-//   // go through each route group... check if group matches [list of groups in user]
+//   // g1 = route groups, g2 = user roles
+//   // go through each route group... check if group matches [list of roles in user]
 //   allowed: (g1, g2) => g1.find(x => g2.includes(x))
 // }
 
@@ -44,9 +44,9 @@ export const authGuard = async (to, from, next) => {
   const loggedIn = !!store.user;
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
-  // const { groups } = store.state.user
+  // const { roles } = store.state.user
   // if (routeGroups[to.matched[0].path]) {
-  //   let found = permissions.allowed(routeGroups[to.matched[0].path], groups.split(','))
+  //   let found = permissions.allowed(routeGroups[to.matched[0].path], roles.split(','))
   //   if (!found) {
   //     alert('Forbidden... Check Page Permissions')
   //     return next('/')

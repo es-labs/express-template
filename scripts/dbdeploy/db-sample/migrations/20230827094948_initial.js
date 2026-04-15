@@ -6,8 +6,8 @@ export async function up(knex) {
   await knex.schema.createTable('users', table => {
     // for user login
     table.increments('id').primary();
-    table.string('groups');
-    table.integer('orgId');
+    table.string('roles');
+    table.integer('tenant');
     table.string('username');
 
     table.string('email').notNullable();

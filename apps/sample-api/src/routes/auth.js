@@ -10,9 +10,9 @@ export const myauthRoute = express
   .get('/logout', own.logout)
   .get('/verify', auth.authUser, async (req, res) => res.json({}))
   .get('/me', auth.authUser, (req, res) => {
-    const { id } = req.decoded;
+    const { sub } = req.user;
     // you can also get more user information from here from a datastore
-    return res.status(200).json({ user: id, ts: Date.now() });
+    return res.status(200).json({ user: sub, ts: Date.now() });
   })
   .post('/signup', (req, res) => {
     // TODO

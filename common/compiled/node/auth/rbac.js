@@ -3,16 +3,8 @@
  *
  * Depends on `authenticate` (jwt.js) having already run and set `req.user`.
  *
- * JWT payload shape (relevant fields):
- * {
- *   active_tenant: "tenant_acme",
- *   tenants: {
- *     tenant_acme: {
- *       roles:       ["admin", "billing_manager"],
- *       permissions: ["users:write", "billing:read", "reports:export"]
- *     }
- *   }
- * }
+ * see [./jwt.js](./jwt.js) for shape of JWT payload
+ *
  */
 
 // import { requireRoles, requirePermissions } from 'common/compiled/node/auth/rbac.js';

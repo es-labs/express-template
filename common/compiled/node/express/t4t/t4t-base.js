@@ -1,7 +1,7 @@
 import { Parser } from '@json2csv/plainjs';
 import { parse } from 'csv-parse';
 import * as svc from '../../services';
-import { formUniqueKey, isInvalidInput, kvDb2Col, mapRelation, setAuditData } from './t4t-utils.js';
+import { formUniqueKey, isInvalidInput, kvDb2Col, mapRelation } from './t4t-utils.js';
 
 //import csvParse from "csv-parse";
 const csvParse = parse;
@@ -87,17 +87,6 @@ const upload = async (req, res) => {
         }
       } catch (e) {
         errors.push(`-2,General write error: ${e.toString()}`);
-      }
-      try {
-        if (table.audit) {
-          const audit = setAuditData(req, 'UPLOAD', '', {
-            csv_data: JSON.stringify(output, null, 2),
-            errors: JSON.stringify(errors, null, 2),
-          });
-          await svc.get(table.conn)('audit_logs').insert(audit);
-        }
-      } catch (e) {
-        logger.info('error writing to audit table');
       }
       return res.status(200).json({ errorCount: errors.length, errors });
     });
@@ -243,10 +232,6 @@ const remove = async (req, res) => {
       });
       await Promise.allSettled(keys);
     }
-    if (table.audit) {
-      const audit = setAuditData(req, 'DELETE', ids.join(','));
-      await svc.get(table.conn)('audit_logs').insert(audit).transacting(trx);
-    }
     await trx.commit();
     return res.json({
       deletedRows: ids.length,
@@ -276,7 +261,7 @@ const update = async (req, res) => {
         const invalid = isInvalidInput(col, body[key], key);
         if (invalid) return res.status(400).json(invalid);
         if (col.auto && col.auto === 'user') {
-          body[key] = req?.decoded?.id || 'unknown';
+          body[key] = req?.user?.sub || 'unknown';
         } else if (col.auto && col.auto === 'ts') {
           body[key] = new Date().toISOString();
         } else {
@@ -299,10 +284,6 @@ const update = async (req, res) => {
     const trx = await svc.get(table.conn).transaction();
     try {
       count = await svc.get(table.conn)(table.name).update(body).where(where).transacting(trx);
-      if (table.audit) {
-        const audit = setAuditData(req, 'UPDATE', req.query.__key, body);
-        await svc.get(table.conn)('audit_logs').insert(audit).transacting(trx);
-      }
       await trx.commit();
     } catch (e) {
       await trx.rollback();
@@ -327,7 +308,7 @@ const create = async (req, res) => {
       const invalid = isInvalidInput(col, body[key], key);
       if (invalid) return res.status(400).json(invalid);
       if (col.auto && col.auto === 'user') {
-        body[key] = req?.decoded?.id || 'unknown';
+        body[key] = req?.user?.sub || 'unknown';
       } else if (col.auto && col.auto === 'ts') {
         body[key] = new Date().toISOString();
       } else {
@@ -348,10 +329,6 @@ const create = async (req, res) => {
     let query = svc.get(table.conn)(table.name).insert(body);
     if (table.pk) query = query.returning(table.pk);
     rv = await query.clone().transacting(trx);
-    if (table.audit) {
-      const audit = setAuditData(req, 'INSERT', '', body);
-      await svc.get(table.conn)('audit_logs').insert(audit).transacting(trx);
-    }
     await trx.commit();
   } catch (e) {
     await trx.rollback();

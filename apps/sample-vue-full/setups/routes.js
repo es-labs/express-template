@@ -41,7 +41,7 @@ export const SECURE_ROUTES = [
     path: '/audit-logs',
     name: 'T4t - Audit Logs',
     component: async () => import('../views/T4t.vue'),
-    props: { tableName: 'audit_logs' },
+    props: { tableName: 't4t_audit_logs' },
   },
 
   { path: '/visuals/g2-chart1', name: 'Demo Chart1', component: async () => import('../views/Visuals/DemoChart1.vue') },

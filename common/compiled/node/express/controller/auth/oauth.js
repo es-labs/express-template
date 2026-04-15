@@ -31,8 +31,8 @@ export const callbackOAuth = async (req, res) => {
       const user = await authFns.findUser({ [OAUTH_OPTIONS.FIND_ID]: oauthId }); // match github id (or email?) with our user in our application
       if (!user) return res.status(401).json({ message: 'Unauthorized' });
 
-      const { id, groups } = user;
-      const tokens = await createToken({ id, groups });
+      const { id, roles } = user;
+      const tokens = await createToken({ sub: id, roles: roles.split(',') });
       setTokensToHeader(res, tokens);
       return res.redirect(
         `${OAUTH_OPTIONS.CALLBACK}#${tokens.access_token};${tokens.refresh_token};${JSON.stringify(tokens.user_meta)}`,

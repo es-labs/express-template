@@ -8,7 +8,7 @@ import express from 'express';
 logger.info('WARNING Auth bypass in webpush.js');
 
 const authUser = (req, res, next) => {
-  req.decoded = { id: 1 };
+  req.user = { sub: 1 };
   next();
 };
 
@@ -16,14 +16,12 @@ export default express
   .Router()
   .get('/vapid-public-key', (req, res) => res.json({ publicKey: webpush.getPubKey() }))
   .post('/sub', authUser, async (req, res) => {
-    const { id } = req.decoded;
     const { subscription } = req.body; // should be a string
-    await authFns.updateUser({ id }, { pnToken: subscription });
+    await authFns.updateUser({ id: req.user.sub }, { pnToken: subscription });
     res.json({ status: 'sub' });
   })
   .post('/unsub', authUser, async (req, res) => {
-    const { id } = req.decoded;
-    await authFns.updateUser({ id }, { pnToken: '' });
+    await authFns.updateUser({ id: req.user.sub }, { pnToken: '' });
     res.json({ status: 'unsub' });
   })
   .post(

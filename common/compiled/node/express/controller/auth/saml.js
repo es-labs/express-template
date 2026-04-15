@@ -42,8 +42,8 @@ export const auth = async (req, res) => {
       const TO = req.body.RelayState;
       const authenticated = !parsedResponse.loggedOut;
       const user = {
-        id: parsedResponse.profile[samlJwtMap.id], // id: req.user.nameID, // string
-        groups: parsedResponse.profile[samlJwtMap.groups], // groups: req.user.Role, // comma seperated string or array or object...
+        sub: parsedResponse.profile[samlJwtMap.id], // id: req.user.nameID, // string
+        roles: parsedResponse.profile[samlJwtMap.groups], // groups: req.user.Role, // comma seperated string or array or object...
       };
       if (!TO) {
         // if no RelayState, then it is a test

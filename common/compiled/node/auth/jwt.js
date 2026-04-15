@@ -65,16 +65,23 @@ const authenticate = async (req, res, next) => {
 };
 
 /*
-{
+const jwtPayloadSample ={
   "sub": "user_abc123",
   "email": "alice@example.com",
   "name": "Alice Cruz",
   "iss": "https://auth.myapp.com",
-  "aud": "https://api.myapp.com",
+  "aud": ["https://api.myapp.com"], // one audience per service for microservices, or multiple audiences if token is used across services
   "iat": 1713178320,
   "exp": 1713181920,
   "jti": "550e8400-e29b-41d4-a716-446655440000",
 
+  "tenantId": "tenant_acme",
+  "roles": ["admin", "billing_manager"],
+  "permissions": ["users:write", "billing:read", "reports:export"],
+  "plan": "enterprise",
+}
+
+const listOfTenants = {
   "tenants": {
     "tenant_acme": {
       "name": "Acme Corp",
@@ -89,7 +96,5 @@ const authenticate = async (req, res, next) => {
       "permissions": ["reports:read"]
     }
   },
-
-  "active_tenant": "tenant_acme"
 }
 */

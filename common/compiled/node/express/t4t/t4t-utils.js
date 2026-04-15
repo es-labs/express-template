@@ -1,16 +1,5 @@
-const { USER_ID_KEY, USER_ROLE_KEY, ORG_ID_KEY } = globalThis.__config?.T4T || {};
-
 export const noAuthFunc = (req, res, next) => {
   const message = 'no user auth middleware set';
-  logger.info({
-    error: message,
-    expectedFormat: {
-      'req.decoded': {
-        id: 'testuser',
-        groups: 'admin,user',
-      },
-    },
-  });
   res.status(500).send(message);
 };
 
@@ -128,7 +117,7 @@ export const kvDb2Col = (_row, _joinCols, _tableCols) => {
 };
 
 export const setAuditData = (req, op, keys = '', body = '') => ({
-  user: req?.decoded[USER_ID_KEY] || '---',
+  user: req?.user?.sub || '---',
   timestamp: new Date(),
   db_name: req.table.db,
   table_name: req.table.name,

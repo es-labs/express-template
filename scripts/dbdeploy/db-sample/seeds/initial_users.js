@@ -19,8 +19,8 @@ export async function seed(knex) {
   await knex('users').insert([
     {
       id: 1,
-      groups: 'TestGroup',
-      orgId: 1,
+      roles: 'TestGroup',
+      tenant: 1,
       username: 'test',
       email: 'test',
       githubId: null,
@@ -36,8 +36,8 @@ export async function seed(knex) {
     },
     {
       id: 2,
-      groups: 'TestGithub',
-      orgId: 1,
+      roles: 'TestGithub',
+      tenant: 1,
       username: 'ais-one',
       email: 'ais-one',
       githubId: 4284574,
@@ -53,8 +53,8 @@ export async function seed(knex) {
     },
     {
       id: 3,
-      groups: 'TestGmail,TestGroup',
-      orgId: 1,
+      roles: 'TestGmail,TestGroup',
+      tenant: 1,
       username: 'aaronjxz',
       email: 'aaronjxz',
       githubId: null,

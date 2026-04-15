@@ -19,7 +19,7 @@ export default [
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk0NDk2NDA5LCJleHAiOjE2OTQ1MDAwMDl9.p3xFoXix9_xBJOOLgH2hkvomQnz5D4ct_Zk21tcsojE',
       user_meta: {
         email: 'test',
-        groups: 'TestGroup',
+        roles: ['TestGroup'],
       },
     });
   }),

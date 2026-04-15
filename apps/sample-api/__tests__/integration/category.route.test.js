@@ -23,7 +23,7 @@ before(async () => {
   require(path.join(process.cwd(), 'router'))(app)
 
   // authService.setup(services.get("keyv"), services.get("knex1"));
-  // const tokens = await authService.createToken({ id: 100, groups: 'TestGroup' })
+  // const tokens = await authService.createToken({ sub: 100, roles: ['TestGroup'] })
   // authObj = {
   //   Authorization: `Bearer ${tokens.access_token}`,
   //   refresh_token: tokens.refresh_token

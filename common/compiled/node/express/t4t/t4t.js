@@ -6,15 +6,7 @@ import multer from 'multer';
 import { memoryUpload } from '../../express/upload';
 import * as svc from '../../services';
 
-const {
-  CONFIGS_FOLDER_PATH,
-  CONFIGS_CSV_SIZE,
-  CONFIGS_UPLOAD_SIZE,
-  CUSTOM_PATH,
-  USER_ID_KEY,
-  USER_ROLE_KEY,
-  ORG_ID_KEY,
-} = globalThis.__config?.T4T || {};
+const { CONFIGS_FOLDER_PATH, CONFIGS_CSV_SIZE, CONFIGS_UPLOAD_SIZE, CUSTOM_PATH } = globalThis.__config?.T4T || {};
 
 import base from './t4t-base.js';
 import { noAuthFunc, processJson, roleOperationMatch } from './t4t-utils.js';
@@ -88,18 +80,18 @@ const generateTable = async (req, res, next) => {
   req.table.db = database || filename || 'DB Not Found';
 
   // permissions settings
-  req.table.view = roleOperationMatch(req.decoded[roleKey], req.table.view);
+  req.table.view = roleOperationMatch(req.user[roleKey], req.table.view);
   const acStr = '/autocomplete';
   const acLen = acStr.length;
   if (req.path.substring(req.path.length - acLen) === acStr) {
     logger.info('auto complete here...');
     return next();
   }
-  req.table.create = roleOperationMatch(req.decoded[roleKey], req.table.create);
-  req.table.update = roleOperationMatch(req.decoded[roleKey], req.table.update);
-  req.table.delete = roleOperationMatch(req.decoded[roleKey], req.table.delete);
-  req.table.import = roleOperationMatch(req.decoded[roleKey], req.table.import);
-  req.table.export = roleOperationMatch(req.decoded[roleKey], req.table.export);
+  req.table.create = roleOperationMatch(req.user[roleKey], req.table.create);
+  req.table.update = roleOperationMatch(req.user[roleKey], req.table.update);
+  req.table.delete = roleOperationMatch(req.user[roleKey], req.table.delete);
+  req.table.import = roleOperationMatch(req.user[roleKey], req.table.import);
+  req.table.export = roleOperationMatch(req.user[roleKey], req.table.export);
 
   // sanitize
   req.table.deleteLimit = Number(req.table.deleteLimit) || -1;
@@ -119,9 +111,9 @@ const generateTable = async (req, res, next) => {
     if (col.required) req.table.required.push(key);
     if (col?.ui?.tag === 'files') req.table.fileConfigUi[key] = col?.ui;
 
-    col.editor = !(col.editor && !roleOperationMatch(req.decoded[roleKey], col.editor, key));
+    col.editor = !(col.editor && !roleOperationMatch(req.user[roleKey], col.editor, key));
     if (!col.editor && col.edit) col.edit = 'readonly';
-    col.creator = !(col.creator && !roleOperationMatch(req.decoded[roleKey], col.creator, key));
+    col.creator = !(col.creator && !roleOperationMatch(req.user[roleKey], col.creator, key));
     if (!col.creator && col.add) col.add = 'readonly';
   }
   // logger.info(req.table)
@@ -130,9 +122,9 @@ const generateTable = async (req, res, next) => {
 
 const routes = options => {
   const authUser = options?.authFunc || noAuthFunc;
-  roleKey = USER_ROLE_KEY;
-  idKey = USER_ID_KEY;
-  orgIdKey = ORG_ID_KEY;
+  roleKey = 'roles';
+  idKey = 'sub';
+  orgIdKey = 'tenant';
 
   return express
     .Router()

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 export const auditMiddleware = db => {
   return async (req, res, next) => {
     // Adapt these to match your auth middleware output
-    const userId = req.user?.id ?? null;
+    const userId = req.user?.sub ?? null;
     const tenantId = req.user?.tenantId ?? null; // remove if single-tenant
     const sessionId = req.headers['x-request-id'] ?? req.sessionID ?? null;
 
