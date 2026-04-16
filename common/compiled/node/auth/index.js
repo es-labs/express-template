@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import * as keyv from './keyv.js';
 import * as knex from './knex.js';
 import * as fga from './openfga.js';
-import * as rbacService from './rbac-service.js';
+import * as rbac from './rbac.js';
 import * as redis from './redis.js';
 
 const HASH_KEYLEN = 64;
@@ -78,7 +78,7 @@ const setup = (tokenService, userService, fgaConfig, rbacConfig) => {
   if (setRefreshTokenStoreName) setRefreshTokenStoreName(JWT_REFRESH_STORE_NAME);
   if (setAuthUserStoreName) setAuthUserStoreName(AUTH_USER_STORE_NAME);
   if (fgaConfig) fga.setup(fgaConfig);
-  if (rbacConfig?.enabled) rbacService.setup(userService);
+  if (rbacConfig?.enabled) rbac.setup(userService);
 };
 
 const { COOKIE_OPTS } = globalThis.__config;
@@ -122,7 +122,7 @@ const createToken = async user => {
 
   // Fetch tenant-scoped roles and permissions from RBAC tables when configured.
   // user.tenant is the user's default/preferred tenant from the users table.
-  const rbacData = await rbacService.getUserTenantsData(id, user.tenant);
+  const rbacData = await rbac.getUserTenantsData(id, user.tenant);
 
   const keys = AUTH_USER_FIELDS_JWT_PAYLOAD.split(',');
   for (const key of keys) {
@@ -246,9 +246,8 @@ const authRefresh = async (req, res) => {
 
 // Re-export OpenFGA helpers so callers can import from a single auth entry point
 export { check, deleteTuple, listUserRoles, requireFga, writeTuple } from './openfga.js';
-// Re-export RBAC middleware and management helpers from a single auth entry point
-export { requirePermissions, requireRoles } from './rbac.js';
-export { assignRole, grantPermission, revokePermission, revokeRole } from './rbac-service.js';
+// Re-export RBAC management helpers from a single auth entry point
+export { assignRole, grantPermission, revokePermission, revokeRole } from './rbac.js';
 export {
   authFns,
   authRefresh,

@@ -1,83 +1,156 @@
 /**
- * RBAC middleware — role and permission checks against the active tenant in the JWT payload.
+ * DB-backed RBAC service — tenant-scoped roles and permissions.
  *
- * Depends on `authenticate` (jwt.js) having already run and set `req.user`.
+ * Tables required (created by migration 20260416000001_rbac_tables):
+ *   tenants           — registered tenants
+ *   roles             — named roles, each scoped to a tenant
+ *   permissions       — global permission strings (e.g. "users:read")
+ *   role_permissions  — M:N join between roles and permissions
+ *   user_tenant_roles — M:N:N join of user × tenant × role
  *
- * see [./jwt.js](./jwt.js) for shape of JWT payload
+ * This service is optional — when not configured, createToken falls back to
+ * the flat DB roles column or FGA as before.
  *
+ * Usage:
+ *   import * as rbac from '@common/node/auth/rbac.js';
+ *   rbac.setup(knexInstance); // call once at startup via auth setup()
+ *
+ *   // In createToken — fetch tenant/role/permission data to embed in JWT
+ *   const data = await rbac.getUserTenantsData(userId, user.tenant);
+ *
+ *   // Management helpers (e.g. admin routes)
+ *   await rbac.assignRole(userId, tenantId, roleId);
+ *   await rbac.revokeRole(userId, tenantId, roleId);
+ *   await rbac.grantPermission(roleId, permissionId);
+ *   await rbac.revokePermission(roleId, permissionId);
  */
 
-// import { requireRoles, requirePermissions } from 'common/compiled/node/auth/rbac.js';
-// router.delete('/users/:id',   authenticate, requireRoles('admin'), handler);
-// router.get('/reports',        authenticate, requirePermissions('reports:read'), handler);
-// router.post('/billing/export', authenticate, requireRoles('admin', 'billing_manager'), requirePermissions('billing:read', 'reports:export'), handler);
+/** @type {import('knex').Knex | null} */
+let _knex = null;
 
 /**
- * Resolves the active tenant context from `req.user`.
- * Returns null when the payload is missing or malformed.
+ * Initialise the RBAC service with a Knex query builder instance.
+ * Call once during app startup (via auth setup()).
  *
- * @param {import('express').Request} req
- * @returns {{ roles: string[], permissions: string[] } | null}
+ * @param {import('knex').Knex} knexInstance
  */
-const _activeTenant = req => {
-  const { active_tenant, tenants } = req.user ?? {};
-  if (!active_tenant || !tenants) return null;
-  return tenants[active_tenant] ?? null;
+const setup = knexInstance => {
+  _knex = knexInstance;
 };
 
 /**
- * Middleware factory — passes when the user holds **at least one** of the given roles
- * in their active tenant.
- *
- * @param {...string} roles - Required roles (ANY match is sufficient).
- * @returns {import('express').RequestHandler}
- *
- * @example
- * router.delete('/users/:id', authenticate, requireRoles('admin'), handler);
+ * Returns true when the RBAC service has been initialised.
+ * @returns {boolean}
  */
-export const requireRoles =
-  (...roles) =>
-  (req, res, next) => {
-    const tenant = _activeTenant(req);
-    if (!tenant) {
-      return res.status(403).json({ error: 'No active tenant context' });
-    }
-
-    const userRoles = tenant.roles ?? [];
-    const allowed = roles.some(r => userRoles.includes(r));
-    if (!allowed) {
-      logger.warn({ sub: req.user?.sub, required: roles, actual: userRoles }, 'rbac: role check failed');
-      return res.status(403).json({ error: 'Insufficient role' });
-    }
-
-    next();
-  };
+const isConfigured = () => _knex !== null;
 
 /**
- * Middleware factory — passes when the user holds **all** of the given permissions
- * in their active tenant.
+ * Fetch all tenant memberships for a user, together with their roles and the
+ * permissions resolved from those roles.
  *
- * @param {...string} permissions - Required permissions (ALL must be present).
- * @returns {import('express').RequestHandler}
+ * Returns null when:
+ * - RBAC has not been configured (setup() not called), or
+ * - the user has no active tenant memberships.
  *
- * @example
- * router.get('/reports', authenticate, requirePermissions('reports:read'), handler);
- * router.post('/users',  authenticate, requirePermissions('users:write'), handler);
+ * The returned shape is embedded directly into the JWT payload by createToken.
+ *
+ * @param {string|number} userId
+ * @param {string|number} [defaultTenantId]
+ *   Preferred active_tenant. If the user belongs to this tenant it will be
+ *   used; otherwise the first tenant found is used.
+ * @returns {Promise<{
+ *   active_tenant: number,
+ *   tenants: Record<number, { roles: string[], permissions: string[] }>
+ * } | null>}
  */
-export const requirePermissions =
-  (...permissions) =>
-  (req, res, next) => {
-    const tenant = _activeTenant(req);
-    if (!tenant) {
-      return res.status(403).json({ error: 'No active tenant context' });
+const getUserTenantsData = async (userId, defaultTenantId) => {
+  if (!_knex) return null;
+  try {
+    const rows = await _knex('user_tenant_roles as utr')
+      .join('roles as r', 'r.id', 'utr.role_id')
+      .join('tenants as t', 't.id', 'utr.tenant_id')
+      .leftJoin('role_permissions as rp', 'rp.role_id', 'r.id')
+      .leftJoin('permissions as p', 'p.id', 'rp.permission_id')
+      .where('utr.user_id', userId)
+      .where('t.is_active', true)
+      .select('utr.tenant_id', 'r.name as role_name', 'p.name as permission_name');
+
+    if (rows.length === 0) return null;
+
+    // Group rows into { tenantId: { roles: Set, permissions: Set } }
+    const map = {};
+    for (const row of rows) {
+      const tid = row.tenant_id;
+      if (!map[tid]) map[tid] = { roles: new Set(), permissions: new Set() };
+      map[tid].roles.add(row.role_name);
+      if (row.permission_name) map[tid].permissions.add(row.permission_name);
     }
 
-    const userPerms = tenant.permissions ?? [];
-    const missing = permissions.filter(p => !userPerms.includes(p));
-    if (missing.length > 0) {
-      logger.warn({ sub: req.user?.sub, missing }, 'rbac: permission check failed');
-      return res.status(403).json({ error: 'Insufficient permissions' });
+    // Convert Sets to sorted arrays for deterministic JWT payloads
+    const tenants = {};
+    for (const [tid, data] of Object.entries(map)) {
+      tenants[Number(tid)] = {
+        roles: [...data.roles].sort(),
+        permissions: [...data.permissions].sort(),
+      };
     }
 
-    next();
-  };
+    const tenantIds = Object.keys(tenants).map(Number);
+    const active_tenant = tenantIds.includes(Number(defaultTenantId)) ? Number(defaultTenantId) : tenantIds[0];
+
+    return { active_tenant, tenants };
+  } catch (err) {
+    logger.error({ err, userId }, 'rbac: getUserTenantsData failed');
+    return null;
+  }
+};
+
+/**
+ * Assign a role to a user within a tenant (idempotent).
+ *
+ * @param {number} userId
+ * @param {number} tenantId
+ * @param {number} roleId
+ */
+const assignRole = async (userId, tenantId, roleId) => {
+  await _knex('user_tenant_roles')
+    .insert({ user_id: userId, tenant_id: tenantId, role_id: roleId })
+    .onConflict(['user_id', 'tenant_id', 'role_id'])
+    .ignore();
+};
+
+/**
+ * Revoke a role from a user within a tenant.
+ *
+ * @param {number} userId
+ * @param {number} tenantId
+ * @param {number} roleId
+ */
+const revokeRole = async (userId, tenantId, roleId) => {
+  await _knex('user_tenant_roles').where({ user_id: userId, tenant_id: tenantId, role_id: roleId }).delete();
+};
+
+/**
+ * Grant a permission to a role (idempotent).
+ *
+ * @param {number} roleId
+ * @param {number} permissionId
+ */
+const grantPermission = async (roleId, permissionId) => {
+  await _knex('role_permissions')
+    .insert({ role_id: roleId, permission_id: permissionId })
+    .onConflict(['role_id', 'permission_id'])
+    .ignore();
+};
+
+/**
+ * Revoke a permission from a role.
+ *
+ * @param {number} roleId
+ * @param {number} permissionId
+ */
+const revokePermission = async (roleId, permissionId) => {
+  await _knex('role_permissions').where({ role_id: roleId, permission_id: permissionId }).delete();
+};
+
+export { assignRole, getUserTenantsData, grantPermission, isConfigured, revokePermission, revokeRole, setup };

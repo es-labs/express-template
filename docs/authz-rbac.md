@@ -9,7 +9,6 @@ The RBAC module provides multi-tenant, coarse-grained authorization as a complem
 - Roles and permissions are stored in the DB — no external service required
 - Users can belong to multiple tenants, each with their own role assignments
 - On login, roles and their resolved permissions are embedded in the JWT
-- Route middleware (`requireRoles`, `requirePermissions`) reads directly from the JWT — no per-request DB call
 - **Optional at runtime** — when `RBAC_CONFIG.enabled` is `false` the system falls back to the flat `roles` column on the `users` table
 
 RBAC and FGA can be used together: RBAC for coarse-grained tenant/role checks, FGA for fine-grained per-object checks.
@@ -52,8 +51,7 @@ users
 
 | File | Purpose |
 |---|---|
-| `common/compiled/node/auth/rbac-service.js` | DB query service — `setup`, `getUserTenantsData`, `assignRole`, `revokeRole`, `grantPermission`, `revokePermission` |
-| `common/compiled/node/auth/rbac.js` | Express middleware — `requireRoles`, `requirePermissions` |
+| `common/compiled/node/auth/rbac.js` | DB query service — `setup`, `getUserTenantsData`, `assignRole`, `revokeRole`, `grantPermission`, `revokePermission` |
 | `common/compiled/node/auth/index.js` | `setup()` accepts `rbacConfig`; `createToken` merges RBAC data into JWT; `authUser` attaches `req.rbac`; re-exports RBAC helpers |
 | `common/compiled/node/express/preRoute.js` | Reads `RBAC_CONFIG` and forwards it to `authService.setup()` |
 | `apps/sample-api/.env.json` | Added `RBAC_CONFIG` block |
@@ -90,7 +88,7 @@ Restart the API. `createToken` will now fetch tenant/role/permission data on eve
 
 ### `createToken`
 
-On login, after the password check, `createToken` calls `rbacService.getUserTenantsData(userId, user.tenant)`. This runs a single JOIN query across `user_tenant_roles → roles → role_permissions → permissions` for all active tenants the user belongs to. The result is merged into the JWT payload as `active_tenant` and `tenants`.
+On login, after the password check, `createToken` calls `rbac.getUserTenantsData(userId, user.tenant)`. This runs a single JOIN query across `user_tenant_roles → roles → role_permissions → permissions` for all active tenants the user belongs to. The result is merged into the JWT payload as `active_tenant` and `tenants`.
 
 If RBAC is not enabled or the user has no tenant memberships, the field is omitted and the flat `roles` column / FGA fallback applies as before.
 
@@ -109,31 +107,6 @@ req.rbac = {
 
 ## Usage in routes
 
-### Middleware factory — `requireRoles` and `requirePermissions`
-
-Use after `authUser` for declarative route-level checks:
-
-```js
-import { authUser, requireRoles, requirePermissions } from '@common/node/auth';
-
-// Pass when user holds at least one of the given roles
-router.delete('/users/:id', authUser, requireRoles('admin'), handler);
-
-// Pass when user holds ALL of the given permissions
-router.get('/reports', authUser, requirePermissions('reports:read'), handler);
-
-// Combine — role check AND permission check both required
-router.post(
-  '/billing/export',
-  authUser,
-  requireRoles('admin', 'billing_manager'),
-  requirePermissions('billing:read', 'reports:export'),
-  handler,
-);
-```
-
-Both middleware check against the `active_tenant` in the JWT. They return `403` when the tenant context is missing or the check fails.
-
 ### Ad-hoc check inside a handler
 
 ```js
@@ -146,14 +119,14 @@ router.get('/dashboard', authUser, async (req, res) => {
 ### Using RBAC and FGA together
 
 ```js
-import { authUser, requireRoles, requireFga } from '@common/node/auth';
+import { authUser, requireFga } from '@common/node/auth';
 
-// Coarse: user must be an admin in their active tenant
+// Coarse: user must be an admin in their active tenant (inline check)
 // Fine:   user must own this specific document
 router.put(
   '/docs/:id',
   authUser,
-  requireRoles('admin'),
+  (req, res, next) => req.rbac.hasRole('admin') ? next() : res.sendStatus(403),
   requireFga('owner', req => `document:${req.params.id}`),
   handler,
 );

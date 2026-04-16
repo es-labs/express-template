@@ -15,7 +15,6 @@
 | File | What was read |
 |---|---|
 | `docs/fga.md` | Existing FGA integration design and usage patterns |
-| `common/compiled/node/auth/rbac.js` | Existing middleware stubs (`requireRoles`, `requirePermissions`) that already reference `req.user.active_tenant` / `req.user.tenants` |
 | `common/compiled/node/auth/index.js` | `setup()`, `createToken`, `authUser` — integration points |
 | `common/compiled/node/auth/openfga.js` | FGA service module — used as design reference |
 | `common/compiled/node/express/preRoute.js` | Where `authService.setup()` is called with config |
@@ -87,7 +86,7 @@ Mirrors `req.fga.check(...)` (async FGA) but reads JWT in-memory.
 
 | File | Purpose |
 |---|---|
-| `common/compiled/node/auth/rbac-service.js` | DB query service — `setup`, `getUserTenantsData`, `assignRole`, `revokeRole`, `grantPermission`, `revokePermission` |
+| `common/compiled/node/auth/rbac.js` | DB query service — `setup`, `getUserTenantsData`, `assignRole`, `revokeRole`, `grantPermission`, `revokePermission` |
 | `scripts/dbdeploy/db-sample/migrations/20260416000001_rbac_tables.js` | Creates the five RBAC tables |
 | `scripts/dbdeploy/db-sample/seeds/initial_rbac.js` | Seeds 1 tenant, 4 permissions, 3 roles, 4 user-role assignments (mirrors initial_users.js) |
 | `docs/rbac.md` | Full reference documentation |
@@ -96,7 +95,7 @@ Mirrors `req.fga.check(...)` (async FGA) but reads JWT in-memory.
 
 | File | Change |
 |---|---|
-| `common/compiled/node/auth/index.js` | Import `rbac-service`; extend `setup()`; enrich `createToken` JWT payload; attach `req.rbac` in `authUser`; re-export `requireRoles`, `requirePermissions`, management helpers |
+| `common/compiled/node/auth/index.js` | Import `rbac`; extend `setup()`; enrich `createToken` JWT payload; attach `req.rbac` in `authUser`; re-export management helpers |
 | `common/compiled/node/express/preRoute.js` | Read `RBAC_CONFIG` and pass as 4th arg to `authService.setup()` |
 | `apps/sample-api/.env.json` | Added `RBAC_CONFIG: { enabled: false }` block |
 
@@ -111,27 +110,16 @@ Mirrors `req.fga.check(...)` (async FGA) but reads JWT in-memory.
 3. Set `RBAC_CONFIG.enabled: true` in `.env.json`
 4. Restart the API
 
-### Route middleware
-
-```js
-import { authUser, requireRoles, requirePermissions } from '@common/node/auth';
-
-router.delete('/users/:id',    authUser, requireRoles('admin'),                  handler);
-router.get('/reports',         authUser, requirePermissions('reports:read'),      handler);
-router.post('/billing/export', authUser, requireRoles('admin', 'billing_manager'),
-                                         requirePermissions('billing:read'),      handler);
-```
-
 ### RBAC + FGA together
 
 ```js
-import { authUser, requireRoles, requireFga } from '@common/node/auth';
+import { authUser, requireFga } from '@common/node/auth';
 
 router.put(
   '/docs/:id',
   authUser,
-  requireRoles('editor'),                                    // RBAC: coarse tenant role
-  requireFga('owner', req => `document:${req.params.id}`),  // FGA: fine-grained object
+  (req, res, next) => req.rbac.hasRole('editor') ? next() : res.sendStatus(403), // RBAC: coarse tenant role
+  requireFga('owner', req => `document:${req.params.id}`),                        // FGA: fine-grained object
   handler,
 );
 ```

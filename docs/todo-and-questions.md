@@ -3,8 +3,8 @@
 ## TODO
 
 - **IN PROGRESS** JSON in env, refactor to use something else
-- add RBAC
-- audit_logs
+- **IN PROGRESS** add RBAC and FGA
+- **IN PROGRESS** audit_logs
 - safeJSON
 - remove barrel index.js files...
 on:
