@@ -2,6 +2,8 @@ import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import * as keyv from './keyv.js';
 import * as knex from './knex.js';
+import * as fga from './openfga.js';
+import * as rbacService from './rbac-service.js';
 import * as redis from './redis.js';
 
 const HASH_KEYLEN = 64;
@@ -53,10 +55,18 @@ const store = {
   redis,
 };
 
-const setup = (tokenService, userService) => {
+/**
+ * @param {object} tokenService - service instance for refresh-token storage (keyv/redis/knex)
+ * @param {object} userService  - service instance for user lookups (knex)
+ * @param {{ apiUrl: string, storeId: string, authorizationModelId?: string }} [fgaConfig]
+ *   Optional OpenFGA connection config. When omitted, FGA checks are skipped and
+ *   createToken falls back to user.roles from the database.
+ * @param {{ enabled: boolean }} [rbacConfig]
+ *   Optional RBAC config. When enabled, createToken fetches tenant/role/permission
+ *   data from the DB and embeds it in the JWT as active_tenant + tenants.
+ */
+const setup = (tokenService, userService, fgaConfig, rbacConfig) => {
   //NOSONAR ({ } = process.env);
-  // ({ setRefreshToken, getRefreshToken, revokeRefreshToken, setRefreshTokenStoreName, setTokenService } = require('./' + JWT_REFRESH_STORE)); // keyv, redis, knex
-  // ({ findUser, updateUser, setAuthUserStoreName, setUserService } = require('./' + AUTH_USER_STORE)); // knex
   ({ setRefreshToken, getRefreshToken, revokeRefreshToken, setRefreshTokenStoreName, setTokenService } =
     store[JWT_REFRESH_STORE]); // keyv, redis, knex
   ({ findUser, updateUser, setAuthUserStoreName, setUserService } = store[AUTH_USER_STORE]); // knex
@@ -67,6 +77,8 @@ const setup = (tokenService, userService) => {
   if (setUserService) setUserService(userService);
   if (setRefreshTokenStoreName) setRefreshTokenStoreName(JWT_REFRESH_STORE_NAME);
   if (setAuthUserStoreName) setAuthUserStoreName(AUTH_USER_STORE_NAME);
+  if (fgaConfig) fga.setup(fgaConfig);
+  if (rbacConfig?.enabled) rbacService.setup(userService);
 };
 
 const { COOKIE_OPTS } = globalThis.__config;
@@ -104,7 +116,13 @@ const createToken = async user => {
   if (!id) throw Error('User ID Not Found');
   if (user.revoked) throw Error('User Revoked');
 
-  const roles = user.roles.split(',');
+  // Fetch roles from OpenFGA when available; fall back to the DB `roles` column.
+  const fgaRoles = await fga.listUserRoles(id);
+  const roles = fgaRoles.length > 0 ? fgaRoles : (user.roles ?? '').split(',').filter(Boolean);
+
+  // Fetch tenant-scoped roles and permissions from RBAC tables when configured.
+  // user.tenant is the user's default/preferred tenant from the users table.
+  const rbacData = await rbacService.getUserTenantsData(id, user.tenant);
 
   const keys = AUTH_USER_FIELDS_JWT_PAYLOAD.split(',');
   for (const key of keys) {
@@ -114,7 +132,14 @@ const createToken = async user => {
   options.allowInsecureKeySizes = false;
   options.algorithm = JWT_ALG;
   options.expiresIn = JWT_EXPIRY_SEC;
-  const access_token = jwt.sign({ sub: id, roles }, getSecret('sign'), options);
+
+  // Build JWT payload — RBAC tenant data is merged in when available.
+  const payload = {
+    sub: id,
+    roles, // flat roles list (FGA or DB column) kept for backward compatibility
+    ...(rbacData && { active_tenant: rbacData.active_tenant, tenants: rbacData.tenants }),
+  };
+  const access_token = jwt.sign(payload, getSecret('sign'), options);
 
   options.expiresIn = JWT_REFRESH_EXPIRY_SEC;
   const refresh_token = crypto.randomBytes(JWT_REFRESH_TOKEN_BYTE_LEN).toString('base64url');
@@ -137,6 +162,15 @@ const setTokensToHeader = (res, { access_token, refresh_token }) => {
   }
 };
 
+/**
+ * JWT authentication middleware.
+ * Verifies the Bearer token and populates:
+ *   req.user — decoded JWT payload { sub, roles, iat, exp, ... }
+ *   req.fga  — convenience object for per-request OpenFGA checks
+ *
+ * For route-level fine-grained checks use fga.requireFga() instead of calling
+ * req.fga.check() inline.
+ */
 const authUser = async (req, res, next) => {
   let access_token = null;
   try {
@@ -150,6 +184,23 @@ const authUser = async (req, res, next) => {
       const access_result = jwt.verify(access_token, getSecret('verify'), { algorithm: [JWT_ALG] }); // and options
       if (access_result) {
         req.user = access_result;
+        // Attach a scoped FGA check helper so route handlers can do ad-hoc checks
+        // without importing the fga module directly.
+        req.fga = {
+          check: (relation, object) => fga.check(access_result.sub, relation, object),
+        };
+        // Attach synchronous RBAC helpers that inspect the JWT payload.
+        // These mirror requireRoles / requirePermissions but for inline handler use.
+        req.rbac = {
+          hasRole: (...roleList) => {
+            const ctx = access_result.tenants?.[access_result.active_tenant];
+            return ctx ? roleList.some(r => ctx.roles.includes(r)) : false;
+          },
+          hasPermission: (...permList) => {
+            const ctx = access_result.tenants?.[access_result.active_tenant];
+            return ctx ? permList.every(p => ctx.permissions.includes(p)) : false;
+          },
+        };
         return next();
       } else {
         return res.status(401).json({ message: 'Access Error' });
@@ -193,6 +244,11 @@ const authRefresh = async (req, res) => {
   }
 };
 
+// Re-export OpenFGA helpers so callers can import from a single auth entry point
+export { check, deleteTuple, listUserRoles, requireFga, writeTuple } from './openfga.js';
+// Re-export RBAC middleware and management helpers from a single auth entry point
+export { requirePermissions, requireRoles } from './rbac.js';
+export { assignRole, grantPermission, revokePermission, revokeRole } from './rbac-service.js';
 export {
   authFns,
   authRefresh,

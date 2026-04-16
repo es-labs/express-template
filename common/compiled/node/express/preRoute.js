@@ -81,7 +81,11 @@ const preRoute = () => {
   // SERVICES need server
   services.start(app, server);
   try {
-    authService.setup(services.get('keyv'), services.get('knex1')); // setup authorization
+    // Pass FGA_CONFIG when present; omit to skip OpenFGA and use DB roles fallback.
+    const fgaConfig = globalThis.__config?.FGA_CONFIG?.storeId ? globalThis.__config.FGA_CONFIG : undefined;
+    // Pass RBAC_CONFIG when enabled; omit to skip DB-backed tenant/role/permission lookup.
+    const rbacConfig = globalThis.__config?.RBAC_CONFIG?.enabled ? globalThis.__config.RBAC_CONFIG : undefined;
+    authService.setup(services.get('keyv'), services.get('knex1'), fgaConfig, rbacConfig); // setup authorization
   } catch (e) {
     logger.info(e);
   }
