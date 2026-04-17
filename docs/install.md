@@ -61,7 +61,6 @@ ms-azuretools.vscode-docker
 ms-azuretools.vscode-containers
 tobermory.es6-string-html
 github.vscode-github-actions
-github.copilot-chat
 eamodio.gitlens
 connor4312.nodejs-testing
 ms-vscode-remote.remote-ssh
@@ -70,3 +69,5 @@ ms-vscode.remote-explorer
 humao.rest-client
 vue.volar
 ```
+
+- copilot chat already built into latest VS Code

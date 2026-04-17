@@ -17,6 +17,18 @@ RBAC and FGA can be used together: RBAC for coarse-grained tenant/role checks, F
 
 ## Data model
 
+### Schema
+
+```
+tenants           id, name, slug, is_active, timestamps
+roles             id, tenant_id→tenants, name, description, timestamps
+permissions       id, name (e.g. "users:read"), description, timestamps
+role_permissions  (role_id, permission_id) composite PK
+user_tenant_roles (user_id, tenant_id, role_id) composite PK
+```
+
+Roles are **tenant-scoped**. Permissions are **global** (shared across all tenants). A user can hold **multiple roles per tenant**.
+
 ```
 tenants
   └── roles (tenant_id FK)
@@ -43,20 +55,29 @@ users
 }
 ```
 
-`roles` (flat list) is kept for backward compatibility. `active_tenant` is the user's default tenant from the `users.tenant` column.
+- `roles` (flat list) retained for backward compatibility.
+- `active_tenant` defaults to `user.tenant` from the `users` table; falls back to first tenant found.
+- Permissions are **resolved at login** — JWT is self-contained, no per-request DB call.
 
 ---
 
-## Files changed
+## Files
+
+### New files
 
 | File | Purpose |
 |---|---|
-| `common/compiled/node/auth/rbac.js` | DB query service — `setup`, `getUserTenantsData`, `assignRole`, `revokeRole`, `grantPermission`, `revokePermission` |
-| `common/compiled/node/auth/index.js` | `setup()` accepts `rbacConfig`; `createToken` merges RBAC data into JWT; `authUser` attaches `req.rbac`; re-exports RBAC helpers |
-| `common/compiled/node/express/preRoute.js` | Reads `RBAC_CONFIG` and forwards it to `authService.setup()` |
-| `apps/sample-api/.env.json` | Added `RBAC_CONFIG` block |
+| `common/compiled/node/auth/rbac-service.js` | DB query service — `setup`, `getUserTenantsData`, `assignRole`, `revokeRole`, `grantPermission`, `revokePermission` |
 | `scripts/dbdeploy/db-sample/migrations/20260416000001_rbac_tables.js` | Creates `tenants`, `roles`, `permissions`, `role_permissions`, `user_tenant_roles` |
 | `scripts/dbdeploy/db-sample/seeds/initial_rbac.js` | Seeds 1 tenant, 4 permissions, 3 roles, 4 user-role assignments |
+
+### Modified files
+
+| File | Change |
+|---|---|
+| `common/compiled/node/auth/index.js` | Import `rbac-service`; extend `setup()`; enrich `createToken` JWT payload; attach `req.rbac` in `authUser`; re-export management helpers |
+| `common/compiled/node/express/preRoute.js` | Read `RBAC_CONFIG` and pass as 4th arg to `authService.setup()` |
+| `apps/sample-api/.env.json` | Added `RBAC_CONFIG: { enabled: false }` block |
 
 ---
 
@@ -86,11 +107,13 @@ Restart the API. `createToken` will now fetch tenant/role/permission data on eve
 
 ## How it works
 
-### `createToken`
+### Fallback chain (`createToken`)
 
-On login, after the password check, `createToken` calls `rbac.getUserTenantsData(userId, user.tenant)`. This runs a single JOIN query across `user_tenant_roles → roles → role_permissions → permissions` for all active tenants the user belongs to. The result is merged into the JWT payload as `active_tenant` and `tenants`.
+1. RBAC enabled → call `rbac.getUserTenantsData(userId, user.tenant)` — runs a single JOIN query across `user_tenant_roles → roles → role_permissions → permissions` for all active tenants. Embeds `active_tenant` and `tenants` in the JWT.
+2. FGA configured → populate flat `roles` from OpenFGA `ListObjects`.
+3. Neither → flat `roles` from `users.roles` DB column.
 
-If RBAC is not enabled or the user has no tenant memberships, the field is omitted and the flat `roles` column / FGA fallback applies as before.
+All three can coexist in the same deployment.
 
 ### `authUser`
 
@@ -154,7 +177,7 @@ await revokePermission(roleId, permissionId);
 
 ---
 
-## Seed data (initial_rbac.js)
+## Seed data (`initial_rbac.js`)
 
 | Tenant | Role | Permissions |
 |---|---|---|
@@ -170,7 +193,14 @@ await revokePermission(roleId, permissionId);
 
 ---
 
-## Choosing between RBAC, FGA, or both
+## Mode selection
+
+| Mode | Config |
+|---|---|
+| RBAC only | `RBAC_CONFIG.enabled: true`, FGA `storeId` empty |
+| FGA only | `RBAC_CONFIG.enabled: false`, FGA `storeId` set |
+| Both | Both enabled |
+| Neither (legacy) | Both disabled — uses flat `users.roles` column |
 
 | Use case | Recommendation |
 |---|---|
@@ -179,4 +209,3 @@ await revokePermission(roleId, permissionId);
 | Both coarse and fine-grained control | RBAC + FGA together |
 | No external service, simple deployments | RBAC only |
 | Maximum flexibility, dynamic policies | FGA only or RBAC + FGA |
-

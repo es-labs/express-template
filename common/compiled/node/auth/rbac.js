@@ -153,4 +153,27 @@ const revokePermission = async (roleId, permissionId) => {
   await _knex('role_permissions').where({ role_id: roleId, permission_id: permissionId }).delete();
 };
 
-export { assignRole, getUserTenantsData, grantPermission, isConfigured, revokePermission, revokeRole, setup };
+/**
+ * Route middleware — requires the user to hold at least one of the given roles
+ * from the flat JWT `roles` array. Works regardless of which source populated it
+ * (FGA, RBAC, or the legacy DB column). Use after authUser.
+ *
+ * @param {...string} roles
+ */
+const requireRole =
+  (...roles) =>
+  (req, res, next) => {
+    if (req.user?.roles?.some(r => roles.includes(r))) return next();
+    return res.sendStatus(403);
+  };
+
+export {
+  assignRole,
+  getUserTenantsData,
+  grantPermission,
+  isConfigured,
+  requireRole,
+  revokePermission,
+  revokeRole,
+  setup,
+};

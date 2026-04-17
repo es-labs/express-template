@@ -247,7 +247,7 @@ const authRefresh = async (req, res) => {
 // Re-export OpenFGA helpers so callers can import from a single auth entry point
 export { check, deleteTuple, listUserRoles, requireFga, writeTuple } from './openfga.js';
 // Re-export RBAC management helpers from a single auth entry point
-export { assignRole, grantPermission, revokePermission, revokeRole } from './rbac.js';
+export { assignRole, grantPermission, requireRole, revokePermission, revokeRole } from './rbac.js';
 export {
   authFns,
   authRefresh,

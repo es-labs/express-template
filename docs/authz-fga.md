@@ -24,6 +24,8 @@ type role
     define assignee: [user]
 ```
 
+The model maps directly to the existing flat roles: a user is an "assignee" of a named role object. This mirrors the `users.roles` format so existing role names work unchanged.
+
 Tuples assign users to roles:
 
 | user    | relation   | object           |
@@ -35,17 +37,24 @@ Tuples assign users to roles:
 
 ---
 
-## Files changed
+## Files
+
+### New files
 
 | File | Purpose |
 |---|---|
 | `common/compiled/node/auth/openfga.js` | OpenFGA client wrapper — `setup`, `listUserRoles`, `check`, `writeTuple`, `deleteTuple`, `requireFga` |
-| `common/compiled/node/auth/index.js` | `createToken` uses FGA roles; `authUser` attaches `req.fga`; `setup()` accepts `fgaConfig`; re-exports FGA helpers |
-| `common/compiled/node/express/preRoute.js` | Reads `FGA_CONFIG` from app config and forwards it to `authService.setup()` |
-| `common/compiled/node/package.json` | Added `@openfga/sdk ^0.9.0` |
-| `apps/sample-api/.env.json` | Added `FGA_CONFIG` block |
 | `scripts/dbdeploy/db-sample/migrations/20260416000000_fga_config.js` | Creates `fga_config` table (stores `store_id` + `auth_model_id`) |
-| `scripts/dbdeploy/db-sample/seeds/initial_openfga.js` | Creates FGA store, writes model and seed tuples, saves IDs to `fga_config` |
+| `scripts/dbdeploy/db-sample/seeds/initial_openfga.js` | Creates FGA store, writes authorization model and seed tuples, persists IDs to `fga_config` |
+
+### Modified files
+
+| File | Change |
+|---|---|
+| `common/compiled/node/auth/index.js` | Import `openfga`; extend `setup()` with `fgaConfig`; call `fga.listUserRoles` in `createToken`; attach `req.fga` in `authUser`; re-export FGA helpers |
+| `common/compiled/node/express/preRoute.js` | Read `FGA_CONFIG` and pass to `authService.setup()` when `storeId` is set |
+| `apps/sample-api/.env.json` | Added `FGA_CONFIG` block |
+| `common/compiled/node/package.json` | Added `@openfga/sdk ^0.9.0` |
 
 ---
 
@@ -91,9 +100,12 @@ Restart the API. `createToken` will now fetch roles from OpenFGA on every login.
 
 ## How it works
 
-### `createToken`
+### Fallback chain (`createToken`)
 
-On login, after the password check, `createToken` calls `fga.listUserRoles(userId)` to retrieve the user's roles from OpenFGA via `ListObjects`. The returned role names are embedded in the JWT payload under `roles`, identical to the old format. If FGA returns an empty list (not configured or store empty) the DB `roles` column is used as fallback.
+1. FGA configured (`storeId` set) → call `fga.listUserRoles(userId)` via `ListObjects`.
+2. FGA returns empty list (not configured / store empty) → fall back to `users.roles` DB column.
+
+The JWT `roles` array format is identical in both cases — consumers are unaware which source was used.
 
 ### `authUser`
 
@@ -111,9 +123,9 @@ This lets handlers perform ad-hoc FGA checks without importing the module direct
 
 ## Usage in routes
 
-### Middleware factory — `requireFga`
+### `requireFga` middleware
 
-Use `requireFga` after `authUser` for declarative route-level permission checks:
+Use after `authUser` for declarative route-level permission checks:
 
 ```js
 import { authUser, requireFga } from '@common/node/auth';
@@ -171,6 +183,29 @@ Stores the active FGA store and model IDs so they can be read by tooling or admi
 | `api_url` | string(255) | FGA server URL |
 | `is_active` | boolean | Whether this config is in use |
 | `created_at` / `updated_at` | timestamp | |
+
+---
+
+## Seed data (`initial_openfga.js`)
+
+The seed is idempotent — it checks for an existing store named `"sample-app"` before creating a new one. It:
+
+1. Creates (or reuses) the `"sample-app"` store.
+2. Writes the authorization model (`user`, `role` with `assignee` relation).
+3. Writes tuples mirroring `initial_users.js`.
+4. Saves `store_id` and `auth_model_id` to the `fga_config` table.
+
+If the OpenFGA server is unreachable the seed exits gracefully with a warning rather than throwing.
+
+---
+
+## Mode selection
+
+| Mode | Config |
+|---|---|
+| FGA enabled | `FGA_CONFIG.storeId` set to a valid store ID |
+| FGA disabled (legacy fallback) | `FGA_CONFIG.storeId` empty (default) |
+| FGA + RBAC together | Both `FGA_CONFIG.storeId` set and `RBAC_CONFIG.enabled: true` |
 
 ---
 

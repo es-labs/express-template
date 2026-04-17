@@ -1,4 +1,5 @@
-const authIsAdmin = async (req, res, next) => {
+// Final fallback for Authorization
+const authzIsAdmin = async (req, res, next) => {
   if (req.user.roles.includes('admin')) {
     return next();
   } else {
@@ -6,4 +7,4 @@ const authIsAdmin = async (req, res, next) => {
   }
 };
 
-export { authIsAdmin };
+export { authzIsAdmin };
