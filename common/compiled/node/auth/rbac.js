@@ -16,7 +16,7 @@
  *   rbac.setup(knexInstance); // call once at startup via auth setup()
  *
  *   // In createToken — fetch tenant/role/permission data to embed in JWT
- *   const data = await rbac.getUserTenantsData(userId, user.tenant);
+ *   const data = await rbac.getUserTenantsData(userId, user.tenant_id);
  *
  *   // Management helpers (e.g. admin routes)
  *   await rbac.assignRole(userId, tenantId, roleId);
@@ -45,19 +45,52 @@ const setup = knexInstance => {
 const isConfigured = () => _knex !== null;
 
 /**
- * Fetch all tenant memberships for a user, together with their roles and the
- * permissions resolved from those roles.
+ * Fetch the user's active tenant for embedding in the JWT.
+ * Returns tenant_id, tenant_plan, and the coarse roles held in that tenant.
+ * Roles are used as the primary source in the JWT roles fallback chain
+ * (RBAC → FGA → legacy DB column).
  *
- * Returns null when:
- * - RBAC has not been configured (setup() not called), or
- * - the user has no active tenant memberships.
+ * @param {string|number} userId
+ * @param {string|number} [defaultTenantId] Preferred tenant; falls back to first found.
+ * @returns {Promise<{ tenant_id: number, tenant_plan: string | null, roles: string[] } | null>}
+ */
+const getActiveTenant = async (userId, defaultTenantId) => {
+  if (!_knex) return null;
+  try {
+    const rows = await _knex('user_tenant_roles as utr')
+      .join('tenants as t', 't.id', 'utr.tenant_id')
+      .join('roles as r', 'r.id', 'utr.role_id')
+      .where('utr.user_id', userId)
+      .where('t.is_active', true)
+      .select('t.id as tenant_id', 't.plan as tenant_plan', 'r.name as role_name');
+
+    if (rows.length === 0) return null;
+
+    const map = {};
+    for (const row of rows) {
+      const tid = row.tenant_id;
+      if (!map[tid]) map[tid] = { tenant_id: tid, tenant_plan: row.tenant_plan ?? null, roles: new Set() };
+      map[tid].roles.add(row.role_name);
+    }
+
+    const entries = Object.values(map);
+    const preferred = entries.find(e => e.tenant_id === Number(defaultTenantId));
+    const entry = preferred ?? entries[0];
+    return { tenant_id: entry.tenant_id, tenant_plan: entry.tenant_plan, roles: [...entry.roles].sort() };
+  } catch (err) {
+    logger.error({ err, userId }, 'rbac: getActiveTenant failed');
+    return null;
+  }
+};
+
+/**
+ * Fetch all tenant memberships for a user with their roles and resolved permissions.
+ * Use at request time (e.g. permission middleware) with tenant_id from req.user.
  *
- * The returned shape is embedded directly into the JWT payload by createToken.
+ * Returns null when RBAC is not configured or the user has no active memberships.
  *
  * @param {string|number} userId
  * @param {string|number} [defaultTenantId]
- *   Preferred active_tenant. If the user belongs to this tenant it will be
- *   used; otherwise the first tenant found is used.
  * @returns {Promise<{
  *   active_tenant: number,
  *   tenants: Record<number, { roles: string[], permissions: string[] }>
@@ -169,6 +202,7 @@ const requireRole =
 
 export {
   assignRole,
+  getActiveTenant,
   getUserTenantsData,
   grantPermission,
   isConfigured,

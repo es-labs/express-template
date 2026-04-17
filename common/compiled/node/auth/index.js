@@ -6,35 +6,28 @@ import * as fga from './openfga.js';
 import * as rbac from './rbac.js';
 import * as redis from './redis.js';
 
-const HASH_KEYLEN = 64;
-
-let setRefreshToken,
-  getRefreshToken,
-  revokeRefreshToken,
-  setRefreshTokenStoreName,
-  setTokenService,
-  setUserService,
-  findUser,
-  updateUser,
-  setAuthUserStoreName;
+let setRefreshToken, getRefreshToken, setRefreshTokenStoreName, setTokenService, setUserService, setAuthUserStoreName;
 
 const {
+  COOKIE_HTTPONLY,
   JWT_ALG,
+  JWT_AUD = '',
   JWT_EXPIRY_SEC = 900,
+  JWT_ISS = '',
   JWT_REFRESH_EXPIRY_SEC = 3600,
   JWT_REFRESH_STORE = 'keyv',
   JWT_REFRESH_STORE_NAME,
   JWT_REFRESH_TOKEN_BYTE_LEN = 32,
+  JWT_SCOPE = '',
 } = globalThis.__config.JWT;
 
 const {
   AUTH_REFRESH_URL,
   AUTH_USER_FIELD_ID_FOR_JWT,
+  AUTH_USER_FIELD_LOGIN,
   AUTH_USER_FIELDS_JWT_PAYLOAD = '',
   AUTH_USER_STORE,
   AUTH_USER_STORE_NAME,
-
-  USE_OTP,
 
   JWT_PRIVATE_KEY,
   JWT_CERTIFICATE,
@@ -43,7 +36,6 @@ const {
 } = process.env;
 
 const authFns = {
-  // rename to authFns
   findUser: null,
   updateUser: null,
   revokeRefreshToken: null,
@@ -59,20 +51,26 @@ const store = {
  * @param {object} tokenService - service instance for refresh-token storage (keyv/redis/knex)
  * @param {object} userService  - service instance for user lookups (knex)
  * @param {{ apiUrl: string, storeId: string, authorizationModelId?: string }} [fgaConfig]
- *   Optional OpenFGA connection config. When omitted, FGA checks are skipped and
- *   createToken falls back to user.roles from the database.
+ *   Optional OpenFGA config. Used as the second tier in the roles fallback chain
+ *   when RBAC yields no roles.
  * @param {{ enabled: boolean }} [rbacConfig]
- *   Optional RBAC config. When enabled, createToken fetches tenant/role/permission
- *   data from the DB and embeds it in the JWT as active_tenant + tenants.
+ *   Optional RBAC config. When enabled, createToken uses RBAC as the primary roles
+ *   source and embeds tenant_id + tenant_plan in the JWT.
  */
 const setup = (tokenService, userService, fgaConfig, rbacConfig) => {
-  //NOSONAR ({ } = process.env);
-  ({ setRefreshToken, getRefreshToken, revokeRefreshToken, setRefreshTokenStoreName, setTokenService } =
-    store[JWT_REFRESH_STORE]); // keyv, redis, knex
-  ({ findUser, updateUser, setAuthUserStoreName, setUserService } = store[AUTH_USER_STORE]); // knex
-  authFns.findUser = findUser;
-  authFns.updateUser = updateUser;
-  authFns.revokeRefreshToken = revokeRefreshToken;
+  ({
+    setRefreshToken,
+    getRefreshToken,
+    revokeRefreshToken: authFns.revokeRefreshToken,
+    setRefreshTokenStoreName,
+    setTokenService,
+  } = store[JWT_REFRESH_STORE]);
+  ({
+    findUser: authFns.findUser,
+    updateUser: authFns.updateUser,
+    setAuthUserStoreName,
+    setUserService,
+  } = store[AUTH_USER_STORE]);
   if (setTokenService) setTokenService(tokenService);
   if (setUserService) setUserService(userService);
   if (setRefreshTokenStoreName) setRefreshTokenStoreName(JWT_REFRESH_STORE_NAME);
@@ -83,46 +81,30 @@ const setup = (tokenService, userService, fgaConfig, rbacConfig) => {
 
 const { COOKIE_OPTS } = globalThis.__config;
 
-//NOSONAR algorithm
-// expiresIn
-// issuer  = 'Mysoft corp'
-// subject  = 'some@user.com'
-// audience  = 'http://mysoftcorp.in'
-// ip
-// We implement stateful refresh_token not stateless
-
-//NOSONAR
-// mode: sign, verify
 const getSecret = mode => {
   if (JWT_ALG.substring(0, 2) !== 'HS') {
-    if (mode === 'sign') return JWT_PRIVATE_KEY;
-    else return JWT_CERTIFICATE;
+    return mode === 'sign' ? JWT_PRIVATE_KEY : JWT_CERTIFICATE;
   }
   return JWT_SECRET;
 };
 
-// should use:
-// sub - for user id
-// roles - for user roles (based on selected token)
-// all other user related information sent on initial login and stored using local storage
-// do not catch exception here, let functions above handle
 const createToken = async user => {
-  // Create a tokens & data from user
   const user_meta = {};
   const options = {};
 
-  const id = user[AUTH_USER_FIELD_ID_FOR_JWT];
+  const sub = user[AUTH_USER_FIELD_ID_FOR_JWT];
 
-  if (!id) throw Error('User ID Not Found');
+  if (!sub) throw Error('User ID Not Found');
   if (user.revoked) throw Error('User Revoked');
 
-  // Fetch roles from OpenFGA when available; fall back to the DB `roles` column.
-  const fgaRoles = await fga.listUserRoles(id);
-  const roles = fgaRoles.length > 0 ? fgaRoles : (user.roles ?? '').split(',').filter(Boolean);
-
-  // Fetch tenant-scoped roles and permissions from RBAC tables when configured.
-  // user.tenant is the user's default/preferred tenant from the users table.
-  const rbacData = await rbac.getUserTenantsData(id, user.tenant);
+  // Three-tier roles fallback: RBAC (active tenant) → FGA → legacy DB column.
+  // Each tier is only consulted if the previous one yields no roles.
+  const tenantData = await rbac.getActiveTenant(sub, user.tenant_id);
+  let roles = tenantData?.roles ?? [];
+  if (roles.length === 0) {
+    const fgaRoles = await fga.listUserRoles(sub);
+    roles = fgaRoles.length > 0 ? fgaRoles : (user.roles ?? '').split(',').filter(Boolean);
+  }
 
   const keys = AUTH_USER_FIELDS_JWT_PAYLOAD.split(',');
   for (const key of keys) {
@@ -133,17 +115,19 @@ const createToken = async user => {
   options.algorithm = JWT_ALG;
   options.expiresIn = JWT_EXPIRY_SEC;
 
-  // Build JWT payload — RBAC tenant data is merged in when available.
   const payload = {
-    sub: id,
-    roles, // flat roles list (FGA or DB column) kept for backward compatibility
-    ...(rbacData && { active_tenant: rbacData.active_tenant, tenants: rbacData.tenants }),
+    iss: JWT_ISS,
+    sub,
+    aud: JWT_AUD,
+    scope: JWT_SCOPE,
+    roles, // coarse-grained roles (FGA or DB column)
+    ...(tenantData && { tenant_id: tenantData.tenant_id, tenant_plan: tenantData.tenant_plan }),
   };
   const access_token = jwt.sign(payload, getSecret('sign'), options);
 
   options.expiresIn = JWT_REFRESH_EXPIRY_SEC;
   const refresh_token = crypto.randomBytes(JWT_REFRESH_TOKEN_BYTE_LEN).toString('base64url');
-  await setRefreshToken(id, refresh_token); // store in DB or Cache
+  await setRefreshToken(sub, refresh_token); // store in DB or Cache
   return {
     access_token,
     refresh_token,
@@ -165,11 +149,11 @@ const setTokensToHeader = (res, { access_token, refresh_token }) => {
 /**
  * JWT authentication middleware.
  * Verifies the Bearer token and populates:
- *   req.user — decoded JWT payload { sub, roles, iat, exp, ... }
- *   req.fga  — convenience object for per-request OpenFGA checks
+ *   req.user — decoded JWT payload { iss, sub, aud, scope, roles, tenant_id, tenant_plan, iat, exp }
+ *   req.fga  — { check(relation, object) } for ad-hoc OpenFGA checks
+ *   req.rbac — { hasRole(...roles) } checks flat JWT roles array
  *
- * For route-level fine-grained checks use fga.requireFga() instead of calling
- * req.fga.check() inline.
+ * For fine-grained permission checks, call rbac.getUserTenantsData(req.user.sub, req.user.tenant_id).
  */
 const authUser = async (req, res, next) => {
   let access_token = null;
@@ -181,7 +165,7 @@ const authUser = async (req, res, next) => {
   }
   if (access_token) {
     try {
-      const access_result = jwt.verify(access_token, getSecret('verify'), { algorithm: [JWT_ALG] }); // and options
+      const access_result = jwt.verify(access_token, getSecret('verify'), { algorithm: [JWT_ALG] });
       if (access_result) {
         req.user = access_result;
         // Attach a scoped FGA check helper so route handlers can do ad-hoc checks
@@ -189,17 +173,10 @@ const authUser = async (req, res, next) => {
         req.fga = {
           check: (relation, object) => fga.check(access_result.sub, relation, object),
         };
-        // Attach synchronous RBAC helpers that inspect the JWT payload.
-        // These mirror requireRoles / requirePermissions but for inline handler use.
+        // hasRole checks the coarse-grained flat roles array from the JWT.
+        // For permission checks use rbac.getUserTenantsData with req.user.tenant_id.
         req.rbac = {
-          hasRole: (...roleList) => {
-            const ctx = access_result.tenants?.[access_result.active_tenant];
-            return ctx ? roleList.some(r => ctx.roles.includes(r)) : false;
-          },
-          hasPermission: (...permList) => {
-            const ctx = access_result.tenants?.[access_result.active_tenant];
-            return ctx ? permList.every(p => ctx.permissions.includes(p)) : false;
-          },
+          hasRole: (...roleList) => roleList.some(r => access_result.roles?.includes(r)),
         };
         return next();
       } else {
@@ -218,19 +195,17 @@ const authUser = async (req, res, next) => {
 };
 
 const authRefresh = async (req, res) => {
-  // get refresh token
   try {
     const refresh_token = req.cookies?.refresh_token || req.header('refresh_token') || req.query?.refresh_token; // check refresh token & user - always stateful
     const access_token = req.cookies?.access_token || req.header('access_token') || req.query?.access_token; // check refresh token & user - always stateful
     const user = jwt.decode(access_token);
-    const { id, iat } = user;
+    const { sub, iat } = user;
     if (Math.floor(Date.now() / 1000) > iat + JWT_REFRESH_EXPIRY_SEC) {
       return res.status(401).json({ message: 'Refresh Token Expired' });
     }
-    const refreshToken = await getRefreshToken(id);
+    const refreshToken = await getRefreshToken(sub);
     if (String(refreshToken) === String(refresh_token)) {
-      // ok... generate new access token & refresh token
-      const user = await findUser({ id });
+      const user = await authFns.findUser({ [AUTH_USER_FIELD_LOGIN]: sub });
       // TODO user also include tenant and other information
       const tokens = await createToken(user);
       setTokensToHeader(res, tokens);
@@ -244,44 +219,20 @@ const authRefresh = async (req, res) => {
   }
 };
 
-// Re-export OpenFGA helpers so callers can import from a single auth entry point
-export { check, deleteTuple, listUserRoles, requireFga, writeTuple } from './openfga.js';
-// Re-export RBAC management helpers from a single auth entry point
-export { assignRole, grantPermission, requireRole, revokePermission, revokeRole } from './rbac.js';
-export {
-  authFns,
-  authRefresh,
-  authUser,
-  createToken,
-  // findUser, updateUser,
-  getSecret,
-  setTokensToHeader,
-  setup,
-};
+export { authFns, authRefresh, authUser, createToken, getSecret, setTokensToHeader, setup };
 
 // do refresh token check from backend ?
-/*
-Signout across tabs
-window.addEventListener('storage', this.syncLogout) 
-//....
-syncLogout (event) {
-  if (event.key === 'logout') {
-    Router.push('/login')
-  }
-}
-async function logout () {
-  inMemoryToken = null;
-  const url = 'http://localhost:3010/auth/logout'
-  const response = await fetch(url, { method: 'POST', credentials: 'include', })
-  // to support logging out from all windows
-  window.localStorage.setItem('logout', Date.now())
-}
-*/
-
-// The user logs in with a login API call.
-// Server generates JWT Token and refresh_token
-// Server sets a HttpOnly cookie with refresh_token. jwt_token and jwt_token_expiry are returned back to the client as a JSON payload.
-// The jwt_token is stored in memory.
-// A countdown to a future silent refresh is started based on jwt_token_expiry
-
-// https://hasura.io/blog/best-practices-of-using-jwt-with-graphql/
+// // Signout across tabs
+// window.addEventListener('storage', this.syncLogout)
+//
+// syncLogout (event) {
+//   if (event.key === 'logout') {
+//     Router.push('/login')
+//   }
+// }
+// async function logout () {
+//   const url = 'http://localhost:3010/auth/logout'
+//   const response = await fetch(url, { method: 'POST', credentials: 'include', })
+//   // to support logging out from all windows
+//   window.localStorage.setItem('logout', Date.now())
+// }

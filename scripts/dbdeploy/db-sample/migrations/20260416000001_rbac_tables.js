@@ -16,6 +16,7 @@ export async function up(knex) {
     t.increments('id').primary();
     t.string('name', 100).notNullable();
     t.string('slug', 100).notNullable();
+    t.string('plan', 50).nullable();
     t.boolean('is_active').notNullable().defaultTo(true);
     t.timestamp('created_at', { useTz: true }).notNullable().defaultTo(knex.fn.now());
     t.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(knex.fn.now());

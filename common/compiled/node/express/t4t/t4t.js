@@ -124,7 +124,7 @@ const routes = options => {
   const authUser = options?.authFunc || noAuthFunc;
   roleKey = 'roles';
   idKey = 'sub';
-  orgIdKey = 'tenant';
+  orgIdKey = 'tenant_id';
 
   return express
     .Router()

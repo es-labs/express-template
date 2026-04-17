@@ -7,7 +7,7 @@ export async function up(knex) {
     // for user login
     table.increments('id').primary();
     table.string('roles');
-    table.integer('tenant');
+    table.integer('tenant_id');
     table.string('username');
 
     table.string('email').notNullable();

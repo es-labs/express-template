@@ -216,6 +216,26 @@ Required GitHub Variables:
 
 > Secrets must never be stored in the repo — use a secrets vault for CI/CD.
 
+## Authorization
+
+The auth module (`common/node/auth`) supports three authorization layers, all optional and composable:
+
+| Layer | Module | JWT field populated |
+|---|---|---|
+| RBAC | `rbac.js` — tenant-scoped roles + permissions | `active_tenant`, `tenants` |
+| FGA | `openfga.js` — fine-grained per-object checks | `roles` (flat list) |
+| Legacy | DB `users.roles` column | `roles` (flat list, fallback) |
+
+Route middleware available after `authUser`:
+
+| Middleware | Source | Checks |
+|---|---|---|
+| `requireRole(...roles)` | `@common/node/auth` | flat `req.user.roles` — works with all three layers |
+| `requireFga(relation, object)` | `@common/node/auth` | OpenFGA tuple lookup |
+| `req.rbac.hasRole(...roles)` | attached by `authUser` | tenant-scoped roles in active tenant |
+| `req.rbac.hasPermission(...perms)` | attached by `authUser` | tenant-scoped permissions in active tenant |
+| `req.fga.check(relation, object)` | attached by `authUser` | ad-hoc FGA check inside a handler |
+
 ## Key documentation
 
 | File | Purpose |
@@ -225,4 +245,5 @@ Required GitHub Variables:
 | `docs/git.md` | Git workflow, branch/tag patterns, merge strategy |
 | `docs/install-apps.md` | Backend and frontend setup and development guide |
 | `docs/install-common.md` | Shared code and workspace reference |
+| `docs/authz.md` | Authorization — RBAC and FGA: setup, JWT payload, roles fallback chain, usage |
 | `docs/NOTES.md` | Design decisions, caveats, open questions, TODOs |
