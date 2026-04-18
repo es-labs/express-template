@@ -11,6 +11,7 @@ This document is for
 - Fully ES Modules - JS Standards Compliant
 - Named exports preferred (default exports for class, config, or a plugin)
 - Use Native as much as viable (test runners, datetime, fetch / xhr, npm, git hooks)
+- Option to use Javascript or Typescript (using NodeJS native typescript) for backend.
 - npm workspaces (microservices & shared libraries)
   - apps : microservices or applications (frontend or backend)
     - shared-<tenant1>
@@ -47,6 +48,9 @@ This document is for
 - Support postgres as primary RDBMS, mysql as secondary.
   - DO NOT USE mongoDB
 - DB audit logging [strategy](decs/pg-audit-implementation)
+- Authorization
+  - RBAC, FGA, and legacy roles fallback
+  - multi-tenant, scopes
 - jsdoc for typing and autocomplete on IDE ?
 
 
