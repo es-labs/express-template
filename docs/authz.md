@@ -314,10 +314,10 @@ Store and model IDs should be managed via a secrets vault and injected as enviro
 |---|---|
 | `common/compiled/node/auth/rbac.js` | RBAC service — `getActiveTenant`, `getUserTenantsData`, `requireRole`, `assignRole`, `revokeRole`, `grantPermission`, `revokePermission` |
 | `common/compiled/node/auth/openfga.js` | FGA client wrapper — `setup`, `listUserRoles`, `check`, `writeTuple`, `deleteTuple`, `requireFga` |
-| `scripts/dbdeploy/db-sample/migrations/20260416000000_fga_config.js` | Creates `fga_config` table |
-| `scripts/dbdeploy/db-sample/migrations/20260416000001_rbac_tables.js` | Creates `tenants`, `roles`, `permissions`, `role_permissions`, `user_tenant_roles` |
-| `scripts/dbdeploy/db-sample/seeds/initial_rbac.js` | Seeds tenant, roles, permissions, user assignments |
-| `scripts/dbdeploy/db-sample/seeds/initial_openfga.js` | Creates FGA store, model, seed tuples |
+| `scripts/dbdeploy/db-sample/migrations/20260416000000_fga_config.ts` | Creates `fga_config` table |
+| `scripts/dbdeploy/db-sample/migrations/20260416000001_rbac_tables.ts` | Creates `tenants`, `roles`, `permissions`, `role_permissions`, `user_tenant_roles` |
+| `scripts/dbdeploy/db-sample/seeds/initial_rbac.ts` | Seeds tenant, roles, permissions, user assignments |
+| `scripts/dbdeploy/db-sample/seeds/initial_openfga.ts` | Creates FGA store, model, seed tuples |
 
 ### Modified files
 
