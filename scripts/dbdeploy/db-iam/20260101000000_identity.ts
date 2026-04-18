@@ -9,11 +9,10 @@
  * Secondary DB: MySQL
  * CHECK constraints and foreign keys are parsed but not enforced by
  * default (run `PRAGMA foreign_keys = ON` at connection open).
- *
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
  */
-export async function up(knex) {
+import type { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
   const isPg = knex.client.config.client === 'postgresql' || knex.client.config.client === 'pg';
 
   // ── users ─────────────────────────────────────────────────────────────────
@@ -200,13 +199,11 @@ export async function up(knex) {
     t.index(['event_type', 'created_at']);
     t.index(['created_at']);
   });
+
+  void isPg; // used for dialect detection; suppress unused variable warning
 }
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function down(knex) {
+export async function down(knex: Knex): Promise<void> {
   await knex.schema.dropTableIfExists('auth_audit_log');
   await knex.schema.dropTableIfExists('user_roles');
   await knex.schema.dropTableIfExists('roles');

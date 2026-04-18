@@ -7,11 +7,10 @@
  *   permissions       — global permission strings (e.g. "users:read")
  *   role_permissions  — M:N join: which permissions belong to a role
  *   user_tenant_roles — M:N:N join: which roles a user holds within a tenant
- *
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
  */
-export async function up(knex) {
+import type { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('tenants', t => {
     t.increments('id').primary();
     t.string('name', 100).notNullable();
@@ -60,11 +59,7 @@ export async function up(knex) {
   });
 }
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function down(knex) {
+export async function down(knex: Knex): Promise<void> {
   await knex.schema.dropTableIfExists('user_tenant_roles');
   await knex.schema.dropTableIfExists('role_permissions');
   await knex.schema.dropTableIfExists('permissions');

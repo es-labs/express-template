@@ -22,6 +22,12 @@ Read this document before making code changes. Use [.github/CONTRIBUTING.md](../
 - Breaking changes must add `!` before `:`.
 - Use [czg](https://cz-git.qbb.sh/cli/) when generating commit messages.
 
+## Language Standard
+
+- `apps/` and `common/` are plain JavaScript (ES Modules). Use JSDoc for typing and IDE autocomplete — no TypeScript compilation.
+- `scripts/` uses TypeScript. Node 24 strips types natively — no build step, no `tsx`, no `typescript` package needed. Run with `node file.ts`.
+- `scripts/tsconfig.json` exists for IDE type checking only (`noEmit: true`).
+
 ## Node Runtime Standard
 
 - Node runtime applications must import `common/node/logger` and use the global `logger` instead of `console.*`.

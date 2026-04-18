@@ -2,9 +2,9 @@ import { readdirSync, statSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-function collectSchemaFiles(dirPath) {
+function collectSchemaFiles(dirPath: string): string[] {
   const entries = readdirSync(dirPath, { withFileTypes: true });
-  const files = [];
+  const files: string[] = [];
 
   for (const entry of entries) {
     const entryPath = resolve(dirPath, entry.name);
@@ -27,16 +27,19 @@ function collectSchemaFiles(dirPath) {
   return files.sort();
 }
 
-function isSchemaLike(value) {
+function isSchemaLike(value: unknown): boolean {
   return Boolean(
-    value && typeof value === 'object' && typeof value.parse === 'function' && typeof value.safeParse === 'function',
+    value &&
+      typeof value === 'object' &&
+      typeof (value as Record<string, unknown>).parse === 'function' &&
+      typeof (value as Record<string, unknown>).safeParse === 'function',
   );
 }
 
 const inputDir = process.argv[2];
 
 if (!inputDir) {
-  console.error('Usage: node scripts/test-schemas.js <schema-directory>');
+  console.error('Usage: node scripts/test-schemas.ts <schema-directory>');
   process.exit(1);
 }
 
@@ -63,8 +66,8 @@ let hadFailure = false;
 
 for (const filePath of schemaFiles) {
   const moduleExports = await import(pathToFileURL(filePath).href);
-  const schemaExportNames = Object.entries(moduleExports)
-    .filter(([, value]) => isSchemaLike(value))
+  const schemaExportNames = Object.entries(moduleExports as Record<string, unknown>)
+    .filter(([, value]: [string, unknown]) => isSchemaLike(value))
     .map(([name]) => name);
 
   if (schemaExportNames.length === 0) {

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// scripts/generate-openapi.js
+// scripts/generate-openapi.ts
 //
 // Generates docs/openapi/openapi.merged.yaml from Zod v4 schemas at common/schemas/*.schema.js.
 // Uses zod-openapi — no monkey-patching, no separate registry object.

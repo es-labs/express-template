@@ -1,12 +1,8 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-
 import crypto from 'node:crypto';
+import type { Knex } from 'knex';
 import { setScryptHash } from '../../../../common/compiled/node/auth/scrypt.js';
 
-export async function seed(knex) {
+export async function seed(knex: Knex): Promise<void> {
   const salt = crypto.randomBytes(16).toString('hex');
   const password = await setScryptHash('test', salt);
 
@@ -14,7 +10,7 @@ export async function seed(knex) {
   try {
     await knex('users').del();
   } catch (e) {
-    console.log(e.toString());
+    console.log((e as Error).toString());
   }
   await knex('users').insert([
     {

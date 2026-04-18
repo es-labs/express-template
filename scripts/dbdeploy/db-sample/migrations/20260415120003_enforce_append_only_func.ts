@@ -1,8 +1,6 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function up(knex) {
+import type { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
   await knex.raw(`
     CREATE OR REPLACE FUNCTION enforce_append_only()
     RETURNS trigger LANGUAGE plpgsql AS $$
@@ -14,10 +12,6 @@ export async function up(knex) {
   `);
 }
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function down(knex) {
+export async function down(knex: Knex): Promise<void> {
   await knex.raw(`DROP FUNCTION IF EXISTS enforce_append_only()`);
 }

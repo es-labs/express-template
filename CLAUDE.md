@@ -6,7 +6,8 @@ A monorepo template for building full-stack JavaScript applications with Node.js
 
 - Node.js 24+ required, npm 11+ required
 - Fully ES Modules — no CommonJS
-- No TypeScript — JSDoc used for typing and IDE autocomplete
+- No TypeScript in `apps/` or `common/` — JSDoc used for typing and IDE autocomplete
+- `scripts/` uses TypeScript, run natively via Node 24 (`node file.ts`) — no build step needed
 
 ## Repository structure
 
@@ -222,7 +223,7 @@ The auth module (`common/node/auth`) supports three authorization layers, all op
 
 | Layer | Module | JWT field populated |
 |---|---|---|
-| RBAC | `rbac.js` — tenant-scoped roles + permissions | `active_tenant`, `tenants` |
+| RBAC | `rbac.js` — tenant-scoped roles + permissions | `tenant_id`, `tenant_plan`, `roles` |
 | FGA | `openfga.js` — fine-grained per-object checks | `roles` (flat list) |
 | Legacy | DB `users.roles` column | `roles` (flat list, fallback) |
 
@@ -230,10 +231,9 @@ Route middleware available after `authUser`:
 
 | Middleware | Source | Checks |
 |---|---|---|
-| `requireRole(...roles)` | `@common/node/auth` | flat `req.user.roles` — works with all three layers |
-| `requireFga(relation, object)` | `@common/node/auth` | OpenFGA tuple lookup |
-| `req.rbac.hasRole(...roles)` | attached by `authUser` | tenant-scoped roles in active tenant |
-| `req.rbac.hasPermission(...perms)` | attached by `authUser` | tenant-scoped permissions in active tenant |
+| `requireRole(...roles)` | `@common/node/auth/rbac.js` | flat `req.user.roles` — works with all three layers |
+| `requireFga(relation, object)` | `@common/node/auth/openfga.js` | OpenFGA tuple lookup |
+| `req.rbac.hasRole(...roles)` | attached by `authUser` | flat JWT `roles` array |
 | `req.fga.check(relation, object)` | attached by `authUser` | ad-hoc FGA check inside a handler |
 
 ## Key documentation

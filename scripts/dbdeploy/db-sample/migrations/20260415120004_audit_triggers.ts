@@ -1,8 +1,6 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function up(knex) {
+import type { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
   // audit_trigger_func()
   await knex.raw(`
     CREATE TRIGGER audit_users
@@ -18,11 +16,7 @@ export async function up(knex) {
   // `);
 }
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function down(knex) {
+export async function down(knex: Knex): Promise<void> {
   // await knex.raw(`DROP TRIGGER IF EXISTS enforce_append_only_notifications ON notifications`);
   await knex.raw(`DROP TRIGGER IF EXISTS audit_users ON users`);
 }

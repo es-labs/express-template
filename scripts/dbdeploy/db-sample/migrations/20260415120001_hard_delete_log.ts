@@ -1,8 +1,6 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function up(knex) {
+import type { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('hard_delete_log', table => {
     table.bigIncrements('id').primary();
     table.timestamp('deleted_at', { useTz: true }).notNullable().defaultTo(knex.fn.now());
@@ -42,11 +40,7 @@ export async function up(knex) {
   await knex.raw(`GRANT SELECT ON hard_delete_log TO audit_reader`);
 }
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function down(knex) {
+export async function down(knex: Knex): Promise<void> {
   await knex.raw(`REVOKE INSERT ON hard_delete_log FROM admin_role`);
   await knex.raw(`REVOKE SELECT ON hard_delete_log FROM audit_reader`);
   await knex.schema.dropTableIfExists('hard_delete_log');

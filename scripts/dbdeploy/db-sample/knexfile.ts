@@ -1,11 +1,9 @@
 // Update with your config settings.
 
-/**
- * @type { Object.<string, import("knex").Knex.Config> }
- */
+import type { Knex } from 'knex';
 import ClientPgLite from 'knex-pglite';
 
-export default {
+const config: Record<string, Knex.Config> = {
   development: {
     client: ClientPgLite,
     dialect: 'postgres',
@@ -31,3 +29,5 @@ export default {
     // information for this should be from a secrets file or env
   },
 };
+
+export default config;

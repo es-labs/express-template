@@ -1,7 +1,7 @@
 /**
  * OpenFGA seed — creates the store, writes the authorization model, and
  * populates initial relationship tuples that mirror the seed users in
- * initial_users.js.
+ * initial_users.ts.
  *
  * Prerequisites
  * ─────────────
@@ -25,16 +25,14 @@
  * type role
  *   relations
  *     define assignee: [user]
- *
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
  */
+import type { Knex } from 'knex';
 
 const FGA_API_URL = process.env.FGA_API_URL || 'http://127.0.0.1:8080';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
-const fgaFetch = async (path, method = 'GET', body) => {
+const fgaFetch = async (path: string, method = 'GET', body?: unknown) => {
   const res = await fetch(`${FGA_API_URL}${path}`, {
     method,
     headers: { 'Content-Type': 'application/json' },
@@ -73,7 +71,7 @@ const AUTHORIZATION_MODEL = {
   ],
 };
 
-// ── initial role assignments (mirrors initial_users.js) ───────────────────────
+// ── initial role assignments (mirrors initial_users.ts) ───────────────────────
 
 const INITIAL_TUPLES = [
   { user: 'user:1', relation: 'assignee', object: 'role:TestGroup' },
@@ -84,34 +82,34 @@ const INITIAL_TUPLES = [
 
 // ── seed ──────────────────────────────────────────────────────────────────────
 
-export async function seed(knex) {
+export async function seed(knex: Knex): Promise<void> {
   // ── 1. Resolve or create the FGA store ──────────────────────────────────────
-  let storeId;
+  let storeId: string;
 
   try {
-    const { stores = [] } = await fgaFetch('/stores?page_size=50');
+    const { stores = [] } = (await fgaFetch('/stores?page_size=50')) as { stores: Array<{ id: string; name: string }> };
     const existing = stores.find(s => s.name === 'sample-app');
 
     if (existing) {
       storeId = existing.id;
       console.log(`OpenFGA: using existing store "${existing.name}" (${storeId})`);
     } else {
-      const created = await fgaFetch('/stores', 'POST', { name: 'sample-app' });
+      const created = (await fgaFetch('/stores', 'POST', { name: 'sample-app' })) as { id: string };
       storeId = created.id;
       console.log(`OpenFGA: created store "sample-app" (${storeId})`);
     }
   } catch (err) {
-    console.error('OpenFGA seed skipped — could not reach FGA server:', err.message);
+    console.error('OpenFGA seed skipped — could not reach FGA server:', (err as Error).message);
     console.error('Start OpenFGA with: docker run -p 8080:8080 openfga/openfga run');
     return;
   }
 
   // ── 2. Write the authorization model ────────────────────────────────────────
-  const { authorization_model_id: authModelId } = await fgaFetch(
+  const { authorization_model_id: authModelId } = (await fgaFetch(
     `/stores/${storeId}/authorization-models`,
     'POST',
     AUTHORIZATION_MODEL,
-  );
+  )) as { authorization_model_id: string };
   console.log(`OpenFGA: wrote authorization model (${authModelId})`);
 
   // ── 3. Write initial relationship tuples ────────────────────────────────────
@@ -134,6 +132,6 @@ export async function seed(knex) {
     console.log('OpenFGA: saved config to fga_config table');
   } catch (err) {
     // fga_config table may not exist in all environments; non-fatal
-    console.warn('OpenFGA: could not write to fga_config table:', err.message);
+    console.warn('OpenFGA: could not write to fga_config table:', (err as Error).message);
   }
 }

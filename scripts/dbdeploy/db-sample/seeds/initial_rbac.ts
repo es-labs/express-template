@@ -1,6 +1,6 @@
 /**
  * RBAC seed — populates tenants, roles, permissions and user-role assignments
- * that mirror the seed users in initial_users.js.
+ * that mirror the seed users in initial_users.ts.
  *
  * Prerequisites
  * ─────────────
@@ -16,15 +16,14 @@
  *      TestGroup   — users:read, reports:read
  *      TestGithub  — users:read
  *      TestGmail   — users:read, reports:read, reports:export
- * 4. Assigns roles to seed users (mirrors initial_users.js and initial_openfga.js):
+ * 4. Assigns roles to seed users (mirrors initial_users.ts and initial_openfga.ts):
  *      user:1 → TestGroup
  *      user:2 → TestGithub
  *      user:3 → TestGmail, TestGroup
- *
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
  */
-export async function seed(knex) {
+import type { Knex } from 'knex';
+
+export async function seed(knex: Knex): Promise<void> {
   // ── 1. Clean up in reverse FK order ────────────────────────────────────────
   await knex('user_tenant_roles').del();
   await knex('role_permissions').del();

@@ -1,3 +1,5 @@
+import type { Knex } from 'knex';
+
 import countriesJson from './icc.json' with { type: 'json' };
 import statesJson from './state.json' with { type: 'json' };
 
@@ -15,11 +17,7 @@ new Intl.DateTimeFormat('default', {
   formatMatcher: 'basic',
 }).format(new Date());
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function seed(knex) {
+export async function seed(knex: Knex): Promise<void> {
   await knex('student_subject').del();
   await knex('subject').del();
   await knex('student').del();

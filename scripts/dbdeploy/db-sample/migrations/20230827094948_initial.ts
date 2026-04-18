@@ -1,8 +1,6 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function up(knex) {
+import type { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('users', table => {
     // for user login
     table.increments('id').primary();
@@ -110,11 +108,7 @@ export async function up(knex) {
   });
 }
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-export async function down(knex) {
+export async function down(knex: Knex): Promise<void> {
   await knex.schema.dropTableIfExists('student_subject');
   await knex.schema.dropTableIfExists('student');
   await knex.schema.dropTableIfExists('state');
