@@ -1,6 +1,4 @@
-// ? set globals here
 // ? caution - avoid name clashes with native JS libraries, other libraries, other globals
-
 import http from 'node:http';
 import https from 'node:https';
 import cookieParser from 'cookie-parser';
@@ -8,57 +6,25 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import pathToRegexp from 'path-to-regexp';
-import * as authService from '../auth/index.ts';
+import * as authService from '../auth/jwt.ts';
+import * as shutdown from '../errors/handler.ts';
+import { healthRouter } from '../health/router.ts';
 import { loggerMiddleware } from '../logger/index.ts';
 import * as services from '../services/index.ts';
-import { healthRouter } from './health/router.ts';
 
 const preRoute = () => {
-  const { NODE_ENV } = process.env;
   const DEFAULT_STACK_TRACE_LIMIT = 3; // default limit error stack trace to 3 level
-  const DEFAULT_SHUTFOWN_TIMEOUT_MS = NODE_ENV === 'production' ? 30000 : 3000;
-  const {
-    GRACEFUL_EXIT = NODE_ENV !== 'development',
-    STACK_TRACE_LIMIT = DEFAULT_STACK_TRACE_LIMIT,
-    SHUTDOWN_TIMEOUT_MS = DEFAULT_SHUTFOWN_TIMEOUT_MS,
-  } = process.env;
+  const { STACK_TRACE_LIMIT = DEFAULT_STACK_TRACE_LIMIT } = process.env;
 
   // setup stacktrace limit
   Error.stackTraceLimit = Number(STACK_TRACE_LIMIT) || DEFAULT_STACK_TRACE_LIMIT;
 
-  // setup graceful exit
-  // **WebSockets/SSE:** You need to track connections manually and close them. For WS, broadcast a "server shutting down" message, then close all clients before server.close().
-  let shuttingDown = false;
-
-  const gracefulShutdown = async signal => {
-    if (shuttingDown) return; // prevent multiple signals from triggering multiple shutdowns
-    logger.info(`Cleanup initiated by signal: ${signal}`);
-    setTimeout(() => {
-      // give the LB time to notice the 503 and stop routing
-      logger.error('Forced shutdown after timeout');
-      process.exit(1);
-    }, Number(SHUTDOWN_TIMEOUT_MS));
-    if (server) {
-      server.close(async () => {
-        await services.stop(); // promise all...
-        logger.info('process exiting gracefully');
-        return process.exit(0);
-      });
-    }
-    shuttingDown = true;
-  };
-
-  if (GRACEFUL_EXIT) {
-    ['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach(signal => {
-      process.on(signal, gracefulShutdown);
-    }); // SIGKILL cannot be caught
-    process.on('uncaughtException', (err, origin) =>
-      logger.info(`Uncaught Exception - error: ${err} origin: ${origin}` && process.exit(1)),
-    );
-    process.on('unhandledRejection', (reason, promise) =>
-      logger.info(`Unhandled Rejection - promise: ${promise} reason: ${reason}` && process.exit(1)),
-    );
-  }
+  // biome-ignore lint/suspicious/noImplicitAnyLet: assigned below after server creation
+  let server;
+  shutdown.setup(
+    () => server,
+    () => services,
+  ); // both resolved lazily — safe to call before server/services exist
 
   const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA, HTTPS_PASSPHRASE } = process.env;
   const https_opts: Record<string, any> = {};
@@ -67,7 +33,7 @@ const preRoute = () => {
   if (HTTPS_CA) https_opts.ca = HTTPS_CERTIFICATE;
   if (HTTPS_PASSPHRASE) https_opts.passphrase = HTTPS_PASSPHRASE; // (fs.readFileSync('passphrase.txt')).toString()
   const app = express();
-  const server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app); // fs.readFileSync('ca.cert')
+  server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app);
 
   // intercept upgrades before Express sees them
   server.on('upgrade', (req, socket, head) => {
@@ -80,15 +46,7 @@ const preRoute = () => {
 
   // SERVICES need server
   services.start(app, server);
-  try {
-    // Pass FGA_CONFIG when present; omit to skip OpenFGA and use DB roles fallback.
-    const fgaConfig = globalThis.__config?.FGA_CONFIG?.storeId ? globalThis.__config.FGA_CONFIG : undefined;
-    // Pass RBAC_CONFIG when enabled; omit to skip DB-backed tenant/role/permission lookup.
-    const rbacConfig = globalThis.__config?.RBAC_CONFIG?.enabled ? globalThis.__config.RBAC_CONFIG : undefined;
-    authService.setup(services.get('keyv'), services.get('knex1'), fgaConfig, rbacConfig); // setup authorization
-  } catch (e) {
-    logger.info(e);
-  }
+  authService.setup('keyv', 'knex1', services.get); // setup authorization
 
   app.use(loggerMiddleware); // HTTP Request and Websocket Related logging
 

@@ -1,4 +1,4 @@
-import { authFns, createToken, setTokensToHeader } from '../../../auth/index.ts';
+import { authFns, createToken, setTokensToHeader } from '../jwt.ts';
 
 const { AUTH_ERROR_URL } = globalThis.__config;
 const OAUTH_OPTIONS = globalThis.__config?.OAUTH_OPTIONS || {};

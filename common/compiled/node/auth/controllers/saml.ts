@@ -2,7 +2,7 @@
 // no refresh token, issue own OAuth2 like JWT server
 
 import { SAML } from '@node-saml/node-saml';
-import { createToken, setTokensToHeader } from '../../../auth/index.ts';
+import { createToken, setTokensToHeader } from '../jwt.ts';
 
 const { SAML_CERTIFICATE, SAML_PRIVATE_KEY } = process.env;
 const { AUTH_ERROR_URL } = globalThis.__config;

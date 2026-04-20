@@ -2,8 +2,8 @@
 import jwt from 'jsonwebtoken';
 import { verify } from 'otplib';
 
-import { authFns, createToken, getSecret, setTokensToHeader } from '../../../auth/index.ts';
-import { matchScryptHash } from '../../../auth/scrypt.ts';
+import { authFns, createToken, getSecret, setTokensToHeader } from '../jwt.ts';
+import { matchScryptHash } from '../scrypt.ts';
 
 const { COOKIE_HTTPONLY, JWT_ALG } = globalThis.__config.JWT;
 

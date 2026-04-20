@@ -13,7 +13,7 @@
  *
  * Usage:
  *   import * as rbac from '@common/node/auth/rbac.ts';
- *   rbac.setup(knexInstance); // call once at startup via auth setup()
+ *   rbac.setup(() => userService); // call once at startup via auth setup()
  *
  *   // In createToken — fetch tenant/role/permission data to embed in JWT
  *   const data = await rbac.getUserTenantsData(userId, user.tenant_id);
@@ -25,24 +25,27 @@
  *   await rbac.revokePermission(roleId, permissionId);
  */
 
-/** @type {import('knex').Knex | null} */
-let _knex = null;
+let _userServiceName: string;
+// biome-ignore lint/suspicious/noExplicitAny: lookup returns the underlying knex instance
+let _lookup: ((name: string) => any) | null = null;
+
+const knex = () => _lookup?.(_userServiceName);
 
 /**
- * Initialise the RBAC service with a Knex query builder instance.
- * Call once during app startup (via auth setup()).
- *
- * @param {import('knex').Knex} knexInstance
+ * Initialise the RBAC service.
+ *   userServiceName — service name from SERVICES_CONFIG (e.g. 'knex1')
+ *   lookup          — services.get — resolves a name to the underlying store instance
  */
-const setup = knexInstance => {
-  _knex = knexInstance;
+const setup = (userServiceName: string, lookup: (name: string) => any) => {
+  _userServiceName = userServiceName;
+  _lookup = lookup;
 };
 
 /**
  * Returns true when the RBAC service has been initialised.
  * @returns {boolean}
  */
-const isConfigured = () => _knex !== null;
+const isConfigured = () => _lookup !== null;
 
 /**
  * Fetch the user's active tenant for embedding in the JWT.
@@ -55,9 +58,9 @@ const isConfigured = () => _knex !== null;
  * @returns {Promise<{ tenant_id: number, tenant_plan: string | null, roles: string[] } | null>}
  */
 const getActiveTenant = async (userId, defaultTenantId) => {
-  if (!_knex) return null;
+  if (!_lookup) return null;
   try {
-    const rows = await _knex('user_tenant_roles as utr')
+    const rows = await knex()('user_tenant_roles as utr')
       .join('tenants as t', 't.id', 'utr.tenant_id')
       .join('roles as r', 'r.id', 'utr.role_id')
       .where('utr.user_id', userId)
@@ -98,9 +101,9 @@ const getActiveTenant = async (userId, defaultTenantId) => {
  * } | null>}
  */
 const getUserTenantsData = async (userId, defaultTenantId) => {
-  if (!_knex) return null;
+  if (!_lookup) return null;
   try {
-    const rows = await _knex('user_tenant_roles as utr')
+    const rows = await knex()('user_tenant_roles as utr')
       .join('roles as r', 'r.id', 'utr.role_id')
       .join('tenants as t', 't.id', 'utr.tenant_id')
       .leftJoin('role_permissions as rp', 'rp.role_id', 'r.id')
@@ -148,7 +151,7 @@ const getUserTenantsData = async (userId, defaultTenantId) => {
  * @param {number} roleId
  */
 const assignRole = async (userId, tenantId, roleId) => {
-  await _knex('user_tenant_roles')
+  await knex()('user_tenant_roles')
     .insert({ user_id: userId, tenant_id: tenantId, role_id: roleId })
     .onConflict(['user_id', 'tenant_id', 'role_id'])
     .ignore();
@@ -162,7 +165,7 @@ const assignRole = async (userId, tenantId, roleId) => {
  * @param {number} roleId
  */
 const revokeRole = async (userId, tenantId, roleId) => {
-  await _knex('user_tenant_roles').where({ user_id: userId, tenant_id: tenantId, role_id: roleId }).delete();
+  await knex()('user_tenant_roles').where({ user_id: userId, tenant_id: tenantId, role_id: roleId }).delete();
 };
 
 /**
@@ -172,7 +175,7 @@ const revokeRole = async (userId, tenantId, roleId) => {
  * @param {number} permissionId
  */
 const grantPermission = async (roleId, permissionId) => {
-  await _knex('role_permissions')
+  await knex()('role_permissions')
     .insert({ role_id: roleId, permission_id: permissionId })
     .onConflict(['role_id', 'permission_id'])
     .ignore();
@@ -185,7 +188,7 @@ const grantPermission = async (roleId, permissionId) => {
  * @param {number} permissionId
  */
 const revokePermission = async (roleId, permissionId) => {
-  await _knex('role_permissions').where({ role_id: roleId, permission_id: permissionId }).delete();
+  await knex()('role_permissions').where({ role_id: roleId, permission_id: permissionId }).delete();
 };
 
 /**

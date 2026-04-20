@@ -20,8 +20,7 @@
   "exports": {
     ".": "./index.ts",
     "./auth": "./auth/index.ts",
-    "./express/controller/auth": "./express/controller/auth/index.ts",
-    "./logger": "./logger/index.ts",
+"./logger": "./logger/index.ts",
     "./services": "./services/index.ts",
     "./*": "./*.ts",
     "./**/*": "./**/*.ts"

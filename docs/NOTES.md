@@ -12,6 +12,11 @@ This document is for
 - Named exports preferred (default exports for class, config, or a plugin)
 - Use Native as much as viable (test runners, datetime, fetch / xhr, npm, git hooks)
 - Option to use Javascript or Typescript (using NodeJS native typescript) for backend.
+  - For TS
+    - avoid enums, instead... use const object pattern / string literal unions
+    - avoid legacy decorators
+    - no any, use unknown
+    - use tsc --noEmit for type checking 
 - npm workspaces (microservices & shared libraries)
   - apps : microservices or applications (frontend or backend)
     - shared-<tenant1>
