@@ -33,7 +33,7 @@ async function uploadFile(file) {
 
 // ─── With cancellation support ────────────────────────────────────────────────
 
-let controller;
+let controller: AbortController | undefined;
 
 async function uploadWithCancel(file) {
   controller = new AbortController();

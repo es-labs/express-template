@@ -1,10 +1,10 @@
 import { Keyv } from 'keyv';
 
 export default class StoreKeyV {
-  _KEYV_CACHE: any;
+  _KEYV_CACHE: Record<string, unknown>;
   _keyv: Keyv | null;
 
-  constructor(options: any = globalThis.__config?.KEYV_CACHE || {}) {
+  constructor(options: Record<string, unknown> = globalThis.__config?.KEYV_CACHE ?? {}) {
     this._KEYV_CACHE = options;
     this._keyv = null;
   }

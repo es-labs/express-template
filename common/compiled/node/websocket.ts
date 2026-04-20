@@ -134,7 +134,7 @@ export default function wsLoader(server) {
     }
 
     // Run auth before the handshake completes
-    let context;
+    let context: unknown;
     try {
       context = await route.auth(req);
     } catch (err) {

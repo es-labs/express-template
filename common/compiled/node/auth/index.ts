@@ -6,7 +6,12 @@ import * as fga from './openfga.ts';
 import * as rbac from './rbac.ts';
 import * as redis from './redis.ts';
 
-let setRefreshToken, getRefreshToken, setRefreshTokenStoreName, setTokenService, setUserService, setAuthUserStoreName;
+let setRefreshToken: (id: string, token: string) => Promise<void> = async () => {};
+let getRefreshToken: (id: string) => Promise<string> = async () => '';
+let setRefreshTokenStoreName: (name: string | undefined) => void = () => {};
+let setTokenService: (service: unknown) => void = () => {};
+let setUserService: (service: unknown) => void = () => {};
+let setAuthUserStoreName: (name: string | undefined) => void = () => {};
 
 const {
   COOKIE_HTTPONLY,
@@ -90,7 +95,7 @@ const getSecret = mode => {
 
 const createToken = async user => {
   const user_meta = {};
-  const options: Record<string, any> = {};
+  const options: Record<string, unknown> = {};
 
   const sub = user[AUTH_USER_FIELD_ID_FOR_JWT];
 

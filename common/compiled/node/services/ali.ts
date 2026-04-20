@@ -169,7 +169,7 @@ const getUploadURL = async (directory, filename, contentType, action = 'write', 
   }
 
   try {
-    let url;
+    let url: string | undefined;
 
     // write / new file action
     if (action === 'write') {

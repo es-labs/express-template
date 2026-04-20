@@ -2,7 +2,7 @@
 export class AppError extends Error {
   statusCode: number;
   code: string;
-  details: any;
+  details: unknown;
   isOperational: boolean;
   constructor(message, statusCode = 500, code = 'INTERNAL_ERROR', details = null) {
     super(message);

@@ -1,10 +1,12 @@
+import type { Keyv } from 'keyv';
+
 const assert = require('node:assert/strict');
 const { describe, it, beforeEach, afterEach } = require('node:test');
 
 const StoreKeyV = require('../keyv');
 
 describe('StoreKeyV (keyv wrapper)', () => {
-  let store;
+  let store!: { open(): void; get(): Keyv | null; close(): void };
 
   beforeEach(() => {
     store = new StoreKeyV();

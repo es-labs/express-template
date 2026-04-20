@@ -66,7 +66,12 @@ const getActiveTenant = async (userId, defaultTenantId) => {
 
     if (rows.length === 0) return null;
 
-    const map: Record<string, any> = {};
+    interface TenantEntry {
+      tenant_id: number;
+      tenant_plan: string | null;
+      roles: Set<string>;
+    }
+    const map: Record<string, TenantEntry> = {};
     for (const row of rows) {
       const tid = row.tenant_id;
       if (!map[tid]) map[tid] = { tenant_id: tid, tenant_plan: row.tenant_plan ?? null, roles: new Set() };
@@ -111,7 +116,11 @@ const getUserTenantsData = async (userId, defaultTenantId) => {
     if (rows.length === 0) return null;
 
     // Group rows into { tenantId: { roles: Set, permissions: Set } }
-    const map: Record<string, any> = {};
+    interface TenantRolesEntry {
+      roles: Set<string>;
+      permissions: Set<string>;
+    }
+    const map: Record<string, TenantRolesEntry> = {};
     for (const row of rows) {
       const tid = row.tenant_id;
       if (!map[tid]) map[tid] = { roles: new Set(), permissions: new Set() };

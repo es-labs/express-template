@@ -24,7 +24,7 @@ export const login = async (req, res) => {
   // return res.redirect('/' + token...) // for faking, bypass real callback
   // console.debug(req.header('referer'), req.query.RelayState)
   // getAuthorizeUrlAsync(RelayState: string, host: string | undefined, options: AuthOptions)
-  const authUrl = await (saml as any)?.getAuthorizeUrlAsync(req.query.RelayState); // validatePostResponseAsync (calls..., processValidlySignedPostRequestAsync)
+  const authUrl = await saml?.getAuthorizeUrlAsync(String(req.query.RelayState), undefined, {}); // validatePostResponseAsync (calls..., processValidlySignedPostRequestAsync)
   res.redirect(authUrl);
 };
 

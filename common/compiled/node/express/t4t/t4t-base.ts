@@ -105,7 +105,7 @@ const find = async (req, res) => {
   }
   if (page < 1) page = 1;
   const rv = { results: [], total: 0 };
-  let rows;
+  let rows: unknown[];
   let query = svc.get(table.conn)(table.name);
 
   let columns = [`${table.name}.*`];
@@ -114,7 +114,7 @@ const find = async (req, res) => {
   query = query.where({});
 
   // TODO handle filters for joins...
-  let prevFilter: Record<string, any> = {};
+  let prevFilter: Record<string, unknown> = {};
   const joinCols = {};
   if (filters?.length)
     for (const filter of filters) {
@@ -322,7 +322,7 @@ const create = async (req, res) => {
       }
     }
   }
-  let rv;
+  let rv: unknown;
   const trx = await svc.get(table.conn).transaction();
   try {
     let query = svc.get(table.conn)(table.name).insert(body);

@@ -4,8 +4,8 @@
 const { NODE_ENV } = process.env;
 const DEFAULT_STACK_TRACE_LIMIT = 10;
 const DEFAULT_SHUTFOWN_TIMEOUT_MS = NODE_ENV === 'production' ? 30000 : 3000;
-declare var server: any;
-declare var services: any;
+declare var server: { close: (cb?: () => void) => void };
+declare var services: { stop: () => Promise<void> };
 const {
   GRACEFUL_EXIT = NODE_ENV !== 'development',
   STACK_TRACE_LIMIT = DEFAULT_STACK_TRACE_LIMIT,

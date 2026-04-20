@@ -61,7 +61,7 @@ const preRoute = () => {
   }
 
   const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA, HTTPS_PASSPHRASE } = process.env;
-  const https_opts: Record<string, any> = {};
+  const https_opts: https.ServerOptions = {};
   if (HTTPS_CERTIFICATE) https_opts.cert = HTTPS_CERTIFICATE;
   if (HTTPS_PRIVATE_KEY) https_opts.key = HTTPS_PRIVATE_KEY;
   if (HTTPS_CA) https_opts.ca = HTTPS_CERTIFICATE;

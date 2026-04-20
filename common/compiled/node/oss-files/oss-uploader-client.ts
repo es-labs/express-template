@@ -20,6 +20,17 @@
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB per part
 const MULTIPART_THRESHOLD = 5 * 1024 * 1024; // Use multipart above 5MB
 
+interface OSSUploaderOptions {
+  signEndpoint: string;
+  chunkSize?: number;
+  maxConcurrent?: number;
+}
+interface OSSUploadOpts {
+  key?: string;
+  onProgress?: (pct: number) => void;
+  signal?: AbortSignal | null;
+}
+
 class OSSUploader {
   signEndpoint: string;
   chunkSize: number;
@@ -30,7 +41,7 @@ class OSSUploader {
    * @param {number} [options.chunkSize]    - Bytes per part (default 10MB, min 100KB for OSS)
    * @param {number} [options.maxConcurrent]- Parallel part uploads (default 3)
    */
-  constructor(options: Record<string, any> = {}) {
+  constructor(options: Partial<OSSUploaderOptions> = {}) {
     if (!options.signEndpoint) throw new Error('signEndpoint is required');
     this.signEndpoint = options.signEndpoint;
     this.chunkSize = options.chunkSize || CHUNK_SIZE;
@@ -49,7 +60,7 @@ class OSSUploader {
    * @param {AbortSignal} [opts.signal]    - AbortController signal to cancel
    * @returns {Promise<{ key: string, location: string }>}
    */
-  async upload(file, opts: Record<string, any> = {}) {
+  async upload(file, opts: OSSUploadOpts = {}) {
     const key = opts.key || file.name;
     const onProgress = opts.onProgress || (() => {});
     const signal = opts.signal || null;

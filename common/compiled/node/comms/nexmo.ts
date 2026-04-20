@@ -7,7 +7,7 @@ const { NEXMO_KEY, NEXMO_SECRET, NEXMO_SENDER = 'SMSnotice' } = process.env;
 
 // sms = 6511112222
 // one at a time...
-export const send = async (sms, message, from) => {
+export const send = async (sms: string, message: string, from?: string) => {
   if (!from) from = NEXMO_SENDER;
   if (sms && message) {
     // just throw if failed
@@ -19,21 +19,22 @@ export const send = async (sms, message, from) => {
 
 // sms = 6511112222
 // one at a time...
-export const ismsSend = async (sms, message, from) => {
+export const ismsSend = async (sms: string, message: string, from?: string) => {
   const url = 'https://sms.era.sg/isms_mt.php?';
   try {
     if (sms && message) {
-      const options = {
-        params: {
-          uid: NEXMO_KEY,
-          pwd: crypto.createHash('md5').update(NEXMO_SECRET).digest('hex'),
-          dnr: sms,
-          snr: from || NEXMO_SENDER,
-          msg: message,
-          split: 5,
-        },
-      };
-      return await fetch(url, options as any);
+      const params = new URLSearchParams({
+        uid: NEXMO_KEY ?? '',
+        pwd: crypto
+          .createHash('md5')
+          .update(NEXMO_SECRET ?? '')
+          .digest('hex'),
+        dnr: sms,
+        snr: from || NEXMO_SENDER,
+        msg: message,
+        split: '5',
+      });
+      return await fetch(`${url}${params}`);
     }
   } catch (e) {
     // logger.info('ismsSend', e.toString())

@@ -1,6 +1,8 @@
-let knex;
-let JWT_REFRESH_STORE_NAME;
-let AUTH_USER_STORE_NAME;
+import type { Knex as KnexClient } from 'knex';
+
+let knex: KnexClient | null = null;
+let JWT_REFRESH_STORE_NAME = '';
+let AUTH_USER_STORE_NAME = '';
 
 const setTokenService = service => (knex = service);
 const setUserService = service => (knex = service);

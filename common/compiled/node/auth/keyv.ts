@@ -1,4 +1,6 @@
-let keyv;
+import type Keyv from 'keyv';
+
+let keyv: Keyv | null = null;
 const setTokenService = service => (keyv = service);
 const setRefreshToken = async (id, refresh_token) => keyv.set(id, refresh_token);
 const getRefreshToken = async id => keyv.get(id);
