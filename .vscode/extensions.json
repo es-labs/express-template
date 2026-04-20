@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "biomejs.biome",
+    "vue.volar",
+    "humao.rest-client",
+    "rangav.vscode-thunder-client",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "github.copilot",
+    "github.copilot-chat",
+    "anthropic.claude-code",
+    "usernamehw.errorlens",
+    "streetsidesoftware.code-spell-checker",
+    "pflannery.vscode-versionlens",
+    "christian-kohler.npm-intellisense",
+    "ms-vscode.vscode-typescript-next"
+  ],
+  "unwantedRecommendations": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
+}

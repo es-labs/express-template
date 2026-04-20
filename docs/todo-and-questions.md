@@ -3,8 +3,8 @@
 ## TODO
 
 - **IN PROGRESS** JSON in env, refactor to use something else
-- **IN PROGRESS** add RBAC and FGA
-- **IN PROGRESS** Typescript to zod, convert code to TS for node runtime...
+- **TO TEST** add RBAC and FGA
+- **TO TEST** Typescript to zod, convert code to TS for node runtime...
   - **TO TEST** scripts
   - **TO TEST** common/compiled/node
   - **TO TEST** apps/sample-api
