@@ -98,6 +98,7 @@ export default class Wss {
         logger.info(`WS API listening on port ${this._port}`);
 
         if (this._wss) {
+          this._wss.on('error', (e: Error) => logger.info(`WS error: ${e.toString()}`));
           this._wss.on('connection', (ws: WebSocket) => {
             const aliveWs = ws as AliveWebSocket;
             logger.info('ws client connected');

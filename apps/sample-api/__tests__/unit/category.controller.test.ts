@@ -1,4 +1,5 @@
 import '@common/node/config'; // setup env vars
+import '@common/node/logger'; // setup global logger
 import assert from 'node:assert';
 // TODO testing websockets using native node testing
 import { after, before, beforeEach, describe, it } from 'node:test';
