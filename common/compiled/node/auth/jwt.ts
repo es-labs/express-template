@@ -33,10 +33,6 @@ const {
   JWT_SECRET,
 } = process.env;
 
-// findUser: null,
-// updateUser: null,
-// revokeRefreshToken: null,
-
 /**
  * @param {string} tokenServiceName - service name from SERVICES_CONFIG for token storage (e.g. 'keyv')
  * @param {string} userServiceName  - service name from SERVICES_CONFIG for user lookups (e.g. 'knex1')

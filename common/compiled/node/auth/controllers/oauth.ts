@@ -1,4 +1,5 @@
-import { authFns, createToken, setTokensToHeader } from '../jwt.ts';
+import { createToken, setTokensToHeader } from '../jwt.ts';
+import { findUser } from '../store.ts';
 
 const { AUTH_ERROR_URL } = globalThis.__config;
 const OAUTH_OPTIONS = globalThis.__config?.OAUTH_OPTIONS || {};
@@ -28,7 +29,7 @@ export const callbackOAuth = async (req, res) => {
       const oauthUser = await resultUser.json();
       const oauthId = oauthUser[OAUTH_OPTIONS.USER_ID]; // github id, email
 
-      const user = await authFns.findUser({ [OAUTH_OPTIONS.FIND_ID]: oauthId }); // match github id (or email?) with our user in our application
+      const user = await findUser({ [OAUTH_OPTIONS.FIND_ID]: oauthId }); // match github id (or email?) with our user in our application
       if (!user) return res.status(401).json({ message: 'Unauthorized' });
 
       const { id, roles } = user;

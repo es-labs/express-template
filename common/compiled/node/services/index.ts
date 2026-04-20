@@ -2,7 +2,8 @@ import StoreKeyV from './db/keyv.ts';
 import StoreKnex from './db/knex.ts';
 import StoreRedis from './db/redis.ts';
 import Wss from './websocket.ts';
-import '../auth/jwt.ts';
+
+// import '../auth/jwt.ts';
 
 type ServiceConfig = { type: string; options: string };
 let servicesConfig: Record<string, ServiceConfig> = {};
