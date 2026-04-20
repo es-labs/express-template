@@ -5,6 +5,10 @@
 - **IN PROGRESS** JSON in env, refactor to use something else
 - **IN PROGRESS** add RBAC and FGA
 - **IN PROGRESS** Typescript to zod, convert code to TS for node runtime...
+  - **TO TEST** scripts
+  - common/compiled/node
+  - apps/sample-api
+  - apps/sample-mcp
 - **TO TEST** audit_logs
 - safeJSON
 - remove barrel index.js files...

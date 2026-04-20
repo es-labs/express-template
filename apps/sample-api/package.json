@@ -28,9 +28,9 @@
   },
   "scripts": {
     "lint": "biome check --config-path ../biome.json",
-    "start": "node --watch --watch-preserve-output --trace-warnings src/index.js",
-    "test:unit": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./src/**/__tests__/unit/*.test.js",
-    "test:integration": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./src/**/__tests__/integration/*.test.js",
+    "start": "node --watch --watch-preserve-output --trace-warnings src/index.ts",
+    "test:unit": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./__tests__/unit/*.test.ts",
+    "test:integration": "node --test-reporter=spec --experimental-test-coverage --test --test-only ./__tests__/integration/*.test.ts",
     "test:schema": "node ../../scripts/test-schemas.ts ./schemas",
     "test": "npm run test:unit && npm run test:integration && npm run test:schema",
     "test:e2e": "start-server-and-test start http://localhost:8080 test"
