@@ -7,7 +7,7 @@ import express from 'express';
 import helmet from 'helmet';
 import pathToRegexp from 'path-to-regexp';
 import * as authService from '../auth/jwt.ts';
-import * as shutdown from '../errors/handler.ts';
+import * as shutdown from '../errors/shutdown.ts';
 import { healthRouter } from '../health/router.ts';
 import { loggerMiddleware } from '../logger/index.ts';
 import * as services from '../services/index.ts';
@@ -26,12 +26,11 @@ const preRoute = () => {
     () => services,
   ); // both resolved lazily — safe to call before server/services exist
 
-  const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA, HTTPS_PASSPHRASE } = process.env;
+  const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA } = process.env;
   const https_opts: Record<string, any> = {};
   if (HTTPS_CERTIFICATE) https_opts.cert = HTTPS_CERTIFICATE;
   if (HTTPS_PRIVATE_KEY) https_opts.key = HTTPS_PRIVATE_KEY;
   if (HTTPS_CA) https_opts.ca = HTTPS_CERTIFICATE;
-  if (HTTPS_PASSPHRASE) https_opts.passphrase = HTTPS_PASSPHRASE; // (fs.readFileSync('passphrase.txt')).toString()
   const app = express();
   server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app);
 
@@ -48,6 +47,8 @@ const preRoute = () => {
   services.start(app, server);
   authService.setup('keyv', 'knex1', services.get); // setup authorization
 
+  // with timeout handling: socket timeouts, client aborts, close connections, normal responses
+  // and prevents duplicate logs
   app.use(loggerMiddleware); // HTTP Request and Websocket Related logging
 
   // skip middleware for WebSocket upgrade requests
@@ -58,14 +59,6 @@ const preRoute = () => {
   });
 
   app.use('/health', healthRouter); // Mount before auth middleware — healthchecks must be unprotected
-
-  // ------ LOGGING ------
-  // HTTP request logging middleware with timeout handling
-  // handles: socket timeouts, client aborts, close connections, normal responses
-  // and prevents duplicate logs
-  app.use((req, res, next) => {
-    next();
-  });
 
   // ------ SECURITY ------
   try {

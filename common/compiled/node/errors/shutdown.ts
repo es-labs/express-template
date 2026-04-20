@@ -2,13 +2,8 @@
 // **WebSockets/SSE:** You need to track connections manually and close them
 // For WS, broadcast a "server shutting down" message, then close all clients before server.close().
 const { NODE_ENV } = process.env;
-const DEFAULT_STACK_TRACE_LIMIT = 10;
 const DEFAULT_SHUTFOWN_TIMEOUT_MS = NODE_ENV === 'production' ? 30000 : 3000;
-const {
-  GRACEFUL_EXIT = NODE_ENV !== 'development',
-  STACK_TRACE_LIMIT = DEFAULT_STACK_TRACE_LIMIT,
-  SHUTDOWN_TIMEOUT_MS = DEFAULT_SHUTFOWN_TIMEOUT_MS,
-} = process.env;
+const { GRACEFUL_EXIT = NODE_ENV !== 'development', SHUTDOWN_TIMEOUT_MS = DEFAULT_SHUTFOWN_TIMEOUT_MS } = process.env;
 
 // both resolved lazily at shutdown time so setup() can be called before server/services are ready
 // biome-ignore lint/suspicious/noExplicitAny: set via setup()

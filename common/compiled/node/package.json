@@ -20,7 +20,7 @@
   "exports": {
     ".": "./index.ts",
     "./auth": "./auth/index.ts",
-"./logger": "./logger/index.ts",
+    "./logger": "./logger/index.ts",
     "./services": "./services/index.ts",
     "./*": "./*.ts",
     "./**/*": "./**/*.ts"
@@ -32,10 +32,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1026.0",
+    "@aws-sdk/client-s3": "^3.1032.0",
     "@node-saml/node-saml": "^5.1.0",
-    "@openfga/sdk": "^0.9.0",
-    "@scalar/express-api-reference": "^0.9.6",
+    "@openfga/sdk": "^0.9.5",
+    "@scalar/express-api-reference": "^0.9.9",
     "ali-oss": "^6.23.0",
     "connect-history-api-fallback": "^2.0.0",
     "cookie-parser": "^1.4.7",
