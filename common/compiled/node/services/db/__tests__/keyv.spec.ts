@@ -4,6 +4,7 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const StoreKeyV = require('../keyv');
 
 describe('StoreKeyV (keyv wrapper)', () => {
+  // biome-ignore lint/suspicious/noImplicitAnyLet: test fixture assigned in beforeEach
   let store;
 
   beforeEach(() => {

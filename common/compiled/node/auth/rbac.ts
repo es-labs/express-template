@@ -66,6 +66,7 @@ const getActiveTenant = async (userId, defaultTenantId) => {
 
     if (rows.length === 0) return null;
 
+    // biome-ignore lint/suspicious/noExplicitAny: row shape from knex is untyped
     const map: Record<string, any> = {};
     for (const row of rows) {
       const tid = row.tenant_id;
@@ -111,6 +112,7 @@ const getUserTenantsData = async (userId, defaultTenantId) => {
     if (rows.length === 0) return null;
 
     // Group rows into { tenantId: { roles: Set, permissions: Set } }
+    // biome-ignore lint/suspicious/noExplicitAny: row shape from knex is untyped
     const map: Record<string, any> = {};
     for (const row of rows) {
       const tid = row.tenant_id;

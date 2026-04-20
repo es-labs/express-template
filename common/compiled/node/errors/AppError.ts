@@ -2,6 +2,7 @@
 export class AppError extends Error {
   statusCode: number;
   code: string;
+  // biome-ignore lint/suspicious/noExplicitAny: error details can be any shape
   details: any;
   isOperational: boolean;
   constructor(message, statusCode = 500, code = 'INTERNAL_ERROR', details = null) {

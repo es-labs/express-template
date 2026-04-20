@@ -4,7 +4,9 @@
 const { NODE_ENV } = process.env;
 const DEFAULT_STACK_TRACE_LIMIT = 10;
 const DEFAULT_SHUTFOWN_TIMEOUT_MS = NODE_ENV === 'production' ? 30000 : 3000;
+// biome-ignore lint/suspicious/noExplicitAny: ambient refs injected by app entrypoint
 declare var server: any;
+// biome-ignore lint/suspicious/noExplicitAny: ambient refs injected by app entrypoint
 declare var services: any;
 const {
   GRACEFUL_EXIT = NODE_ENV !== 'development',

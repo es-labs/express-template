@@ -33,6 +33,7 @@ async function uploadFile(file) {
 
 // ─── With cancellation support ────────────────────────────────────────────────
 
+// biome-ignore lint/suspicious/noImplicitAnyLet: assigned in uploadWithCancel below
 let controller;
 
 async function uploadWithCancel(file) {

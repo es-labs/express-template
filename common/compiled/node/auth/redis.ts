@@ -1,4 +1,5 @@
-let redis;
+// biome-ignore lint/suspicious/noExplicitAny: service reference assigned at runtime
+let redis: any;
 const setTokenService = service => (redis = service);
 const setRefreshToken = async (id, refresh_token) => redis.set(id, refresh_token);
 const getRefreshToken = async id => redis.get(id);

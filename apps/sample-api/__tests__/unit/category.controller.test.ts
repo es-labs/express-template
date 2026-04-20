@@ -7,10 +7,10 @@ import * as Services from '@common/node/services';
 import httpMocks from 'node-mocks-http';
 import CategoryController from '../../src/controllers/category.ts';
 
-let services;
+let services: any;
 // let createdCategoryId;
-let categoryController;
-let req, res, next;
+let categoryController: any;
+let req: any, res: any, next: any;
 
 beforeEach(() => {
   req = httpMocks.createRequest();

@@ -33,6 +33,7 @@ export const ismsSend = async (sms, message, from) => {
           split: 5,
         },
       };
+      // biome-ignore lint/suspicious/noExplicitAny: options has non-standard `params` field not in RequestInit
       return await fetch(url, options as any);
     }
   } catch (e) {

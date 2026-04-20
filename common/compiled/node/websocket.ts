@@ -134,7 +134,8 @@ export default function wsLoader(server) {
     }
 
     // Run auth before the handshake completes
-    let context;
+    // biome-ignore lint/suspicious/noExplicitAny: auth context shape varies by route
+    let context: any;
     try {
       context = await route.auth(req);
     } catch (err) {

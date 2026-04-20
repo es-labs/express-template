@@ -31,7 +31,9 @@ async function apiRequest(token, method, params = {}, formData = null) {
 }
 
 class TelegramError extends Error {
+  // biome-ignore lint/suspicious/noExplicitAny: error code and method can be any shape
   code: any;
+  // biome-ignore lint/suspicious/noExplicitAny: error code and method can be any shape
   method: any;
   constructor(message, code, method) {
     super(`[${method}] Telegram API error ${code}: ${message}`);
@@ -116,6 +118,7 @@ function commonOpts({
   protect_content,
   message_thread_id, // forum thread id
   business_connection_id,
+  // biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
 }: Record<string, any> = {}) {
   return Object.fromEntries(
     Object.entries({
@@ -147,6 +150,7 @@ function commonOpts({
  * @param {boolean} [opts.disable_web_page_preview]
  * @param {string}  [opts.reply_markup]        – use inlineKeyboard() etc.
  */
+// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
 export async function sendMessage(token, chatId, text, opts: Record<string, any> = {}) {
   return apiRequest(token, 'sendMessage', {
     chat_id: chatId,
@@ -163,6 +167,7 @@ export async function sendMessage(token, chatId, text, opts: Record<string, any>
  * @param {string} photo – local path, HTTPS URL, or "file_id:<id>"
  * @param {boolean} [opts.has_spoiler]
  */
+// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
 export async function sendPhoto(token, chatId, photo, opts: Record<string, any> = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
@@ -192,6 +197,7 @@ export async function sendPhoto(token, chatId, photo, opts: Record<string, any> 
  * @param {boolean} [opts.supports_streaming]
  * @param {boolean} [opts.has_spoiler]
  */
+// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
 export async function sendVideo(token, chatId, video, opts: Record<string, any> = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
@@ -225,6 +231,7 @@ export async function sendVideo(token, chatId, video, opts: Record<string, any> 
  * @param {string}  [opts.title]
  * @param {string}  [opts.thumbnail]
  */
+// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
 export async function sendAudio(token, chatId, audio, opts: Record<string, any> = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
@@ -252,6 +259,7 @@ export async function sendAudio(token, chatId, audio, opts: Record<string, any> 
  * @param {string}  document – local path, URL, or file_id
  * @param {boolean} [opts.disable_content_type_detection]
  */
+// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
 export async function sendDocument(token, chatId, document, opts: Record<string, any> = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
@@ -274,6 +282,7 @@ export async function sendDocument(token, chatId, document, opts: Record<string,
 // ─── Voice ────────────────────────────────────────────────────────────────────
 
 /** OGG/OPUS encoded voice message. */
+// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
 export async function sendVoice(token, chatId, voice, opts: Record<string, any> = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
@@ -290,6 +299,7 @@ export async function sendVoice(token, chatId, voice, opts: Record<string, any> 
 // ─── Video Note ───────────────────────────────────────────────────────────────
 
 /** Round video (1:1 aspect ratio). */
+// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
 export async function sendVideoNote(token, chatId, videoNote, opts: Record<string, any> = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
@@ -308,6 +318,7 @@ export async function sendVideoNote(token, chatId, videoNote, opts: Record<strin
  * @param {string}  sticker – local .webp/.tgs/.webm, URL, or file_id
  * @param {string}  [opts.emoji]  – emoji associated with the sticker
  */
+// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
 export async function sendSticker(token, chatId, sticker, opts: Record<string, any> = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
@@ -435,7 +446,12 @@ export async function sendVenue(
 
 // ─── Contact ──────────────────────────────────────────────────────────────────
 
-export async function sendContact(token, chatId, { phone_number, first_name, last_name, vcard }, opts: Record<string, any> = {}) {
+export async function sendContact(
+  token,
+  chatId,
+  { phone_number, first_name, last_name, vcard },
+  opts: Record<string, any> = {},
+) {
   return apiRequest(token, 'sendContact', {
     chat_id: chatId,
     phone_number,

@@ -1,6 +1,9 @@
-let knex;
-let JWT_REFRESH_STORE_NAME;
-let AUTH_USER_STORE_NAME;
+// biome-ignore lint/suspicious/noExplicitAny: service references assigned at runtime
+let knex: any;
+// biome-ignore lint/suspicious/noExplicitAny: service references assigned at runtime
+let JWT_REFRESH_STORE_NAME: any;
+// biome-ignore lint/suspicious/noExplicitAny: service references assigned at runtime
+let AUTH_USER_STORE_NAME: any;
 
 const setTokenService = service => (knex = service);
 const setUserService = service => (knex = service);

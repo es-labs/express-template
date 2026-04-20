@@ -93,6 +93,7 @@ export default class Wss {
 
   open(server = null, app = null) {
     const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE } = process.env;
+    // biome-ignore lint/suspicious/noImplicitAnyLet: assigned in catch block below
     let err;
     try {
       if (!this._wss && this._port) {

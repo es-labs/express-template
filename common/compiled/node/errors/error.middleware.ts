@@ -13,7 +13,6 @@ const isDev = process.env.NODE_ENV !== 'production';
 //   return res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' } });
 // }
 
-
 /**
  * Normalize any thrown value into a consistent shape.
  * Express v5 auto-forwards async rejections, but the thrown

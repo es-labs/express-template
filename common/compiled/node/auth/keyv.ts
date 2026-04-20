@@ -1,4 +1,5 @@
-let keyv;
+// biome-ignore lint/suspicious/noExplicitAny: service reference assigned at runtime
+let keyv: any;
 const setTokenService = service => (keyv = service);
 const setRefreshToken = async (id, refresh_token) => keyv.set(id, refresh_token);
 const getRefreshToken = async id => keyv.get(id);

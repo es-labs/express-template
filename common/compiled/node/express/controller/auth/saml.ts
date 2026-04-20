@@ -24,6 +24,7 @@ export const login = async (req, res) => {
   // return res.redirect('/' + token...) // for faking, bypass real callback
   // console.debug(req.header('referer'), req.query.RelayState)
   // getAuthorizeUrlAsync(RelayState: string, host: string | undefined, options: AuthOptions)
+  // biome-ignore lint/suspicious/noExplicitAny: saml type definitions are incomplete
   const authUrl = await (saml as any)?.getAuthorizeUrlAsync(req.query.RelayState); // validatePostResponseAsync (calls..., processValidlySignedPostRequestAsync)
   res.redirect(authUrl);
 };

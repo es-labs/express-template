@@ -6,7 +6,18 @@ import * as fga from './openfga.ts';
 import * as rbac from './rbac.ts';
 import * as redis from './redis.ts';
 
-let setRefreshToken, getRefreshToken, setRefreshTokenStoreName, setTokenService, setUserService, setAuthUserStoreName;
+// biome-ignore lint/suspicious/noExplicitAny: service references assigned at runtime
+let setRefreshToken: any;
+// biome-ignore lint/suspicious/noExplicitAny: service references assigned at runtime
+let getRefreshToken: any;
+// biome-ignore lint/suspicious/noExplicitAny: service references assigned at runtime
+let setRefreshTokenStoreName: any;
+// biome-ignore lint/suspicious/noExplicitAny: service references assigned at runtime
+let setTokenService: any;
+// biome-ignore lint/suspicious/noExplicitAny: service references assigned at runtime
+let setUserService: any;
+// biome-ignore lint/suspicious/noExplicitAny: service references assigned at runtime
+let setAuthUserStoreName: any;
 
 const {
   COOKIE_HTTPONLY,
@@ -90,6 +101,7 @@ const getSecret = mode => {
 
 const createToken = async user => {
   const user_meta = {};
+  // biome-ignore lint/suspicious/noExplicitAny: jwt options shape varies
   const options: Record<string, any> = {};
 
   const sub = user[AUTH_USER_FIELD_ID_FOR_JWT];
