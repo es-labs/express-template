@@ -3,7 +3,9 @@ import {
   findUser,
 } from '@common/node/auth/store';
 import * as webpush from '@common/node/comms/webpush';
+import { validate } from '@common/node/errors/validate';
 import express from 'express';
+import { WebPushParamsSchema, WebPushSendSchema, WebPushSubSchema } from '../../schemas/webpush.schema.js';
 
 logger.info('WARNING Auth bypass in webpush.js');
 
@@ -15,7 +17,7 @@ const authUser = (req, res, next) => {
 export default express
   .Router()
   .get('/vapid-public-key', (req, res) => res.json({ publicKey: webpush.getPubKey() }))
-  .post('/sub', authUser, async (req, res) => {
+  .post('/sub', authUser, validate('body', WebPushSubSchema), async (req, res) => {
     const { subscription } = req.body; // should be a string
     await updateUser({ id: req.user.sub }, { pnToken: subscription });
     res.json({ status: 'sub' });
@@ -26,7 +28,9 @@ export default express
   })
   .post(
     '/send/:id',
-    /* authUser, */ async (req, res) => {
+    /* authUser, */ validate('params', WebPushParamsSchema),
+    validate('body', WebPushSendSchema),
+    async (req, res) => {
       // sending...
       const { id } = req.params;
       const { mode, data = {} } = req.body;
