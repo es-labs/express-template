@@ -256,7 +256,8 @@ class OSSUploader {
     // ReadableStream, and OSS requires it for multipart PUT requests.
     headers['Content-Length'] = String(totalBytes);
 
-    let response: Response;
+    // biome-ignore lint/suspicious/noImplicitAnyLet: assigned in try/catch below
+    let response;
     try {
       // duplex:'half' is required for streaming bodies (Chrome 105+, Firefox 112+) but missing from TypeScript's RequestInit
       const fetchOpts: RequestInit & { duplex?: string } = {

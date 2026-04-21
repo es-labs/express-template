@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { createToken, setTokensToHeader } from '../../../auth/index.ts';
+import { createToken, setTokensToHeader } from '../jwt.ts';
 
 const { AUTH_ERROR_URL } = globalThis.__config;
 const OIDC_OPTIONS = globalThis.__config?.OIDC_OPTIONS || {};

@@ -105,7 +105,8 @@ const find = async (req, res) => {
   }
   if (page < 1) page = 1;
   const rv = { results: [], total: 0 };
-  let rows: unknown[];
+  // biome-ignore lint/suspicious/noImplicitAnyLet: assigned from knex query below
+  let rows;
   let query = svc.get(table.conn)(table.name);
 
   let columns = [`${table.name}.*`];
@@ -322,7 +323,8 @@ const create = async (req, res) => {
       }
     }
   }
-  let rv: unknown;
+  // biome-ignore lint/suspicious/noImplicitAnyLet: assigned from knex insert result below
+  let rv;
   const trx = await svc.get(table.conn).transaction();
   try {
     let query = svc.get(table.conn)(table.name).insert(body);

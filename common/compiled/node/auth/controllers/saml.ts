@@ -2,7 +2,7 @@
 // no refresh token, issue own OAuth2 like JWT server
 
 import { SAML } from '@node-saml/node-saml';
-import { createToken, setTokensToHeader } from '../../../auth/index.ts';
+import { createToken, setTokensToHeader } from '../jwt.ts';
 
 const { SAML_CERTIFICATE, SAML_PRIVATE_KEY } = process.env;
 const { AUTH_ERROR_URL } = globalThis.__config;
@@ -24,7 +24,8 @@ export const login = async (req, res) => {
   // return res.redirect('/' + token...) // for faking, bypass real callback
   // console.debug(req.header('referer'), req.query.RelayState)
   // getAuthorizeUrlAsync(RelayState: string, host: string | undefined, options: AuthOptions)
-  const authUrl = await saml?.getAuthorizeUrlAsync(String(req.query.RelayState), undefined, {}); // validatePostResponseAsync (calls..., processValidlySignedPostRequestAsync)
+  // biome-ignore lint/suspicious/noExplicitAny: saml type definitions are incomplete
+  const authUrl = await (saml as any)?.getAuthorizeUrlAsync(req.query.RelayState); // validatePostResponseAsync (calls..., processValidlySignedPostRequestAsync)
   res.redirect(authUrl);
 };
 

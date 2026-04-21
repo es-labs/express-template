@@ -6,7 +6,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "serve": "node serve-db.js",
+    "serve": "node serve-db.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

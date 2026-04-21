@@ -169,7 +169,8 @@ const getUploadURL = async (directory, filename, contentType, action = 'write', 
   }
 
   try {
-    let url: string | undefined;
+    // biome-ignore lint/suspicious/noImplicitAnyLet: assigned conditionally below
+    let url;
 
     // write / new file action
     if (action === 'write') {

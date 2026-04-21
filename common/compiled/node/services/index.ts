@@ -2,32 +2,31 @@ import StoreKeyV from './db/keyv.ts';
 import StoreKnex from './db/knex.ts';
 import StoreRedis from './db/redis.ts';
 import Wss from './websocket.ts';
-// import auth from '../auth/index.ts'
-import '../auth/index.ts';
 
-let servicesConfig = [];
-const services = {};
+// import '../auth/jwt.ts';
 
-const start = async (app, server, config = globalThis.__config?.SERVICES_CONFIG || []) => {
-  // const serviceTypesAvailable = process.env.SERVICES_TYPES_AVAILABLE.split(',');
-  // if (opts && svc.type === 'knex' && StoreKnex) services[svc.name] = new StoreKnex(svc.options);
+type ServiceConfig = { type: string; options: string };
+let servicesConfig: Record<string, ServiceConfig> = {};
+const services: Record<string, any> = {};
+
+const start = async (app, server, config = globalThis.__config?.SERVICES_CONFIG || {}) => {
   try {
     servicesConfig = config;
-    servicesConfig.forEach(svc => {
+    for (const [name, svc] of Object.entries(servicesConfig)) {
       const opts = globalThis.__config?.[svc.options];
-      if (opts && svc.type === 'knex' && StoreKnex) services[svc.name] = new StoreKnex(svc.options);
-      if (opts && svc.type === 'redis' && StoreRedis) services[svc.name] = new StoreRedis(opts);
-      if (opts && svc.type === 'keyv' && StoreKeyV) services[svc.name] = new StoreKeyV(opts);
-      if (opts && svc.type === 'ws' && Wss) services[svc.name] = new Wss(opts);
+      if (opts && svc.type === 'knex' && StoreKnex) services[name] = new StoreKnex(svc.options);
+      if (opts && svc.type === 'redis' && StoreRedis) services[name] = new StoreRedis(opts);
+      if (opts && svc.type === 'keyv' && StoreKeyV) services[name] = new StoreKeyV(opts);
+      if (opts && svc.type === 'ws' && Wss) services[name] = new Wss(opts);
 
       if (opts) {
         if (svc.type === 'ws') {
-          services[svc.name].open(server, app); // set server or get app object
+          services[name].open(server, app); // set server or get app object
         } else {
-          services[svc.name].open();
+          services[name].open();
         }
       }
-    });
+    }
   } catch (e) {
     logger.info(e);
   }
@@ -36,7 +35,7 @@ const start = async (app, server, config = globalThis.__config?.SERVICES_CONFIG 
 const stop = async () => {
   logger.info('services - stop - begin');
   try {
-    const promises = servicesConfig.map(svc => services[svc.name].close());
+    const promises = Object.keys(servicesConfig).map(name => services[name].close());
     await Promise.allSettled(promises);
   } catch (e) {
     logger.info(e.toString());

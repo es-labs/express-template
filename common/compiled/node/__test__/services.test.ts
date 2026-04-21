@@ -3,7 +3,8 @@ import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 import StoreKnex from '../services/db/knex.ts';
 
-let sqldb: InstanceType<typeof StoreKnex> | null = null;
+// biome-ignore lint/suspicious/noExplicitAny: uninitialized store ref
+let sqldb: any;
 
 const RUN_TEST = false;
 if (RUN_TEST) {

@@ -1,7 +1,7 @@
 import {
   // authUser,
-  authFns,
-} from '@common/node/auth';
+  findUser,
+} from '@common/node/auth/store';
 import * as webpush from '@common/node/comms/webpush';
 import express from 'express';
 
@@ -17,11 +17,11 @@ export default express
   .get('/vapid-public-key', (req, res) => res.json({ publicKey: webpush.getPubKey() }))
   .post('/sub', authUser, async (req, res) => {
     const { subscription } = req.body; // should be a string
-    await authFns.updateUser({ id: req.user.sub }, { pnToken: subscription });
+    await updateUser({ id: req.user.sub }, { pnToken: subscription });
     res.json({ status: 'sub' });
   })
   .post('/unsub', authUser, async (req, res) => {
-    await authFns.updateUser({ id: req.user.sub }, { pnToken: '' });
+    await updateUser({ id: req.user.sub }, { pnToken: '' });
     res.json({ status: 'unsub' });
   })
   .post(
@@ -30,7 +30,7 @@ export default express
       // sending...
       const { id } = req.params;
       const { mode, data = {} } = req.body;
-      const user = await authFns.findUser({ id });
+      const user = await findUser({ id });
       let rv = null;
 
       if (user?.pnToken) {

@@ -1,4 +1,4 @@
-import { authFns } from '@common/node/auth';
+import { findUser } from '@common/node/auth/jwt';
 import webpush from '@common/node/comms/webpush';
 import express from 'express';
 import request from 'supertest';
@@ -18,7 +18,7 @@ describe('POST /send/:id', () => {
   });
 
   it('should send Webpush notification successfully', async () => {
-    authFns.findUser.mockResolvedValue({ id: '1', pnToken: '{"endpoint":"test"}' });
+    findUser.mockResolvedValue({ id: '1', pnToken: '{"endpoint":"test"}' });
     webpush.send.mockResolvedValue({ success: true });
 
     const res = await request(app)
@@ -31,7 +31,7 @@ describe('POST /send/:id', () => {
   });
 
   it('should return 404 when user not found', async () => {
-    authFns.findUser.mockResolvedValue(null);
+    findUser.mockResolvedValue(null);
 
     const res = await request(app)
       .post('/send/1')
@@ -42,7 +42,7 @@ describe('POST /send/:id', () => {
   });
 
   it('should return 500 on send error', async () => {
-    authFns.findUser.mockResolvedValue({ id: '1', pnToken: 'token' });
+    findUser.mockResolvedValue({ id: '1', pnToken: 'token' });
     webpush.send.mockRejectedValue(new Error('Webpush error'));
 
     const res = await request(app)

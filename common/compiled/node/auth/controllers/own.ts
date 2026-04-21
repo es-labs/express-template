@@ -2,8 +2,9 @@
 import jwt from 'jsonwebtoken';
 import { verify } from 'otplib';
 
-import { authFns, createToken, getSecret, setTokensToHeader } from '../../../auth/index.ts';
-import { matchScryptHash } from '../../../auth/scrypt.ts';
+import { createToken, getSecret, setTokensToHeader } from '../jwt.ts';
+import { matchScryptHash } from '../scrypt.ts';
+import { findUser, revokeRefreshToken } from '../store.ts';
 
 const { COOKIE_HTTPONLY, JWT_ALG } = globalThis.__config.JWT;
 
@@ -30,7 +31,7 @@ const logout = async (req, res) => {
   }
   try {
     if (id) {
-      await authFns.revokeRefreshToken(id); // clear
+      await revokeRefreshToken(id); // clear
       if (COOKIE_HTTPONLY) {
         res.clearCookie('refresh_token');
         res.clearCookie('Authorization');
@@ -50,7 +51,7 @@ const refresh = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const user = await authFns.findUser({
+    const user = await findUser({
       [AUTH_USER_FIELD_LOGIN]: req.body[AUTH_USER_FIELD_LOGIN],
     });
     if (!user) return res.status(401).json({ message: 'Incorrect credentials...1' });
@@ -87,7 +88,7 @@ const otp = async (req, res) => {
   // need to be authentication, body { id: '', pin: '123456' }
   try {
     const { id, pin } = req.body;
-    const user = await authFns.findUser({ id });
+    const user = await findUser({ id });
     if (user) {
       const gaKey = user[AUTH_USER_FIELD_GAKEY];
       if (USE_OTP !== 'TEST' ? verify({ token: pin, secret: gaKey }) : String(pin) === '111111') {

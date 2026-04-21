@@ -1,4 +1,4 @@
-import { authUser } from '@common/node/auth';
+import { authUser } from '@common/node/auth/jwt';
 import express from 'express';
 import categoryController from '../controllers/category.ts';
 
