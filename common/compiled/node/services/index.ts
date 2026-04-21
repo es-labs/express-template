@@ -1,7 +1,7 @@
+import Wss from '../ws/index.ts';
 import StoreKeyV from './db/keyv.ts';
 import StoreKnex from './db/knex.ts';
 import StoreRedis from './db/redis.ts';
-import Wss from './websocket.ts';
 
 // import '../auth/jwt.ts';
 
