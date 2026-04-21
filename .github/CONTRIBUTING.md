@@ -83,7 +83,7 @@ Runs automatically on every `git push`:
 
 | Check | Details |
 |-------|---------|
-| **Unit tests** | Runs `npm run test:workspace` (or `npm test`). |
+| **Unit tests** | Runs `npm run test:workspaces` (or `npm test`). |
 | **Schema validation tests** | Runs `npm run test:schemas` if the script exists. |
 
 To skip the pre-push hook temporarily:

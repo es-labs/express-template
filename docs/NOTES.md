@@ -15,7 +15,7 @@ This document is for
   - For TS
     - avoid enums, instead... use const object pattern / string literal unions
     - avoid legacy decorators
-    - no any, use unknown
+    - avoid using <any>, use <unknown>
     - use tsc --noEmit for type checking 
 - npm workspaces (microservices & shared libraries)
   - apps : microservices or applications (frontend or backend)
