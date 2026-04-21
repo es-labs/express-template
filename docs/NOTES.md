@@ -7,7 +7,9 @@ This document is for
 - migration notes
 - ideas that are not yet stable policy
 
-### Design
+
+### Design Features
+
 - Fully ES Modules - JS Standards Compliant
 - Named exports preferred (default exports for class, config, or a plugin)
 - Use Native as much as viable (test runners, datetime, fetch / xhr, npm, git hooks)
@@ -29,7 +31,6 @@ This document is for
     - default port 3000
   - common/shared code and schemas
   - sripts
-- web frontends ? to include? can be quite heavy
 - use zod for validation and openapi generation...
 - automation
   - non-critical
@@ -57,6 +58,15 @@ This document is for
   - RBAC, FGA, and legacy roles fallback
   - multi-tenant, scopes
 - jsdoc for typing and autocomplete on IDE ?
+
+### Sample Applications And Implementations
+
+- Express-based backend services
+- Vue and Vite frontend
+- shared ESM modules for Node, browser, Vue, and isomorphic code
+- common `zod` schemas and supporting utilities
+- deployment, documentation, and database helper scripts
+- sample implementations for features such as SAML, OIDC, OAuth, OTP, FIDO2, and push notifications
 
 
 ## precommits

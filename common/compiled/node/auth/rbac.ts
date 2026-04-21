@@ -36,6 +36,7 @@ const knex = () => _lookup?.(_userServiceName);
  *   userServiceName — service name from SERVICES_CONFIG (e.g. 'knex1')
  *   lookup          — services.get — resolves a name to the underlying store instance
  */
+// biome-ignore lint/suspicious/noExplicitAny: external service lookup return type
 const setup = (userServiceName: string, lookup: (name: string) => any) => {
   _userServiceName = userServiceName;
   _lookup = lookup;

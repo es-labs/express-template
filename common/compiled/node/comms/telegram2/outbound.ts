@@ -489,6 +489,7 @@ export async function sendContact(
   token,
   chatId,
   { phone_number, first_name, last_name, vcard },
+  // biome-ignore lint/suspicious/noExplicitAny: flexible options object
   opts: Record<string, any> = {},
 ) {
   return apiRequest(token, 'sendContact', {

@@ -6,6 +6,52 @@ Repository-wide coding and runtime conventions now live in [docs/conventions.md]
 
 This document keeps the repo's git workflow reference, branch/tag patterns, hooks notes, and merge-strategy discussion.
 
+---
+
+## Branching
+
+### Branch tags used
+
+- <feat/fix/chore>/scope/<...>
+- rel/<current release version>, rel/<next release version>
+  - can add -rc.1, -beta.1 suffixes as needed
+- hotfix/<current release version>/<...>
+- tag/<patch version>
+- main
+
+Examples:
+- release branch: rel/1.1
+- patch tags: tag/1.1.1
+- beta release: rel/1.1-beta.4
+
+### Branch & Tag Summary & Flow
+
+Use the table below to find out how to name branches based on action taken. Usually, contributors will create feat/fix/chore based off a `rel` branch
+
+| Branch | Branch from | Merge to | Notes |
+|---|---|---|---|
+| `rel/1.0` | `main` | `main` when production ready | Active dev branch |
+| `feat/fix/chore` | `rel/1.0` | `rel/1.0` via PR | Day-to-day work |
+| `hotfix/scope/name` | `main` | `main` + `rel/1.0` + `rel/2.0` | Emergency only |
+| `tag: v1.0.0` | `rel/1.0` after merge to main | — | Full release tag |
+| `tag: v1.0.1` | `rel/1.0` after hotfix merges in | — | Patch tag, then rel/1.0 → main |
+| `rel/1.1` | `main` after `v1.0.0` tag | `main` when ready | Cut from stable tag |
+
+The consistent rule is: **tags always come from `rel/*`**, never directly from `main`. Main is the destination, not the source of truth for what shipped.
+
+### Hotfix & Backport Flow
+
+```
+hotfix/payment-crash (check out from rel/v1.0)
+  → merge to main (keeps main stable)
+  → merge to rel/1.0
+      → tag v1.0.1 here (patch tag on rel/1.0)
+      → DO NOT DO THIS! DANGEROUS! merge rel/1.0 to main (main now has the patch)
+  → cherry-pick to rel/2.0 (backport)
+```
+
+---
+
 ## Release Automation
 
 Release automation is handled by the `release-please` job in [.github/workflows/ci.yml](../.github/workflows/ci.yml).
@@ -15,6 +61,7 @@ Release automation is handled by the `release-please` job in [.github/workflows/
 - Releases are tracked per workspace for `apps/*`.
 - The workflow requires a GitHub App installation token.
 - Troubleshooting lives in [release-troubleshooting.md](./release-troubleshooting.md).
+- Setup and workflow details live in [docs/git.md](docs/git.md).
 
 ### How It Works
 
@@ -46,39 +93,6 @@ Use a GitHub App instead of a PAT if you want release PRs and release-created ev
 Once configured, the workflow step uses [actions/create-github-app-token](https://github.com/actions/create-github-app-token) to mint a short-lived installation token and passes it to `release-please`.
 
 If the variable or secret is missing, the workflow fails early instead of falling back to `GITHUB_TOKEN`.
-
-### branch tags used
-
-- <feat/fix/chore>/scope/<...>
-- rel/<current release version>, rel/<next release version>
-  - can add -rc.1, -beta.1 suffixes as needed
-- hotfix/<current release version>/<...>
-- tag/<patch version>
-- main
-
-### Branch & Tag Summary & Flow
-
-| Branch | Branch from | Merge to | Notes |
-|---|---|---|---|
-| `rel/1.0` | `main` | `main` when production ready | Active dev branch |
-| `feat/fix/chore` | `rel/1.0` | `rel/1.0` via PR | Day-to-day work |
-| `hotfix/scope/name` | `main` | `main` + `rel/1.0` + `rel/2.0` | Emergency only |
-| `tag: v1.0.0` | `rel/1.0` after merge to main | — | Full release tag |
-| `tag: v1.0.1` | `rel/1.0` after hotfix merges in | — | Patch tag, then rel/1.0 → main |
-| `rel/1.1` | `main` after `v1.0.0` tag | `main` when ready | Cut from stable tag |
-
-The consistent rule is: **tags always come from `rel/*`**, never directly from `main`. Main is the destination, not the source of truth for what shipped.
-
-### Hotfix & Backport Flow
-
-```
-hotfix/payment-crash (check out from rel/v1.0)
-  → merge to main (keeps main stable)
-  → merge to rel/1.0
-      → tag v1.0.1 here (patch tag on rel/1.0)
-      → DO NOT DO THIS! DANGEROUS! merge rel/1.0 to main (main now has the patch)
-  → cherry-pick to rel/2.0 (backport)
-```
 
 ---
 
@@ -141,7 +155,7 @@ For each pattern, enable:
 | **Require conversation resolution before merging** | Enable. |
 | **Include administrators** | Enable. Prevents bypass by repo admins. |
 
-### CI Action Shape
+## CI Action Shape
 
 Please read the following scripts for more information
 - CI workflow for non-CI file changes [ci.yml](../.github/workflows/ci.yml)

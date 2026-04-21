@@ -8,9 +8,12 @@ import * as Services from '@common/node/services';
 import httpMocks from 'node-mocks-http';
 import CategoryController from '../../src/controllers/category.ts';
 
+// biome-ignore lint/suspicious/noExplicitAny: test mock
 let services: any;
 // let createdCategoryId;
+// biome-ignore lint/suspicious/noExplicitAny: test mock
 let categoryController: any;
+// biome-ignore lint/suspicious/noExplicitAny: test mock
 let req: any, res: any, next: any;
 
 beforeEach(() => {

@@ -14,7 +14,7 @@
   <div id="app"></div>
   <h1>FOO</h1>
   <div id="vanilla">
-    <button onclick="hello()">TEST</button>
+    <button type="button" onclick="hello()">TEST</button>
   </div>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <!-- to get latest & integrity sha... https://unpkg.com/vue?meta -->
@@ -23,7 +23,7 @@
   <script type="module" src="main.js"></script>
   <script>
     console.log('main.js 500 errors could be due to CORS origin of http server serving the page')
-    window.addEventListener('unhandledrejection', function (event) {
+    window.addEventListener('unhandledrejection', (event) => {
       // ...your code here to handle the unhandled rejection...
       console.log('event', event, event.reason)
       // Prevent the default handling (such as outputting the

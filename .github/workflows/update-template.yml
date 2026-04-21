@@ -1,0 +1,81 @@
+name: Sync upstream template
+# Pulls the latest changes from the upstream template repository and opens a PR
+# with the diff, excluding app-specific folders that should never be overwritten.
+#
+# Process:
+#   1. Checks out this repo.
+#   2. Add the upstream template as a git remote and fetch it.
+#   3. Check out all files from the upstream branch into the working tree.
+#   4. Restore apps/ and scripts/ from HEAD so local customisations are preserved.
+#   5. If any files changed, open a PR on branch chore/sync-upstream for review.
+#
+# Trigger: run manually via workflow_dispatch.
+# Protected branches: safe — changes are pushed to chore/sync-upstream, never directly
+#   to the target branch. A human reviews and merges the PR as normal.
+
+on:
+  # schedule:
+  #   - cron: '0 9 * * 1'  # every Monday 9am UTC
+  workflow_dispatch:
+    inputs:
+      upstream_branch:
+        description: 'Upstream branch to sync from'
+        default: 'main'
+        required: false
+
+env:
+  UPSTREAM_URL: https://github.com/es-labs/express-template.git
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add upstream remote
+        run: git remote add upstream ${{ env.UPSTREAM_URL }}
+
+      - name: Fetch upstream
+        run: git fetch upstream
+
+      # Sync everything from upstream, then restore local apps/ and scripts/
+      # so those folders are never overwritten by the template.
+      #
+      # Checkout reference:
+      #   single file  — git checkout upstream/main -- path/to/file
+      #   folder       — git checkout upstream/main -- folder/   (no wildcards)
+      #   *.ext        — git checkout upstream/main -- 'folder/*.ext'
+      #   recursive    — git checkout upstream/main -- 'folder/**/*.ext'
+      - name: Apply upstream changes (exclude apps/ and scripts/)
+        run: |
+          git checkout upstream/${{ github.event.inputs.upstream_branch || 'main' }} -- .
+          git checkout HEAD -- apps/ scripts/
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --staged --quiet && git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create PR
+        id: create-pr
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/sync-upstream
+          title: "chore: sync from upstream template"
+          commit-message: "chore: sync from upstream template"
+          body: |
+            ## Automated upstream template sync
+
+            Synced all files from `${{ github.event.inputs.upstream_branch || 'main' }}` branch of the upstream template.
+
+            **Excluded (preserved as-is):**
+            - `apps/`
+            - `scripts/`

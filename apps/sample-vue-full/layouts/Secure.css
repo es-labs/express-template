@@ -31,11 +31,11 @@
 }
 
 .ant-menu {
-  background-color: var(--blue-something) !important;
+  background-color: var(--blue-something);
 }
 
 .ant-menu-item {
-  background-color: var(--blue-something) !important;
+  background-color: var(--blue-something);
 }
 
 /*

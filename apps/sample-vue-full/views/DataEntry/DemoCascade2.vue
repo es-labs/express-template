@@ -62,7 +62,6 @@
 </template>
 
 <script setup>
-import { SettingOutlined } from '@ant-design/icons-vue';
 import { computed, onMounted, reactive, ref, toRaw } from 'vue';
 
 onMounted(async () => {});

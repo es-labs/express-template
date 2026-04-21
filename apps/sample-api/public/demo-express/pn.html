@@ -19,9 +19,9 @@
       <p>PN STATE: <span id="txt-pn-state">NA</span></p>
     </div>
     <div>
-      <button id="btn-sub">Subcribe PN</button>
-      <button id="btn-test">Send And Receive Test PN</button>
-      <button id="btn-unsub">Unsubscribe PN</button>
+      <button type="button" id="btn-sub">Subcribe PN</button>
+      <button type="button" id="btn-test">Send And Receive Test PN</button>
+      <button type="button" id="btn-unsub">Unsubscribe PN</button>
     </div>
     <div>
       <p id="txt-output"></p>
@@ -32,8 +32,9 @@
   </div>
 </body>
 <script type="module">
-  import { webpushSubscribe, webpushUnsubscribe } from "/esm/pwa.js"; // served from express /esm static route
   import Fetch from "/esm/fetch.js";
+  import { webpushSubscribe, webpushUnsubscribe } from "/esm/pwa.js"; // served from express /esm static route
+
   let subState = '[NA]'
   const WEBPUSH_URL = '/api/sample-api/webpush'
 
@@ -51,7 +52,7 @@
   }
 
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async function () {
+    window.addEventListener("load", async () => {
       console.log("SW load");
       const params = ""; // '?params=' + encodeURIComponent(JSON.stringify({ a: 1, b: Date.now() })) // TODO some problem with vite (development) if passing in params like this...
       const swPath =
@@ -70,10 +71,10 @@
 
   async function sub() {
     try {
-      const { data } = await http.get(WEBPUSH_URL + '/vapid-public-key')
-      let subscription = await webpushSubscribe(data.publicKey)
+      const { data } = await http.get(`${WEBPUSH_URL}/vapid-public-key`)
+      const subscription = await webpushSubscribe(data.publicKey)
       console.log('subscription', subscription)
-      if (subscription) await http.post(WEBPUSH_URL + '/sub', { subscription });
+      if (subscription) await http.post(`${WEBPUSH_URL}/sub`, { subscription });
       subState = "[Subscribed]";
       elOutput.innerHTML = subState;
     } catch (e) {
@@ -84,7 +85,7 @@
   async function unsub() {
     try {
       if (VITE_PWA_PN === "Webpush") await webpushUnsubscribe();
-      await http.post(WEBPUSH_URL + '/unsub', {});
+      await http.post(`${WEBPUSH_URL}/unsub`, {});
       subState = "[UNsubscribed]";
       elOutput.innerHTML = subState;
     } catch (e) {
@@ -95,8 +96,8 @@
   async function test() {
     if (subState !== "[Subscribed]") return alert("Need to subscribe first");
     try {
-      let data = "Hello Webpush " + new Date().toLocaleString();
-      await http.post(WEBPUSH_URL + '/send/1', { mode: VITE_PWA_PN, data });
+      const data = `Hello Webpush ${new Date().toLocaleString()}`;
+      await http.post(`${WEBPUSH_URL}/send/1`, { mode: VITE_PWA_PN, data });
       console.log('test PN sent')
     } catch (e) {
       console.log("error test", e);

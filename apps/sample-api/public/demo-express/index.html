@@ -44,8 +44,8 @@
       <label for="country_code">Country code:</label>
       <input id="country_code" type="text" pattern="[A-Za-z]{3}" title="Three letter country code" minlength="3"
         maxlength="3" />
-      <button onclick="testConsole()">Test console.log disabling</button>
-      <button onclick="testSentry()">Test Sentry for frontend</button>
+      <button type="button" onclick="testConsole()">Test console.log disabling</button>
+      <button type="button" onclick="testSentry()">Test Sentry for frontend</button>
     </div>
     <form>
       <fieldset>
@@ -65,12 +65,12 @@
         <label for="myBrowser">Choose a browser (autocomplete):</label>
         <input id="myBrowser" list="browsers" />
         <datalist id="browsers">
-          <option value="Chrome">
-          <option value="Firefox">
-          <option value="Internet Explorer">
-          <option value="Opera">
-          <option value="Safari">
-          <option value="Microsoft Edge">
+          <option value="Chrome"></option>
+          <option value="Firefox"></option>
+          <option value="Internet Explorer"></option>
+          <option value="Opera"></option>
+          <option value="Safari"></option>
+          <option value="Microsoft Edge"></option>
         </datalist>
         <input type="submit" />
       </fieldset>
@@ -94,7 +94,7 @@
     }
 
     const testSentry = () => {
-      throw new Error('Blah' + Date.now())
+      throw new Error(`Blah${Date.now()}`)
       // Sentry.captureMessage('Something went wrong' + Date.now())
       // console.error("xdddd", Date.now())
     }

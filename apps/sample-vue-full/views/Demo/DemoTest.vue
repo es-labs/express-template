@@ -50,7 +50,7 @@
 <script setup>
 import { http } from '@common/vue/plugins/fetch.js';
 // NOSONAR unref, toRef, toRefs, isRef, isProxy, isReactive, isReadonly, defineComponent, getCurrentInstance, reactive, readonly, watch, watchEffect
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, onUnmounted, onUpdated, reactive, ref } from 'vue';
+import { onBeforeUnmount, onBeforeUpdate, onMounted, onUnmounted, onUpdated, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '../../store.js';
 

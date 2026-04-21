@@ -7,6 +7,7 @@ import Wss from './websocket.ts';
 
 type ServiceConfig = { type: string; options: string };
 let servicesConfig: Record<string, ServiceConfig> = {};
+// biome-ignore lint/suspicious/noExplicitAny: dynamic service registry
 const services: Record<string, any> = {};
 
 const start = async (app, server, config = globalThis.__config?.SERVICES_CONFIG || {}) => {

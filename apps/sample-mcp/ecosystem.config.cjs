@@ -9,7 +9,7 @@ module.exports = {
       // args: "start",
       env: {
         NODE_ENV: 'dev',
-      }
+      },
     },
-  ]
-}
+  ],
+};

@@ -37,7 +37,6 @@
 </template>
 
 <script setup>
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue';
 import idleTimer from '@common/web/idle';
 // :key="$route.fullPath" // this is causing problems
 import { computed, onBeforeUnmount, onMounted, onUnmounted, reactive, ref } from 'vue';

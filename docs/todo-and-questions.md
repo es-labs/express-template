@@ -2,6 +2,7 @@
 
 ## TODO
 
+- **IN PROGRESS** fix typescript noExplicit any
 - **IN PROGRESS** JSON in env, refactor to use something else
 - **TO TEST** add RBAC and FGA
 - **TO TEST** Typescript to zod, convert code to TS for node runtime...

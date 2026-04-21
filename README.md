@@ -1,38 +1,22 @@
 ## Read Me First - Requires Node.js 24 or Higher
 
-- Contributors: read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) before opening issues or pull requests.
-- Developers: read [docs/conventions.md](docs/conventions.md) before making code changes.
+- Contributors: read [.github/CONTRIBUTING.md]() before opening issues or pull requests.
+  - setup hooks [docs/git.md#Hooks-Usage]()
+  - setup release automation [docs/git.md#Release-Automation]()
+  - setup branch protection [docs/git.md#Branch-Protection-Rules]()
+- Developers - **BEFORE** making **ANY** changes. Read the following:
+  - branching instructions [docs/git.md#Branching]()
+  - engineering standards [docs/conventions.md]()
+  - commit message standard []()
+  - merge strategy [docs/git.md#Rebase-Or-Merge]()
+  - triggering release [docs/git.md#Releasable-Commits]()
+  - workflows []()
 - For template design principles, see this [reference](https://github.com/ais-one/cookbook?tab=readme-ov-file#1---important---read-me-first).
 
 ## Template Maintenance
 
-1 - Setup to allow incoming merge from upstream template update
+Refer to [.github/workflows/update-template.yml]() for description and details on updating template. Userland folders `apps` and `scripts` are untouched.
 
-```bash
-# run once only after you `clone`, or `fork` or `delete .git and run git init`
-./setup-upstream.sh
-```
-
-2 - Updating the template
-
-```bash
-# Commit and push to remote before running commands below
-git fetch upstream # includes tags
-git pull upstream <branch or tag> --no-rebase
-# NO MORE IN USE git merge upstream/<branch or tag> --allow-unrelated-histories
-# There may be some template related merge conflicts to resolve.
-```
-
-3 - Refresh the changelog from Conventional Commits
-
-Release automation is handled by the `release-please` job inside [ci.yml](.github/workflows/ci.yml).
-
-- It opens or updates a release PR from Conventional Commits on `main` and `rel/*`.
-- Existing handwritten changelog entries remain grouped under `0.1.0`.
-- Setup and workflow details live in [docs/git.md](docs/git.md).
-- Troubleshooting lives in [docs/release-troubleshooting.md](docs/release-troubleshooting.md).
-
-Important limitation: `release-please` creates release PRs from releasable commits such as `feat`, `fix`, and `deps`. A branch with only `chore` commits will not produce a release PR unless you force a release with a `Release-As:` footer in the commit body.
 
 ## Description
 
@@ -40,15 +24,9 @@ This repository is a monorepo template for building full-stack JavaScript applic
 
 It combines backend and frontend examples in `apps/` and shared reusable code in `common/` so teams can start from a consistent structure instead of assembling the stack from scratch. It includes workspace-based package management, shared schemas and utilities, sample authentication flows, OpenAPI tooling, Docker support, GitHub Actions workflows, and MCP server examples.
 
-Use it when you want a single repository that can host:
-
-- Express-based backend services
-- Vue and Vite frontend applications
-- shared ESM modules for Node, browser, Vue, and isomorphic code
-- common `zod` schemas and supporting utilities
-- deployment, documentation, and database helper scripts
-- sample implementations for features such as SAML, OIDC, OAuth, OTP, FIDO2, and push notifications
-
+Further Reading
+- [Design Features](docs/NOTES.md#Design-Features)
+- [Sample Applications And Implementations](docs/NOTES.md#Sample-Applications-And-Implementations)
 
 ## Documentation Map
 

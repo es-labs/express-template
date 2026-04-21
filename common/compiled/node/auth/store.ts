@@ -18,6 +18,7 @@ const knex = () => _lookup?.(_userServiceName); // knex instance for user table
  *   userServiceName  — service name from SERVICES_CONFIG (e.g. 'knex1')
  *   lookup           — services.get — resolves a name to the underlying store instance
  */
+// biome-ignore lint/suspicious/noExplicitAny: external service lookup return type
 export const setup = (tokenServiceName: string, userServiceName: string, lookup: (name: string) => any) => {
   _tokenServiceName = tokenServiceName;
   _tokenServiceType = globalThis.__config?.SERVICES_CONFIG?.[tokenServiceName]?.type ?? 'keyv';

@@ -11,9 +11,9 @@
 <body>
   <h1>Fido Test</h1>
   <p>Note: For local testing, please use <strong>localhost</strong> instead of 127.0.0.1</p>
-  <button onclick="register()">Register</button>
-  <button onclick="validate()">Validate</button>
-  <button onclick="testB64()">Test B64</button>
+  <button type="button" onclick="register()">Register</button>
+  <button type="button" onclick="validate()">Validate</button>
+  <button type="button" onclick="testB64()">Test B64</button>
   <h2>Status</h2>
   <textarea id="status"></textarea>
 
@@ -25,8 +25,8 @@
 
   const status = document.querySelector('#status')
 
-  const b64_b64url = (inStr) => inStr.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '')
-  const b64url_b64 = (inStr) => inStr.replace(/\-/g, '+').replace(/_/g, '/') + '='.repeat((inStr.length % 4) ? 4 - (inStr.length % 4) : 0)
+  const b64_b64url = (inStr) => inStr.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+  const b64url_b64 = (inStr) => inStr.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((inStr.length % 4) ? 4 - (inStr.length % 4) : 0)
   const b64_ab = (inStr) => Uint8Array.from(atob(inStr), c => c.charCodeAt(0)) // base64 encoded utf8
   const ab_b64 = (buf) => btoa(buf.reduce((data, val)=> data + String.fromCharCode(val), '')) // Uint8Array
 
@@ -78,7 +78,7 @@
     // enable virtual WebAuthn environment
     // create and add authenticator: ctap2, internal, support resident keys, support user verification
     try {
-      const res = await fetch(FIDO_URL + '/register')
+      const res = await fetch(`${FIDO_URL}/register`)
       const pkCredCreateOpts = await res.json()
       // console.log('pkCredCreateOpts', pkCredCreateOpts)
       // const hasUvpaa = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
@@ -115,7 +115,7 @@
       // const clientDataObj = JSON.parse(decodedClientData);
       // console.log('decoded credential.response.clientDataJSON', clientDataObj)
 
-      const res2 = await fetch(FIDO_URL + '/register', {
+      const res2 = await fetch(`${FIDO_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(passableCredential)
@@ -147,14 +147,14 @@
       status.value = 'Register Pass...'
     } catch (e) {
       console.log(e)
-      status.value = 'Register Fail... ' + e.toString() 
+      status.value = `Register Fail... ${e.toString()}` 
     }
   }
 
 
   const validate = async () => {
     try {
-      const res = await fetch(FIDO_URL + '/validate')
+      const res = await fetch(`${FIDO_URL}/validate`)
       const authnOptions = await res.json()
       authnOptions.allowCredentials = authnOptions.allowCredentials.map(item => {
         item.id = b64_ab(item.id)
@@ -184,7 +184,7 @@
 
       const body = JSON.stringify(passableCredential)
       // console.log('body', body)
-      const res2 = await fetch(FIDO_URL + '/validate', {
+      const res2 = await fetch(`${FIDO_URL}/validate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: body
@@ -194,7 +194,7 @@
       status.value = 'Validate Pass...' 
     } catch (e) {      
       console.log(e)
-      status.value = 'Validate Fail... ' + e.toString() 
+      status.value = `Validate Fail... ${e.toString()}` 
     }
 
 

@@ -24,9 +24,11 @@ Read this document before making code changes. Use [.github/CONTRIBUTING.md](../
 
 ## Language Standard
 
-- `apps/` and `common/` are plain JavaScript (ES Modules). Use JSDoc for typing and IDE autocomplete — no TypeScript compilation.
-- `scripts/` uses TypeScript. Node 24 strips types natively — no build step, no `tsx`, no `typescript` package needed. Run with `node file.ts`.
-- `scripts/tsconfig.json` exists for IDE type checking only (`noEmit: true`).
+- Use of ES Modules is mandated.
+- NodeJS applications or applications requiring compilation like Vue / React may use Native NodeJS Typescript (recommended) or Javascript
+  - NodeJS TS (runtime) + `tsc --noEmit` (static type check) + `zod` (dynamic validation)  
+  - `common/compiled` folder uses Typescript
+- Browser and Isomorphic code must use Javascript only
 
 ## Node Runtime Standard
 
@@ -34,7 +36,6 @@ Read this document before making code changes. Use [.github/CONTRIBUTING.md](../
 - Node runtime applications must import `common/node/config` for application config loading.
 - `.env.json` for non-sensitive structured values, exposed globally through `globalThis.__config`. `//` line comments are allowed.
 - `.env` for secrets and simple scalar values (should be in `vault` service for production) and loaded into `process.env`.
-
 
 ## Configuration And Secrets Standard
 

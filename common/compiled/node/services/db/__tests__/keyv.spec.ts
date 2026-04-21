@@ -1,4 +1,4 @@
-import type { Keyv } from 'keyv';
+export {};
 
 const assert = require('node:assert/strict');
 const { describe, it, beforeEach, afterEach } = require('node:test');

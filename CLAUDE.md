@@ -33,21 +33,18 @@ scripts/           # DB deployment, OpenAPI generation tooling
 ## Setup
 
 ```bash
-# 1. run once after clone/fork/git init to enable upstream template merges
-./setup-upstream.sh
-
-# 2. install all workspace dependencies
+# 1. install all workspace dependencies
 npm i
 
-# 3. configure git hooks (also runs automatically via npm prepare)
+# 2. configure git hooks (also runs automatically via npm prepare)
 chmod +x .githooks/setup.sh && ./.githooks/setup.sh
 # or manually:
 # git config core.hooksPath .githooks
 
-# 4. run the sample backend
+# 3. run the sample backend
 cd apps/sample-api && npm run start
 
-# 5. run the minimal Vue frontend
+# 4. run the minimal Vue frontend
 cd apps/sample-vue-minimal && npm run dev
 ```
 

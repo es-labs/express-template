@@ -22,7 +22,7 @@ const hash = ref('No Hash Found');
 const _setMockUser = async () => {
   const user = {
     id: 'Aaa',
-    roles: ['MyGroup','AnotherGroup'],
+    roles: ['MyGroup', 'AnotherGroup'],
   };
   // store user
   await store.doLogin(user);

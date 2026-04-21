@@ -27,6 +27,7 @@ const preRoute = () => {
   ); // both resolved lazily — safe to call before server/services exist
 
   const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA } = process.env;
+  // biome-ignore lint/suspicious/noExplicitAny: flexible https options object
   const https_opts: Record<string, any> = {};
   if (HTTPS_CERTIFICATE) https_opts.cert = HTTPS_CERTIFICATE;
   if (HTTPS_PRIVATE_KEY) https_opts.key = HTTPS_PRIVATE_KEY;

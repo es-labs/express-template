@@ -108,8 +108,6 @@
 </template>
 
 <script setup>
-import { ArrowDownOutlined, ArrowUpOutlined, UserOutlined } from '@ant-design/icons-vue';
-
 const data = [
   { name: 'Faith', title: 'Full-stack Dev' },
   { name: 'Hope', title: 'Data Scientist' },
@@ -131,7 +129,7 @@ const data = [
 }
 
 .ant-card-meta-title {
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
 }
 
 .ant-card-body {
