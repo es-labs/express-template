@@ -2,96 +2,86 @@
 // NOTE: if --forcedExit --detectOpenHandles in JEST test, will cause error
 // TODO: automated testing for websockets
 
-import https from 'node:https';
-import WebSocket, { WebSocketServer } from 'ws';
+import https, { type Server as HttpsServer } from 'node:https';
+import WebSocket, { type RawData, WebSocketServer } from 'ws';
 
-// NOSONAR
-// function heartbeat() {
-//   clearTimeout(this.pingTimeout)
-//   // Use `WebSocket#terminate()` and not `WebSocket#close()`. Delay should be
-//   // equal to the interval at which your server sends out pings plus a
-//   // conservative assumption of the latency.
-//   this.pingTimeout = setTimeout(() => {
-//     this.terminate()
-//   }, 30000 + 1000)
-//   const client = new WebSocket('wss://echo.websocket.org/')
-//   client.on('open', heartbeat)
-//   client.on('ping', heartbeat)
-//   client.on('close', function clear() {
-//   clearTimeout(this.pingTimeout)
-// })
-// let WSServer = require('ws').Server
-// // Create web socket server on top of a regular http server
-// let wss = new WSServer({ server })
-// server.on('request', app)
+// Extend WebSocket to include isAlive for keep-alive ping/pong tracking
+interface AliveWebSocket extends WebSocket {
+  isAlive: boolean;
+}
 
 export default class Wss {
-  static _instance: Wss;
-  _port: any;
-  _keepAliveMs: any;
-  _wss: WebSocketServer | null;
-  _onClientConnect: any;
-  _onClientClose: any;
-  _onClientMessage: any;
+  static _instance: Wss | null = null;
 
-  constructor(options = {}) {
+  _port: number | undefined;
+  _keepAliveMs: number;
+  _wss: WebSocketServer | null;
+  _keepAliveInterval: ReturnType<typeof setInterval> | null;
+  _onClientConnect: (ws: AliveWebSocket) => void;
+  _onClientClose: (ws: AliveWebSocket) => void;
+  _onClientMessage: (data: RawData, isBinary: boolean, ws: AliveWebSocket, wss: WebSocketServer) => Promise<void>;
+
+  constructor(_options = {}) {
     if (!Wss._instance) {
       Wss._instance = this;
-      this._port = process.env?.WS_PORT;
-      this._keepAliveMs = process.env?.WS_KEEPALIVE_MS;
+      this._port = process.env?.WS_PORT ? Number(process.env.WS_PORT) : undefined;
+      this._keepAliveMs = Number(process.env?.WS_KEEPALIVE_MS) || 30000;
       this._wss = null;
-      this._onClientConnect = ws => {};
-      this._onClientClose = ws => {};
-      this._onClientMessage = async (data, isBinary, ws, wss) => {
-        // client incoming message
+      this._keepAliveInterval = null;
+      this._onClientConnect = (_ws: AliveWebSocket) => {};
+      this._onClientClose = (_ws: AliveWebSocket) => {};
+      this._onClientMessage = async (data: RawData, isBinary: boolean, ws: AliveWebSocket, wss: WebSocketServer) => {
         const message = isBinary ? data : data.toString();
-        logger.info('message', message);
+        logger.info(`ws message: ${message}`);
         try {
-          // try-catch only detect immediate error, cannot detect if write failure
           if (wss) {
-            // send to other clients except self
-            wss.clients.forEach(client => {
+            wss.clients.forEach((client: WebSocket) => {
               if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(message); // send message to others
+                client.send(message);
               }
             });
-            // ws.send('something', function ack(error) { logger.info }) // If error !defined, send has been completed, otherwise error object will indicate what failed.
-            ws.send(message); // echo back message...
+            ws.send(message);
           }
         } catch (e) {
-          logger.info(e.toString());
+          logger.info((e as Error).toString());
         }
       };
     }
   }
-  static getInstance() {
+
+  // Static getInstance — consistency for another service (Knex/Redis/Keyv)
+  static getInstance(): Wss | null {
     return Wss._instance;
   }
-  setOnClientMessage(onClientMessageFn) {
+
+  // Instance get() — used by services/index.ts
+  get(): Wss | null {
+    return Wss._instance;
+  }
+
+  setOnClientMessage(
+    onClientMessageFn: (data: RawData, isBinary: boolean, ws: AliveWebSocket, wss: WebSocketServer) => Promise<void>,
+  ) {
     this._onClientMessage = onClientMessageFn;
   }
-  setOnClientConnect(onClientConnectFn) {
-    //  what to do when client connects
+
+  setOnClientConnect(onClientConnectFn: (ws: AliveWebSocket) => void) {
     this._onClientConnect = onClientConnectFn;
   }
-  setOnClientCLose(onClientCloseFn) {
-    //  what to do when client closes
+
+  setOnClientClose(onClientCloseFn: (ws: AliveWebSocket) => void) {
     this._onClientClose = onClientCloseFn;
   }
 
-  get() {
-    return Wss._instance;
-  }
-
-  send(data) {
-    this._wss.clients.forEach(client => {
+  send(data: string | Buffer) {
+    this._wss?.clients.forEach((client: WebSocket) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(data);
       }
     });
   }
 
-  open(server = null, app = null) {
+  open(server: HttpsServer | null = null, _app = null) {
     const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE } = process.env;
     // biome-ignore lint/suspicious/noImplicitAnyLet: assigned in catch block below
     let err;
@@ -99,52 +89,42 @@ export default class Wss {
       if (!this._wss && this._port) {
         if (HTTPS_CERTIFICATE) {
           if (!server)
-            server = https
-              .createServer({
-                key: HTTPS_PRIVATE_KEY,
-                cert: HTTPS_CERTIFICATE,
-              })
-              .listen(this._port); // use same port, create server because of graphql subscriptions
+            server = https.createServer({ key: HTTPS_PRIVATE_KEY, cert: HTTPS_CERTIFICATE }).listen(this._port);
           this._wss = new WebSocketServer({ server });
         } else {
-          if (!server)
-            this._wss = new WebSocketServer({ port: this._port }); // use seperate port
+          if (!server) this._wss = new WebSocketServer({ port: this._port });
           else this._wss = new WebSocketServer({ server });
         }
 
-        // This caused header to fire twice
-        // if (app) server.on('request', app)
-
-        // new WebSocketServer({ server }) - no need to handle upgrade event, ws will handle it internally
-        // server.on('upgrade', (req, socket, head) => {
-        //   logger.info('WS Upgrade Request Rexeived !!!')
-        //   this._wss.handleUpgrade(req, socket, head, (ws) => {
-        //     this._wss.emit('connection', ws, req);
-        //   });
-        // });
-
         logger.info(`WS API listening on port ${this._port}`);
+
         if (this._wss) {
-          this._wss.on('connection', ws => {
+          this._wss.on('error', (e: Error) => logger.info(`WS error: ${e.toString()}`));
+          this._wss.on('connection', (ws: WebSocket) => {
+            const aliveWs = ws as AliveWebSocket;
             logger.info('ws client connected');
-            this._onClientConnect(ws); // what else to do when client connects
-            ws.isAlive = true;
-            ws.on('pong', () => {
-              ws.isAlive = true;
+            this._onClientConnect(aliveWs);
+            aliveWs.isAlive = true;
+            aliveWs.on('pong', () => {
+              aliveWs.isAlive = true;
             });
-            ws.on('close', () => this._onClientClose(ws));
-            ws.on('message', (data, isBinary) => this._onClientMessage(data, isBinary, ws, this._wss));
+            aliveWs.on('close', () => this._onClientClose(aliveWs));
+            aliveWs.on('message', (data: RawData, isBinary: boolean) => {
+              if (this._wss) this._onClientMessage(data, isBinary, aliveWs, this._wss);
+            });
           });
-          setInterval(() => {
-            // set keep-alive
-            logger.info('WS Clients: ', this._wss.clients.size);
-            this._wss?.clients.forEach(ws => {
-              if (!ws.isAlive) {
-                ws.terminate(); // force close
+
+          // save ref interval so that it can be cleared when close()
+          this._keepAliveInterval = setInterval(() => {
+            logger.info('WS Clients: ', this._wss?.clients.size);
+            this._wss?.clients.forEach((ws: WebSocket) => {
+              const aliveWs = ws as AliveWebSocket;
+              if (!aliveWs.isAlive) {
+                aliveWs.terminate();
                 return;
               }
-              ws.isAlive = false;
-              ws.ping(() => {}); // NOSONAR
+              aliveWs.isAlive = false;
+              aliveWs.ping(() => {}); // NOSONAR
             });
           }, this._keepAliveMs);
         }
@@ -152,7 +132,7 @@ export default class Wss {
         logger.info('NO WS Service To Open');
       }
     } catch (e) {
-      err = e.toString();
+      err = (e as Error).toString();
     }
     logger.info(`WS Open ${err ? err : 'Done'}`);
     return this;
@@ -160,16 +140,33 @@ export default class Wss {
 
   close() {
     try {
-      // close all connections
+      // Clear interval before close to avoid accessing _wss which is already null
+      if (this._keepAliveInterval) {
+        clearInterval(this._keepAliveInterval);
+        this._keepAliveInterval = null;
+      }
+
       if (this._wss) {
+        // Broadcast shutdown to all clients before terminating
+        this._wss.clients.forEach((client: WebSocket) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({ type: 'server_shutdown' }));
+            client.close(1001, 'Server shutting down');
+          }
+        });
+
+        // Force terminate clients that have not yet closed
+        for (const client of this._wss.clients) client.terminate();
         this._wss.close();
-        // this._wss.clients.forEach(client => client.close(0, 'wss close() called')) // close gracefully
-        for (const client of this._wss.clients) client.terminate(); // https://github.com/websockets/ws/releases/tag/8.0.0
-        this._wss = null; //delete wss
+        this._wss = null;
       }
     } catch (e) {
-      logger.error(e.toString());
+      logger.error((e as Error).toString());
     }
+
+    // Reset the singleton so that it can be reinitialized if the service is restarted
+    Wss._instance = null;
+
     logger.info('WS API CLOSE OK');
   }
 }

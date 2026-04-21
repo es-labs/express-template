@@ -1,7 +1,7 @@
 import Knex from 'knex';
 export default class StoreKnex {
-  _KNEXFILE: any;
-  _knex: any;
+  _KNEXFILE: Parameters<typeof Knex>[0] | null;
+  _knex: ReturnType<typeof Knex> | null;
   name: string;
 
   constructor(optionName?: string) {

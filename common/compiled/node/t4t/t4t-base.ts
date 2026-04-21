@@ -115,7 +115,7 @@ const find = async (req, res) => {
   query = query.where({});
 
   // TODO handle filters for joins...
-  let prevFilter: Record<string, any> = {};
+  let prevFilter: Record<string, unknown> = {};
   const joinCols = {};
   if (filters?.length)
     for (const filter of filters) {

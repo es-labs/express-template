@@ -58,5 +58,8 @@
     "ws": "^8.20.0",
     "zod": "^4.3.6",
     "zod-openapi": "^5.4.6"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.1"
   }
 }

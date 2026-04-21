@@ -1,10 +1,16 @@
 import { Redis } from 'ioredis';
 
+interface RedisConfig {
+  opts: Record<string, unknown>;
+  retry?: { step: number; max: number };
+  reconnect?: { targetError: string };
+}
+
 export default class StoreRedis {
-  _REDIS_CONFIG: any;
+  _REDIS_CONFIG: RedisConfig;
   _redis: Redis | null;
 
-  constructor(options: any = globalThis.__config?.REDIS_CONFIG || {}) {
+  constructor(options: RedisConfig = globalThis.__config?.REDIS_CONFIG ?? { opts: {} }) {
     this._REDIS_CONFIG = options;
     this._redis = null;
   }

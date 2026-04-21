@@ -89,7 +89,7 @@ export default express
 
   // test websocket broadcast
   .get('/ws-broadcast', async (req, res) => {
-    services.get('ws').send('WS Broadcast');
+    services.get('ws')?.send('WS Broadcast');
     res.send('ws broadcast');
   })
 

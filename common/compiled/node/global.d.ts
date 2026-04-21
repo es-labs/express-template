@@ -4,4 +4,5 @@ declare var logger: {
   info(msg: unknown, meta?: unknown): void;
   debug(msg: unknown, meta?: unknown): void;
 };
+// biome-ignore lint/suspicious/noExplicitAny: global config shape is dynamic at runtime
 declare var __config: Readonly<Record<string, any>>;

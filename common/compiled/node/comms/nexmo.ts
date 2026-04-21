@@ -7,7 +7,7 @@ const { NEXMO_KEY, NEXMO_SECRET, NEXMO_SENDER = 'SMSnotice' } = process.env;
 
 // sms = 6511112222
 // one at a time...
-export const send = async (sms, message, from) => {
+export const send = async (sms: string, message: string, from?: string) => {
   if (!from) from = NEXMO_SENDER;
   if (sms && message) {
     // just throw if failed
@@ -19,7 +19,7 @@ export const send = async (sms, message, from) => {
 
 // sms = 6511112222
 // one at a time...
-export const ismsSend = async (sms, message, from) => {
+export const ismsSend = async (sms: string, message: string, from?: string) => {
   const url = 'https://sms.era.sg/isms_mt.php?';
   try {
     if (sms && message) {
