@@ -1,7 +1,4 @@
-import {
-  // authUser,
-  findUser,
-} from '@common/node/auth/store';
+import { findUser, updateUser } from '@common/node/auth/store';
 import * as webpush from '@common/node/comms/webpush';
 import { validate } from '@common/node/errors/validate';
 import express from 'express';
