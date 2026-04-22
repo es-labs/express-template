@@ -7,18 +7,18 @@ This document is for
 - migration notes
 - ideas that are not yet stable policy
 
-
 ### Design Features
 
 - Fully ES Modules - JS Standards Compliant
 - Named exports preferred (default exports for class, config, or a plugin)
 - Use Native as much as viable (test runners, datetime, fetch / xhr, npm, git hooks)
-- Option to use Javascript or Typescript (using NodeJS native typescript) for backend.
-  - For TS
-    - avoid enums, instead... use const object pattern / string literal unions
-    - avoid legacy decorators
-    - avoid using <any>, use <unknown>
-    - use tsc --noEmit for type checking 
+- Option to use Javascript or Typescript for backend.
+- For Typescript
+  - avoid compilation, Use NodeJS native typescript
+  - use `tsc --noEmit` for type checking and `zod` for runtime validation
+  - avoid enums, instead... use const object pattern / string literal unions
+  - avoid legacy decorators
+  - avoid using <any>, use <unknown>
 - npm workspaces (microservices & shared libraries)
   - apps : microservices or applications (frontend or backend)
     - shared-<tenant1>
@@ -33,41 +33,27 @@ This document is for
   - sripts
 - use zod for validation and openapi generation...
 - automation
-  - non-critical
-    - commit messages - czg
-    - changelog - release-please workflow
-    - release - release-please workflow
-    - code review AI - TODO
+  - commit messages - czg
+  - changelog - release-please workflow
+  - release - release-please workflow
+  - code review AI - TODO
   - api documentation
   - unit and integration test generation
 - global logger
   - no console log for backend
   - no logs in frontend production, errors sent to Sentry
 - biome vs prettier+eslint
-- zod
-  - validation
-  - openapi schema generation (zod-openapi)
-- NO Typescript unless it becomes runtime-native
 - testing
   - use native node test runner
   - playwright for e2e testing
-- Support postgres as primary RDBMS, mysql as secondary.
-  - DO NOT USE mongoDB
-- DB audit logging [strategy](decs/pg-audit-implementation)
-- Authorization
+- Support
+  - postgres as primary RDBMS, mysql as secondary.
+  - redis or keyv
+- DB audit logging [strategy](design/pg-audit-implementation)
+- Authorization [strategy](design/authz.md)
   - RBAC, FGA, and legacy roles fallback
   - multi-tenant, scopes
 - jsdoc for typing and autocomplete on IDE ?
-
-### Sample Applications And Implementations
-
-- Express-based backend services
-- Vue and Vite frontend
-- shared ESM modules for Node, browser, Vue, and isomorphic code
-- common `zod` schemas and supporting utilities
-- deployment, documentation, and database helper scripts
-- sample implementations for features such as SAML, OIDC, OAuth, OTP, FIDO2, and push notifications
-
 
 ## precommits
 
@@ -82,10 +68,6 @@ This document is for
   - repo-wide testing, no autofix
   - repo-side package audit, no autofix?
 - do not allow PR merge if checks fail
-
-## Secrets Security
-
-- git guardian (use native Github for now)
 
 
 ## TODOS
@@ -103,17 +85,17 @@ npx biome lint common apps scripts --only=useTemplate --write --unsafe
 ### logger usage
 
 - apps/* - use backend logger for backend, frontend logger not implemented
-- common/iso - both (should be simple files remove console.logs)
+- common/iso - both (should be simple files remove console.log)
 - common/node - backend (use backend logger)
-- common/vue -frontend VueJS (allow console, remove in prod)
-- common/web -frontend plainJS (allow console, remove in prod)
+- common/vue - frontend VueJS (allow console.log, remove in prod)
+- common/web - frontend plainJS (allow console.log, remove in prod)
 - common/scripts
 
 
 ### Github Related Readings
 
-- https://github.com/settings/security_analysis
-- https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization
+- [security](https://github.com/settings/security_analysis)
+- [repo custom properties](https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization)
 
 ### Handling Globals
 

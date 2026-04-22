@@ -63,19 +63,34 @@ jobs:
           fi
 
       - name: Create PR
-        id: create-pr
         if: steps.changes.outputs.has_changes == 'true'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: chore/sync-upstream
-          title: "chore: sync from upstream template"
-          commit-message: "chore: sync from upstream template"
-          body: |
-            ## Automated upstream template sync
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SYNC_BRANCH: chore/sync-upstream
+          UPSTREAM_BRANCH: ${{ github.event.inputs.upstream_branch || 'main' }}
+          BASE_BRANCH: ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$SYNC_BRANCH"
+          git add -A
+          git commit -m "chore: sync from upstream template"
+          git push origin "$SYNC_BRANCH" --force
 
-            Synced all files from `${{ github.event.inputs.upstream_branch || 'main' }}` branch of the upstream template.
+          PR_BODY="## Automated upstream template sync
 
-            **Excluded (preserved as-is):**
-            - `apps/`
-            - `scripts/`
+          Synced all files from \`$UPSTREAM_BRANCH\` branch of the upstream template.
+
+          **Excluded (preserved as-is):**
+          - \`apps/\`
+          - \`scripts/\`"
+
+          if gh pr view "$SYNC_BRANCH" --json number &>/dev/null; then
+            gh pr edit "$SYNC_BRANCH" --body "$PR_BODY"
+          else
+            gh pr create \
+              --title "chore: sync from upstream template" \
+              --body "$PR_BODY" \
+              --head "$SYNC_BRANCH" \
+              --base "$BASE_BRANCH"
+          fi

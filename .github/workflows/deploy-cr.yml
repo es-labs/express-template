@@ -18,9 +18,7 @@
 #   - container image tag
 #   - path to dockerfile
 #   - environment (development, staging, production)
-
-
-name: IN USE - Container Registry deployment
+name: DEPLOY - Container Registry
 
 on:
   workflow_dispatch:

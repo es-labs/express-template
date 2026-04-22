@@ -42,7 +42,7 @@ The consistent rule is: **tags always come from `rel/*`**, never directly from `
 ### Hotfix & Backport Flow
 
 ```
-hotfix/payment-crash (check out from rel/v1.0)
+hotfix/payment-crash (check out from main)
   → merge to main (keeps main stable)
   → merge to rel/1.0
       → tag v1.0.1 here (patch tag on rel/1.0)
@@ -54,14 +54,15 @@ hotfix/payment-crash (check out from rel/v1.0)
 
 ## Release Automation
 
-Release automation is handled by the `release-please` job in [.github/workflows/ci.yml](../.github/workflows/ci.yml).
+Release automation is handled by the `release-please` job in [.github/workflows/ci.yml](../.github/workflows/ci.yml), using the [release-please](https://github.com/googleapis/release-please-action) github action.
 
 - The existing handwritten changelog stays grouped under version `0.1.0` in [CHANGELOG.md](../CHANGELOG.md).
-- The workflow runs `release-please-action` in manifest mode using [release-please-config.json](../release-please-config.json) and [.release-please-manifest.json](../.release-please-manifest.json).
+- The workflow runs `release-please-action` in manifest mode using
+  - [release-please-config.json](../release-please-config.json) and
+  - [.release-please-manifest.json](../.release-please-manifest.json)
 - Releases are tracked per workspace for `apps/*`.
-- The workflow requires a GitHub App installation token.
+- The workflow requires a GitHub App installation token [setup](#GitHub-App-Token-Setup).
 - Troubleshooting lives in [release-troubleshooting.md](./release-troubleshooting.md).
-- Setup and workflow details live in [docs/git.md](docs/git.md).
 
 ### How It Works
 

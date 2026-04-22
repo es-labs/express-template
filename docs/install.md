@@ -42,65 +42,30 @@ code --install-extension <extension id>
 
 ---
 
-## Common Workspaces Install
+## Run Sample API
 
-The `common` workspaces contain reusable shared code and schemas for use across applications in this monorepo.
-
-- [common/iso](../common/iso) - isomorphic utilities that can run across multiple JavaScript runtimes
-- [common/node](../common/node) - Node.js runtime modules, including Express-specific middleware and services
-- [common/schemas](../common/schemas) - shared schemas written in `zod`
-- [common/web](../common/web) - browser-only utilities and web components
-- [common/vue](../common/vue) - Vue-specific shared modules
-- [scripts](../scripts) - repository scripts for database deployment, OpenAPI generation, and related tooling
-
-
-### Workspace Command Reference
-
-- List workspaces: `npm ls -ws`
-- Install by workspace: `npm i @node-saml/node-saml@latest --workspace=common/node`
-- Check outdated packages: `npm outdated -ws`
-- Update packages: `npm update --save`
-
-### Publishing packages to npm
-
-- Run `npm publish` from the CLI first if the package has not been published before.
-- Start at version `0.0.1`.
-- When updating a package:
-  - **IMPORTANT** before publish, bump version in each project using `npm version` command (see npm version --help for explanation)
-  - npm publish --access public --workspace=<workspace>
-  
-**NOTE** Use `--access public` because the package is scoped and published on a free plan.
-
-Or publish using GitHub Actions with [.github/workflows/deploy-npm.yml](../.github/workflows/deploy-npm.yml). Add the npm auth token to GitHub Secrets first.
-
-
----
-
-## Install & Run & Test Sample Backend
-
-### Install the dependencies
+1. Install the dependencies
 
 ```bash
 npm i
 ```
 
-### Create and populate file-based pglite (serve as pg) database
+2. Create and populate file-based pglite (serve as pg) database
 
-If sample database at `scripts/dbdeploy/db-sample/dev.db` folder is not present, see [Quick Create DB](scripts/dbdeploy/READMD.md#quick-create-db) to generate one. Due to size, the DB is not commited to git
+If sample database at `scripts/dbdeploy/db-sample/dev.db` folder is not present, see [Quick Create DB](scripts/dbdeploy/README.md#quick-create-db) to generate one. Due to size, the DB is not commited to git.
 
-Local development, run `npm run serve` command in `scripts/dbdeploy` folder to run the database locally
+For local development, run `npm run serve` command in `scripts/dbdeploy` folder to serve the database.
 
-### Run the sample api application
+3. Run the sample api application
 
 ```bash
 cd apps/sample-api
 npm run start
 ```
 
+4. Visit the following URLs
 
-**Visit the following URLs**
-
-- http://127.0.0.1:3000/api/healthcheck - app is running normally
+- http://127.0.0.1:3000/api/healthcheck - API is running normally
 - http://127.0.0.1:3000 - Website served by Express with functional samples and demos
 - http://127.0.0.1:3000/native/index.html - unbundled Vue website sample
 
@@ -110,19 +75,8 @@ npm run start
   - Imports only `vue` and `vue-router` in `index.html`, with plain JavaScript and no bundler.
   - Uses `export const store = reactive({})` [instead of Vuex](https://pinia.vuejs.org/introduction.html#Why-should-I-use-Pinia).
 
-Unit & Integration Tests:
 
-- To run unit and integration tests for the **/api/categories** endpoint. E2E testing is still in progress.
-- To run the full test set, change `describe.only(...)` to `describe(...)` in the test scripts under `apps/sample-api/tests`.
-
-See package.json
-
-```bash
-# run in development only
-npm run test
-```
-
-## Running Using Docker/Podman
+5. Running Using Docker/Podman
 
 For running with Docker or Podman:
 
@@ -131,18 +85,18 @@ docker build -t express-template --target production --build-arg APP_NAME=sample
 docker run -p 3000:3000 express-template
 ```
 
----
-
 Features include SAML, OIDC, OAuth, FIDO2 login, and push notifications.
 
-## Creating A New Node.js Backend Or Service
+## Create New Backend App Or Service
 
 - Make a copy of the `sample-api` folder in the `apps` folder and rename it using kebab-case.
 - Edit the `.env` and `.env.json` files as needed. For production, inject secrets from environment variables or a secret manager.
-- TODO MCP and WS routes
 
 
-## Install & Run Minimal Vue Application
+---
+
+
+## Run Minimal Vue Application
 
 ```bash
 npm i
@@ -186,7 +140,7 @@ npm run local:mocked # run locally with mock service worker (many other API call
 ```
 ---
 
-## Creating A New Web or Vue Frontend
+## Create New Web or Vue Frontend
 
 - Make a copy of the `sample-vue-full` folder in the `apps` folder and rename it using kebab-case.
 - Edit the `.env` and `.env.development` files as needed.
@@ -201,6 +155,40 @@ npm run local:mocked # run locally with mock service worker (many other API call
     - Paths:
       - `'~/xxx.js'` from the **<project>/src** folder
       - `'/xxx.js'` from the **<project>** folder
+
+---
+
+## Common Workspaces Install
+
+The `common` workspaces contain reusable shared code and schemas for use across applications in this monorepo.
+
+- [common/vanilla/iso](../common/vanilla/iso) - isomorphic utilities that can run across multiple JavaScript runtimes
+- [common/compiled/node](../common/compiled/node) - Node.js runtime modules, including Express-specific middleware and services
+- [common/schemas](../common/schemas) - shared schemas written in `zod`
+- [common/vanilla/web](../common/vanilla/web) - browser-only utilities and web components
+- [common/compiled/vue](../common/compiled/vue) - Vue-specific shared modules
+- [scripts](../scripts) - repository scripts for database deployment, OpenAPI generation, and related tooling
+
+
+### Workspace Command Reference
+
+- List workspaces: `npm ls -ws`
+- Install by workspace: `npm i @node-saml/node-saml@latest --workspace=common/node`
+- Check outdated packages: `npm outdated -ws`
+- Update packages: `npm update --save`
+
+### Publishing packages to npm
+
+- Run `npm publish` from the CLI first if the package has not been published before.
+- Start at version `0.0.1`.
+- When updating a package:
+  - **IMPORTANT** before publish, bump version in each project using `npm version` command (see npm version --help for explanation)
+  - npm publish --access public --workspace=<workspace>
+  
+**NOTE** Use `--access public` because the package is scoped and published on a free plan.
+
+Or publish using GitHub Actions with [.github/workflows/deploy-npm.yml](../.github/workflows/deploy-npm.yml). Add the npm auth token to GitHub Secrets first.
+
 
 ### Sample Deployment
 

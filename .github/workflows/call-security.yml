@@ -1,4 +1,4 @@
-name: Security Scan
+name: Call - Security Scan
 
 on:
   workflow_call:

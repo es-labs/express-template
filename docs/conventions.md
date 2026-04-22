@@ -7,7 +7,8 @@ Read this document before making code changes. Use [.github/CONTRIBUTING.md](../
 ## Required Tooling
 
 - [.editorconfig](../.editorconfig) is the baseline for whitespace and formatting behavior and must be followed.
-- `biome` is the required formatter and linter for this repository.
+- `biome` is the required formatter and linter for this repository
+- Customize own configuration file in your `apps/*` workspace
 
 ## Work Tracking Standard
 
@@ -42,3 +43,7 @@ Read this document before making code changes. Use [.github/CONTRIBUTING.md](../
 - Secrets must not be committed to the repository.
 - Secrets must be stored in environment variables or a secret manager.
 - JSON config files must be used only for non-sensitive structured settings.
+
+## Security
+
+- strip `console.*` from Browser runtime applications in production

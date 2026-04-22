@@ -1,4 +1,4 @@
-name: E2E Tests
+name: Call - E2E Tests
 
 on:
   workflow_call:

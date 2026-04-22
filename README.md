@@ -1,59 +1,60 @@
-## Read Me First - Requires Node.js 24 or Higher
-
-- Contributors: read [.github/CONTRIBUTING.md]() before opening issues or pull requests.
-  - setup hooks [docs/git.md#Hooks-Usage]()
-  - setup release automation [docs/git.md#Release-Automation]()
-  - setup branch protection [docs/git.md#Branch-Protection-Rules]()
-- Developers - **BEFORE** making **ANY** changes. Read the following:
-  - branching instructions [docs/git.md#Branching]()
-  - engineering standards [docs/conventions.md]()
-  - commit message standard []()
-  - merge strategy [docs/git.md#Rebase-Or-Merge]()
-  - triggering release [docs/git.md#Releasable-Commits]()
-  - workflows []()
-- For template design principles, see this [reference](https://github.com/ais-one/cookbook?tab=readme-ov-file#1---important---read-me-first).
-
-## Template Maintenance
-
-Refer to [.github/workflows/update-template.yml]() for description and details on updating template. Userland folders `apps` and `scripts` are untouched.
-
-
 ## Description
 
-This repository is a monorepo template for building full-stack JavaScript applications with Node.js, Express, and Vue.
+This repository is a monorepo template for building full-stack JavaScript applications, micro-services and frontends with Node.js (**version 24 or Higher**).
 
-It combines backend and frontend examples in `apps/` and shared reusable code in `common/` so teams can start from a consistent structure instead of assembling the stack from scratch. It includes workspace-based package management, shared schemas and utilities, sample authentication flows, OpenAPI tooling, Docker support, GitHub Actions workflows, and MCP server examples.
-
-Further Reading
-- [Design Features](docs/NOTES.md#Design-Features)
-- [Sample Applications And Implementations](docs/NOTES.md#Sample-Applications-And-Implementations)
-
-## Documentation Map
-
-Use these documents depending on the part of the repository you are working on:
-
-- [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) - contributor setup, hooks, issue reporting, and pull request guidance
-- [docs/git.md](docs/git.md) - git workflow, release flow, tags, and merge strategy
-- [docs/conventions.md](docs/conventions.md) - coding, tooling, commit, and runtime conventions
-- [docs/NOTES.md](docs/NOTES.md) - internal notes, caveats, and open questions
-
-## General Contents
-
-- `apps`: backend and frontend application workspaces
-- `common`: shared JavaScript used by `apps`
-- `docs`: project documentation
+The folders contents are as follows:
+- `apps`: userland backend and frontend application workspaces
 - `scripts`: deployment and documentation scripts
+- `common`: shared JavaScript used by `apps` / `scripts`
+- `docs`: for documentation
 
+## Quickstart
 
-## Project Guides
+Getting started with
+- Sample API [backend](docs/install.md#Run-Sample-API)
+- Sample Vue [minimal frontend](docs/install.md#Run-Sample-Vue)
+- Sample Vue [full frontend](docs/install.md#Run-Sample-Vue)
 
-Use the following guides depending on what you want to build or extend in this repository:
+Creating your own apps/services
+- API [backend](docs/install.md#Create-New-Backend-App-Or-Service)
+- Vue [frontend](docs/install.md#Create New Web or Vue Frontend)
 
-- Backend services: [docs/install-apps.md](docs/install-apps.md)
-  Start from the sample Express application in `apps/` and use it as the baseline for new Node.js servicesm or Use the sample Vue and Vite applications as scaffolding for new browser-based projects.
-- Shared code and schemas: [docs/install-common.md](docs/install-common.md)
-  Reference the reusable modules in `common/` for Node, browser, Vue, isomorphic utilities, and shared `zod` schemas.
+Publish common/** workspace to [npm](docs/install.md#Publishing-packages-to-npm). **for template maintainers ONLY**
 
+## Read Me First
+
+- Contributors: read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) before opening issues or pull requests.
+- End Users: **BEFORE** making **ANY** changes. Read the following:
+
+- SETUP
+  - [git hooks](docs/git.md#hooks-usage)
+  - [branch protection](docs/git.md#branch-protection-rules)
+  - [release automation](docs/git.md#release-automation)
+  - [secret scanning](https://docs.github.com/en/enterprise-cloud@latest/code-security/concepts/secret-security/about-secret-scanning)
+- Read
+  - [branching instructions](docs/git.md#branching)
+  - [merge strategy](docs/git.md#rebase-or-merge)
+  - [engineering standards](docs/conventions.md)
+  - format, lint, commit message, language, tooling, etc.
+  - [triggering release](docs/git.md#releasable-commits)
+  - [workflows](docs/git.md#ci-action-shape)
+  - [template updating details](.github/workflows/update-template.yml)
+  - [docs/NOTES.md](docs/NOTES.md) - design features, internal notes, caveats.
+  - [Design Features](docs/NOTES.md#Design-Features)
+  - [roadmap](docs/ROADMAP.md)
+
+The `apps` folder is for **userland** content. E.g workspace codes, documents, scripts, schemas, etc.
+
+Other files and folders are managed by template maintainers.
+
+## Sample Applications, Implementations And Usage
+
+- `apps/sample-api`: Express-based backend services
+- `apps/sample-vue-full`: Vue and Vite frontend
+- `common/*`: shared ESM modules for Node, browser, Vue, and isomorphic code
+  - sample implementations for SAML, OIDC, OAuth, OTP, FIDO2, and push notifications, zod, OpenAPI, etc.
+  - TODO telegram, whatsapp, etc.
+- `scripts/dbdeploy` database deployment, documentation, and database helper scripts
 
 ## CI/CD
 
