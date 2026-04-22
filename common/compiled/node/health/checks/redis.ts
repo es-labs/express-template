@@ -1,6 +1,11 @@
-// import { redis } from '../../cache/client.ts';   // your redis client
+interface CheckResult {
+  name: string;
+  status: 'ok' | 'degraded' | 'unhealthy';
+  message: string;
+}
 
-export async function checkRedis() {
+/** Placeholder Redis health check. Replace the body with a real PING call. */
+export async function checkRedis(): Promise<CheckResult> {
   // const pong = await redis.ping();
   // if (pong !== 'PONG') throw new Error(`Unexpected PING response: ${pong}`);
   return {

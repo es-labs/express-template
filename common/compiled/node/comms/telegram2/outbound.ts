@@ -5,11 +5,16 @@ import path from 'node:path';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
 
-const BASE_URL = token => `https://api.telegram.org/bot${token}`;
+const BASE_URL = (token: string) => `https://api.telegram.org/bot${token}`;
 
 // ─── Core Request Helper ──────────────────────────────────────────────────────
 
-async function apiRequest(token, method, params = {}, formData = null) {
+async function apiRequest(
+  token: string,
+  method: string,
+  params: Record<string, unknown> = {},
+  formData: FormData | null = null,
+) {
   const url = `${BASE_URL(token)}/${method}`;
 
   const options = formData
@@ -21,7 +26,7 @@ async function apiRequest(token, method, params = {}, formData = null) {
       };
 
   const res = await fetch(url, options);
-  const data = await res.json();
+  const data = (await res.json()) as { ok: boolean; description: string; error_code: number; result: unknown };
 
   if (!data.ok) {
     throw new TelegramError(data.description, data.error_code, method);
@@ -31,11 +36,9 @@ async function apiRequest(token, method, params = {}, formData = null) {
 }
 
 class TelegramError extends Error {
-  // biome-ignore lint/suspicious/noExplicitAny: error code and method can be any shape
-  code: any;
-  // biome-ignore lint/suspicious/noExplicitAny: error code and method can be any shape
-  method: any;
-  constructor(message, code, method) {
+  code: number;
+  method: string;
+  constructor(message: string, code: number, method: string) {
     super(`[${method}] Telegram API error ${code}: ${message}`);
     this.code = code;
     this.method = method;
@@ -50,7 +53,7 @@ class TelegramError extends Error {
  *   - "http(s)://..." → use URL
  *   - Everything else  → treat as local path, attach as multipart
  */
-function resolveFile(fd, fieldName, input) {
+function resolveFile(fd: FormData, fieldName: string, input: string): string | null {
   if (!input) return null;
   if (input.startsWith('file_id:')) return input.replace('file_id:', '');
   if (input.startsWith('http://') || input.startsWith('https://')) return input;
@@ -72,7 +75,7 @@ function resolveFile(fd, fieldName, input) {
  *   [{ text: "Callback", callback_data: "btn_1" }, { text: "Pay", pay: true }]
  * ])
  */
-export function inlineKeyboard(rows) {
+export function inlineKeyboard(rows: Array<Array<Record<string, unknown>>>): string {
   return JSON.stringify({ inline_keyboard: rows });
 }
 
@@ -83,11 +86,13 @@ export function inlineKeyboard(rows) {
  * replyKeyboard([["Yes", "No"], ["Cancel"]], { resize_keyboard: true })
  */
 export function replyKeyboard(
-  rows,
+  rows: Array<Array<string | Record<string, unknown>>>,
   { resize_keyboard = true, one_time_keyboard = false, is_persistent = false, selective = false } = {},
-) {
+): string {
   return JSON.stringify({
-    keyboard: rows.map(row => row.map(btn => (typeof btn === 'string' ? { text: btn } : btn))),
+    keyboard: rows.map(row =>
+      row.map((btn: string | Record<string, unknown>) => (typeof btn === 'string' ? { text: btn } : btn)),
+    ),
     resize_keyboard,
     one_time_keyboard,
     is_persistent,
@@ -157,8 +162,7 @@ function commonOpts({
   protect_content,
   message_thread_id, // forum thread id
   business_connection_id,
-  // biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
-}: Record<string, any> = {}) {
+}: TelegramMessageOpts = {}) {
   return Object.fromEntries(
     Object.entries({
       parse_mode,
@@ -180,17 +184,16 @@ function commonOpts({
 /**
  * Send a plain or formatted text message.
  *
- * @param {string}  token
- * @param {number|string} chatId
- * @param {string}  text
- * @param {object}  opts
- * @param {string}  [opts.parse_mode]          – "HTML" | "Markdown" | "MarkdownV2"
- * @param {Array}   [opts.entities]            – pre-built MessageEntity array
- * @param {boolean} [opts.disable_web_page_preview]
- * @param {string}  [opts.reply_markup]        – use inlineKeyboard() etc.
+ * @param opts.parse_mode       "HTML" | "Markdown" | "MarkdownV2"
+ * @param opts.entities         pre-built MessageEntity array
+ * @param opts.reply_markup     use inlineKeyboard() etc.
  */
-// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
-export async function sendMessage(token, chatId, text, opts: Record<string, any> = {}) {
+export async function sendMessage(
+  token: string,
+  chatId: number | string,
+  text: string,
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'sendMessage', {
     chat_id: chatId,
     text,
@@ -203,11 +206,10 @@ export async function sendMessage(token, chatId, text, opts: Record<string, any>
 // ─── Photo ────────────────────────────────────────────────────────────────────
 
 /**
- * @param {string} photo – local path, HTTPS URL, or "file_id:<id>"
- * @param {boolean} [opts.has_spoiler]
+ * @param photo  local path, HTTPS URL, or "file_id:<id>"
+ * @param opts.has_spoiler
  */
-// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
-export async function sendPhoto(token, chatId, photo, opts: Record<string, any> = {}) {
+export async function sendPhoto(token: string, chatId: number | string, photo: string, opts: TelegramMessageOpts = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
   if (opts.caption) fd.append('caption', opts.caption);
@@ -227,17 +229,15 @@ export async function sendPhoto(token, chatId, photo, opts: Record<string, any> 
 // ─── Video ────────────────────────────────────────────────────────────────────
 
 /**
- * @param {string}  video – local path, URL, or file_id
- * @param {object}  opts
- * @param {number}  [opts.duration]
- * @param {number}  [opts.width]
- * @param {number}  [opts.height]
- * @param {string}  [opts.thumbnail]  – local path, URL, or file_id for cover image
- * @param {boolean} [opts.supports_streaming]
- * @param {boolean} [opts.has_spoiler]
+ * @param video  local path, URL, or file_id
+ * @param opts.duration
+ * @param opts.width
+ * @param opts.height
+ * @param opts.thumbnail   local path, URL, or file_id for cover image
+ * @param opts.supports_streaming
+ * @param opts.has_spoiler
  */
-// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
-export async function sendVideo(token, chatId, video, opts: Record<string, any> = {}) {
+export async function sendVideo(token: string, chatId: number | string, video: string, opts: TelegramMessageOpts = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
   if (opts.duration) fd.append('duration', String(opts.duration));
@@ -263,15 +263,13 @@ export async function sendVideo(token, chatId, video, opts: Record<string, any> 
 // ─── Audio ────────────────────────────────────────────────────────────────────
 
 /**
- * @param {string}  audio – local path, URL, or file_id
- * @param {object}  opts
- * @param {number}  [opts.duration]
- * @param {string}  [opts.performer]
- * @param {string}  [opts.title]
- * @param {string}  [opts.thumbnail]
+ * @param audio  local path, URL, or file_id
+ * @param opts.duration
+ * @param opts.performer
+ * @param opts.title
+ * @param opts.thumbnail
  */
-// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
-export async function sendAudio(token, chatId, audio, opts: Record<string, any> = {}) {
+export async function sendAudio(token: string, chatId: number | string, audio: string, opts: TelegramMessageOpts = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
   if (opts.duration) fd.append('duration', String(opts.duration));
@@ -295,11 +293,15 @@ export async function sendAudio(token, chatId, audio, opts: Record<string, any> 
 // ─── Document ─────────────────────────────────────────────────────────────────
 
 /**
- * @param {string}  document – local path, URL, or file_id
- * @param {boolean} [opts.disable_content_type_detection]
+ * @param document  local path, URL, or file_id
+ * @param opts.disable_content_type_detection
  */
-// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
-export async function sendDocument(token, chatId, document, opts: Record<string, any> = {}) {
+export async function sendDocument(
+  token: string,
+  chatId: number | string,
+  document: string,
+  opts: TelegramMessageOpts = {},
+) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
   if (opts.caption) fd.append('caption', opts.caption);
@@ -321,8 +323,7 @@ export async function sendDocument(token, chatId, document, opts: Record<string,
 // ─── Voice ────────────────────────────────────────────────────────────────────
 
 /** OGG/OPUS encoded voice message. */
-// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
-export async function sendVoice(token, chatId, voice, opts: Record<string, any> = {}) {
+export async function sendVoice(token: string, chatId: number | string, voice: string, opts: TelegramMessageOpts = {}) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
   if (opts.duration) fd.append('duration', String(opts.duration));
@@ -338,8 +339,12 @@ export async function sendVoice(token, chatId, voice, opts: Record<string, any> 
 // ─── Video Note ───────────────────────────────────────────────────────────────
 
 /** Round video (1:1 aspect ratio). */
-// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
-export async function sendVideoNote(token, chatId, videoNote, opts: Record<string, any> = {}) {
+export async function sendVideoNote(
+  token: string,
+  chatId: number | string,
+  videoNote: string,
+  opts: TelegramMessageOpts = {},
+) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
   if (opts.duration) fd.append('duration', String(opts.duration));
@@ -354,11 +359,15 @@ export async function sendVideoNote(token, chatId, videoNote, opts: Record<strin
 // ─── Sticker ──────────────────────────────────────────────────────────────────
 
 /**
- * @param {string}  sticker – local .webp/.tgs/.webm, URL, or file_id
- * @param {string}  [opts.emoji]  – emoji associated with the sticker
+ * @param sticker  local .webp/.tgs/.webm, URL, or file_id
+ * @param opts.emoji  emoji associated with the sticker
  */
-// biome-ignore lint/suspicious/noExplicitAny: flexible options bag passed from callers
-export async function sendSticker(token, chatId, sticker, opts: Record<string, any> = {}) {
+export async function sendSticker(
+  token: string,
+  chatId: number | string,
+  sticker: string,
+  opts: TelegramMessageOpts = {},
+) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
   if (opts.emoji) fd.append('emoji', opts.emoji);
@@ -372,7 +381,12 @@ export async function sendSticker(token, chatId, sticker, opts: Record<string, a
 
 // ─── Animation (GIF) ──────────────────────────────────────────────────────────
 
-export async function sendAnimation(token, chatId, animation, opts: TelegramMessageOpts = {}) {
+export async function sendAnimation(
+  token: string,
+  chatId: number | string,
+  animation: string,
+  opts: TelegramMessageOpts = {},
+) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
   if (opts.duration) fd.append('duration', String(opts.duration));
@@ -389,11 +403,19 @@ export async function sendAnimation(token, chatId, animation, opts: TelegramMess
 
 // ─── Media Group (Album) ──────────────────────────────────────────────────────
 
+interface MediaGroupItem {
+  type: string;
+  file: string;
+  caption?: string;
+  parse_mode?: string;
+  has_spoiler?: boolean;
+}
+
 /**
  * Send 2–10 photos/videos as an album.
  *
- * @param {Array} media  Array of { type, file, caption?, parse_mode? }
- *                       type: "photo" | "video" | "audio" | "document"
+ * @param media  Array of { type, file, caption?, parse_mode? }
+ *               type: "photo" | "video" | "audio" | "document"
  *
  * @example
  * sendMediaGroup(token, chatId, [
@@ -402,7 +424,12 @@ export async function sendAnimation(token, chatId, animation, opts: TelegramMess
  *   { type: "video", file: "./clip.mp4" },
  * ]);
  */
-export async function sendMediaGroup(token, chatId, media, opts: TelegramMessageOpts = {}) {
+export async function sendMediaGroup(
+  token: string,
+  chatId: number | string,
+  media: MediaGroupItem[],
+  opts: TelegramMessageOpts = {},
+) {
   const fd = new FormData();
   fd.append('chat_id', String(chatId));
   if (opts.reply_to_message_id) fd.append('reply_to_message_id', String(opts.reply_to_message_id));
@@ -428,13 +455,18 @@ export async function sendMediaGroup(token, chatId, media, opts: TelegramMessage
 // ─── Location ─────────────────────────────────────────────────────────────────
 
 /**
- * @param {object}  opts
- * @param {number}  [opts.horizontal_accuracy]   – accuracy radius in metres (0–1500)
- * @param {number}  [opts.live_period]           – seconds to broadcast live (60–86400)
- * @param {number}  [opts.heading]               – 1–360 degrees
- * @param {number}  [opts.proximity_alert_radius]
+ * @param opts.horizontal_accuracy   accuracy radius in metres (0–1500)
+ * @param opts.live_period           seconds to broadcast live (60–86400)
+ * @param opts.heading               1–360 degrees
+ * @param opts.proximity_alert_radius
  */
-export async function sendLocation(token, chatId, latitude, longitude, opts: TelegramMessageOpts = {}) {
+export async function sendLocation(
+  token: string,
+  chatId: number | string,
+  latitude: number,
+  longitude: number,
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'sendLocation', {
     chat_id: chatId,
     latitude,
@@ -448,7 +480,14 @@ export async function sendLocation(token, chatId, latitude, longitude, opts: Tel
 }
 
 /** Edit a live location message while it's still broadcasting. */
-export async function editLiveLocation(token, chatId, messageId, latitude, longitude, opts: TelegramMessageOpts = {}) {
+export async function editLiveLocation(
+  token: string,
+  chatId: number | string,
+  messageId: number,
+  latitude: number,
+  longitude: number,
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'editMessageLiveLocation', {
     chat_id: chatId,
     message_id: messageId,
@@ -463,40 +502,48 @@ export async function editLiveLocation(token, chatId, messageId, latitude, longi
 
 // ─── Venue ────────────────────────────────────────────────────────────────────
 
+interface VenueData {
+  latitude: number;
+  longitude: number;
+  title: string;
+  address: string;
+  foursquare_id?: string;
+  foursquare_type?: string;
+  google_place_id?: string;
+  google_place_type?: string;
+}
+
 export async function sendVenue(
-  token,
-  chatId,
-  { latitude, longitude, title, address, foursquare_id, foursquare_type, google_place_id, google_place_type },
+  token: string,
+  chatId: number | string,
+  venue: VenueData,
   opts: TelegramMessageOpts = {},
 ) {
   return apiRequest(token, 'sendVenue', {
     chat_id: chatId,
-    latitude,
-    longitude,
-    title,
-    address,
-    foursquare_id,
-    foursquare_type,
-    google_place_id,
-    google_place_type,
+    ...venue,
     ...commonOpts(opts),
   });
 }
 
 // ─── Contact ──────────────────────────────────────────────────────────────────
 
+interface ContactData {
+  phone_number: string;
+  first_name: string;
+  last_name?: string;
+  vcard?: string;
+}
+
 export async function sendContact(
-  token,
-  chatId,
-  { phone_number, first_name, last_name, vcard },
-  opts: Record<string, any> = {},
+  token: string,
+  chatId: number | string,
+  contact: ContactData,
+  opts: TelegramMessageOpts = {},
 ) {
   return apiRequest(token, 'sendContact', {
     chat_id: chatId,
-    phone_number,
-    first_name,
-    last_name,
-    vcard,
+    ...contact,
     ...commonOpts(opts),
   });
 }
@@ -504,19 +551,20 @@ export async function sendContact(
 // ─── Poll ─────────────────────────────────────────────────────────────────────
 
 /**
- * @param {string}   question
- * @param {string[]} options     – 2–10 answer choices
- * @param {object}   opts
- * @param {string}   [opts.type]                – "regular" | "quiz"
- * @param {boolean}  [opts.is_anonymous]
- * @param {boolean}  [opts.allows_multiple_answers]
- * @param {number}   [opts.correct_option_id]   – required for quiz type
- * @param {string}   [opts.explanation]
- * @param {number}   [opts.open_period]         – seconds (5–600)
- * @param {number}   [opts.close_date]          – unix timestamp
- * @param {boolean}  [opts.is_closed]
+ * @param question
+ * @param options       2–10 answer choices
+ * @param opts.type                "regular" | "quiz"
+ * @param opts.correct_option_id   required for quiz type
+ * @param opts.open_period         seconds (5–600)
+ * @param opts.close_date          unix timestamp
  */
-export async function sendPoll(token, chatId, question, options, opts: TelegramMessageOpts = {}) {
+export async function sendPoll(
+  token: string,
+  chatId: number | string,
+  question: string,
+  options: string[],
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'sendPoll', {
     chat_id: chatId,
     question,
@@ -536,8 +584,8 @@ export async function sendPoll(token, chatId, question, options, opts: TelegramM
 
 // ─── Dice ─────────────────────────────────────────────────────────────────────
 
-/** @param {string} [emoji] – "🎲" | "🎯" | "🏀" | "⚽" | "🎳" | "🎰" (default 🎲) */
-export async function sendDice(token, chatId, emoji = '🎲', opts: TelegramMessageOpts = {}) {
+/** @param emoji – "🎲" | "🎯" | "🏀" | "⚽" | "🎳" | "🎰" (default 🎲) */
+export async function sendDice(token: string, chatId: number | string, emoji = '🎲', opts: TelegramMessageOpts = {}) {
   return apiRequest(token, 'sendDice', {
     chat_id: chatId,
     emoji,
@@ -548,13 +596,18 @@ export async function sendDice(token, chatId, emoji = '🎲', opts: TelegramMess
 // ─── Chat Action (typing indicator) ──────────────────────────────────────────
 
 /**
- * @param {string} action – "typing" | "upload_photo" | "record_video" |
- *                          "upload_video" | "record_voice" | "upload_voice" |
- *                          "upload_document" | "choose_sticker" |
- *                          "find_location" | "record_video_note" |
- *                          "upload_video_note"
+ * @param action – "typing" | "upload_photo" | "record_video" |
+ *                 "upload_video" | "record_voice" | "upload_voice" |
+ *                 "upload_document" | "choose_sticker" |
+ *                 "find_location" | "record_video_note" |
+ *                 "upload_video_note"
  */
-export async function sendChatAction(token, chatId, action, opts: TelegramMessageOpts = {}) {
+export async function sendChatAction(
+  token: string,
+  chatId: number | string,
+  action: string,
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'sendChatAction', {
     chat_id: chatId,
     action,
@@ -564,7 +617,13 @@ export async function sendChatAction(token, chatId, action, opts: TelegramMessag
 
 // ─── Forward & Copy ───────────────────────────────────────────────────────────
 
-export async function forwardMessage(token, chatId, fromChatId, messageId, opts: TelegramMessageOpts = {}) {
+export async function forwardMessage(
+  token: string,
+  chatId: number | string,
+  fromChatId: number | string,
+  messageId: number,
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'forwardMessage', {
     chat_id: chatId,
     from_chat_id: fromChatId,
@@ -576,7 +635,13 @@ export async function forwardMessage(token, chatId, fromChatId, messageId, opts:
 }
 
 /** Copy without the forward header. */
-export async function copyMessage(token, chatId, fromChatId, messageId, opts: TelegramMessageOpts = {}) {
+export async function copyMessage(
+  token: string,
+  chatId: number | string,
+  fromChatId: number | string,
+  messageId: number,
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'copyMessage', {
     chat_id: chatId,
     from_chat_id: fromChatId,
@@ -592,7 +657,13 @@ export async function copyMessage(token, chatId, fromChatId, messageId, opts: Te
 
 // ─── Edit & Delete ────────────────────────────────────────────────────────────
 
-export async function editMessageText(token, chatId, messageId, text, opts: TelegramMessageOpts = {}) {
+export async function editMessageText(
+  token: string,
+  chatId: number | string,
+  messageId: number,
+  text: string,
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'editMessageText', {
     chat_id: chatId,
     message_id: messageId,
@@ -604,7 +675,13 @@ export async function editMessageText(token, chatId, messageId, text, opts: Tele
   });
 }
 
-export async function editMessageCaption(token, chatId, messageId, caption, opts: TelegramMessageOpts = {}) {
+export async function editMessageCaption(
+  token: string,
+  chatId: number | string,
+  messageId: number,
+  caption: string,
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'editMessageCaption', {
     chat_id: chatId,
     message_id: messageId,
@@ -614,7 +691,12 @@ export async function editMessageCaption(token, chatId, messageId, caption, opts
   });
 }
 
-export async function editMessageReplyMarkup(token, chatId, messageId, replyMarkup) {
+export async function editMessageReplyMarkup(
+  token: string,
+  chatId: number | string,
+  messageId: number,
+  replyMarkup: string,
+) {
   return apiRequest(token, 'editMessageReplyMarkup', {
     chat_id: chatId,
     message_id: messageId,
@@ -622,11 +704,16 @@ export async function editMessageReplyMarkup(token, chatId, messageId, replyMark
   });
 }
 
-export async function deleteMessage(token, chatId, messageId) {
+export async function deleteMessage(token: string, chatId: number | string, messageId: number) {
   return apiRequest(token, 'deleteMessage', { chat_id: chatId, message_id: messageId });
 }
 
-export async function pinMessage(token, chatId, messageId, opts: TelegramMessageOpts = {}) {
+export async function pinMessage(
+  token: string,
+  chatId: number | string,
+  messageId: number,
+  opts: TelegramMessageOpts = {},
+) {
   return apiRequest(token, 'pinChatMessage', {
     chat_id: chatId,
     message_id: messageId,
@@ -634,6 +721,6 @@ export async function pinMessage(token, chatId, messageId, opts: TelegramMessage
   });
 }
 
-export async function unpinMessage(token, chatId, messageId) {
+export async function unpinMessage(token: string, chatId: number | string, messageId: number) {
   return apiRequest(token, 'unpinChatMessage', { chat_id: chatId, message_id: messageId });
 }

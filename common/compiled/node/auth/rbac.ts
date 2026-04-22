@@ -25,26 +25,37 @@
  *   await rbac.revokePermission(roleId, permissionId);
  */
 
+import type { NextFunction, Request, Response } from 'express';
+
 let _userServiceName: string;
 // biome-ignore lint/suspicious/noExplicitAny: lookup returns the underlying knex instance
 let _lookup: ((name: string) => any) | null = null;
 
 const knex = () => _lookup?.(_userServiceName);
 
+interface TenantEntry {
+  tenant_id: number;
+  tenant_plan: string | null;
+  roles: Set<string>;
+}
+
+interface TenantRoleEntry {
+  roles: Set<string>;
+  permissions: Set<string>;
+}
+
 /**
  * Initialise the RBAC service.
  *   userServiceName — service name from SERVICES_CONFIG (e.g. 'knex1')
  *   lookup          — services.get — resolves a name to the underlying store instance
  */
+// biome-ignore lint/suspicious/noExplicitAny: lookup returns different service instance types (knex, redis, keyv)
 const setup = (userServiceName: string, lookup: (name: string) => any) => {
   _userServiceName = userServiceName;
   _lookup = lookup;
 };
 
-/**
- * Returns true when the RBAC service has been initialised.
- * @returns {boolean}
- */
+/** Returns true when the RBAC service has been initialised. */
 const isConfigured = () => _lookup !== null;
 
 /**
@@ -53,11 +64,9 @@ const isConfigured = () => _lookup !== null;
  * Roles are used as the primary source in the JWT roles fallback chain
  * (RBAC → FGA → legacy DB column).
  *
- * @param {string|number} userId
- * @param {string|number} [defaultTenantId] Preferred tenant; falls back to first found.
- * @returns {Promise<{ tenant_id: number, tenant_plan: string | null, roles: string[] } | null>}
+ * Preferred tenant falls back to first found when defaultTenantId has no match.
  */
-const getActiveTenant = async (userId, defaultTenantId) => {
+const getActiveTenant = async (userId: string | number, defaultTenantId?: string | number) => {
   if (!_lookup) return null;
   try {
     const rows = await knex()('user_tenant_roles as utr')
@@ -69,8 +78,7 @@ const getActiveTenant = async (userId, defaultTenantId) => {
 
     if (rows.length === 0) return null;
 
-    // biome-ignore lint/suspicious/noExplicitAny: row shape from knex is untyped
-    const map: Record<string, any> = {};
+    const map: Record<string, TenantEntry> = {};
     for (const row of rows) {
       const tid = row.tenant_id;
       if (!map[tid]) map[tid] = { tenant_id: tid, tenant_plan: row.tenant_plan ?? null, roles: new Set() };
@@ -92,15 +100,8 @@ const getActiveTenant = async (userId, defaultTenantId) => {
  * Use at request time (e.g. permission middleware) with tenant_id from req.user.
  *
  * Returns null when RBAC is not configured or the user has no active memberships.
- *
- * @param {string|number} userId
- * @param {string|number} [defaultTenantId]
- * @returns {Promise<{
- *   active_tenant: number,
- *   tenants: Record<number, { roles: string[], permissions: string[] }>
- * } | null>}
  */
-const getUserTenantsData = async (userId, defaultTenantId) => {
+const getUserTenantsData = async (userId: string | number, defaultTenantId?: string | number) => {
   if (!_lookup) return null;
   try {
     const rows = await knex()('user_tenant_roles as utr')
@@ -115,8 +116,7 @@ const getUserTenantsData = async (userId, defaultTenantId) => {
     if (rows.length === 0) return null;
 
     // Group rows into { tenantId: { roles: Set, permissions: Set } }
-    // biome-ignore lint/suspicious/noExplicitAny: row shape from knex is untyped
-    const map: Record<string, any> = {};
+    const map: Record<string, TenantRoleEntry> = {};
     for (const row of rows) {
       const tid = row.tenant_id;
       if (!map[tid]) map[tid] = { roles: new Set(), permissions: new Set() };
@@ -125,7 +125,7 @@ const getUserTenantsData = async (userId, defaultTenantId) => {
     }
 
     // Convert Sets to sorted arrays for deterministic JWT payloads
-    const tenants = {};
+    const tenants: Record<number, { roles: string[]; permissions: string[] }> = {};
     for (const [tid, data] of Object.entries(map)) {
       tenants[Number(tid)] = {
         roles: [...data.roles].sort(),
@@ -143,51 +143,29 @@ const getUserTenantsData = async (userId, defaultTenantId) => {
   }
 };
 
-/**
- * Assign a role to a user within a tenant (idempotent).
- *
- * @param {number} userId
- * @param {number} tenantId
- * @param {number} roleId
- */
-const assignRole = async (userId, tenantId, roleId) => {
+/** Assign a role to a user within a tenant (idempotent). */
+const assignRole = async (userId: number, tenantId: number, roleId: number) => {
   await knex()('user_tenant_roles')
     .insert({ user_id: userId, tenant_id: tenantId, role_id: roleId })
     .onConflict(['user_id', 'tenant_id', 'role_id'])
     .ignore();
 };
 
-/**
- * Revoke a role from a user within a tenant.
- *
- * @param {number} userId
- * @param {number} tenantId
- * @param {number} roleId
- */
-const revokeRole = async (userId, tenantId, roleId) => {
+/** Revoke a role from a user within a tenant. */
+const revokeRole = async (userId: number, tenantId: number, roleId: number) => {
   await knex()('user_tenant_roles').where({ user_id: userId, tenant_id: tenantId, role_id: roleId }).delete();
 };
 
-/**
- * Grant a permission to a role (idempotent).
- *
- * @param {number} roleId
- * @param {number} permissionId
- */
-const grantPermission = async (roleId, permissionId) => {
+/** Grant a permission to a role (idempotent). */
+const grantPermission = async (roleId: number, permissionId: number) => {
   await knex()('role_permissions')
     .insert({ role_id: roleId, permission_id: permissionId })
     .onConflict(['role_id', 'permission_id'])
     .ignore();
 };
 
-/**
- * Revoke a permission from a role.
- *
- * @param {number} roleId
- * @param {number} permissionId
- */
-const revokePermission = async (roleId, permissionId) => {
+/** Revoke a permission from a role. */
+const revokePermission = async (roleId: number, permissionId: number) => {
   await knex()('role_permissions').where({ role_id: roleId, permission_id: permissionId }).delete();
 };
 
@@ -195,13 +173,11 @@ const revokePermission = async (roleId, permissionId) => {
  * Route middleware — requires the user to hold at least one of the given roles
  * from the flat JWT `roles` array. Works regardless of which source populated it
  * (FGA, RBAC, or the legacy DB column). Use after authUser.
- *
- * @param {...string} roles
  */
 const requireRole =
-  (...roles) =>
-  (req, res, next) => {
-    if (req.user?.roles?.some(r => roles.includes(r))) return next();
+  (...roles: string[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.user?.roles?.some((r: string) => roles.includes(r))) return next();
     return res.sendStatus(403);
   };
 

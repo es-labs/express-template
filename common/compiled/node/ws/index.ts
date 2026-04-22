@@ -49,31 +49,35 @@ export default class Wss {
     }
   }
 
-  // Static getInstance — consistency for another service (Knex/Redis/Keyv)
+  /** Returns the singleton Wss instance, or null if not yet initialised. */
   static getInstance(): Wss | null {
     return Wss._instance;
   }
 
-  // Instance get() — used by services/index.ts
+  /** Returns the singleton Wss instance (used by services/index.ts via `services.get()`). */
   get(): Wss | null {
     return Wss._instance;
   }
 
+  /** Override the default broadcast-echo message handler with a custom implementation. */
   setOnClientMessage(
     onClientMessageFn: (data: RawData, isBinary: boolean, ws: AliveWebSocket, wss: WebSocketServer) => Promise<void>,
-  ) {
+  ): void {
     this._onClientMessage = onClientMessageFn;
   }
 
-  setOnClientConnect(onClientConnectFn: (ws: AliveWebSocket) => void) {
+  /** Register a callback invoked when a new client connects. */
+  setOnClientConnect(onClientConnectFn: (ws: AliveWebSocket) => void): void {
     this._onClientConnect = onClientConnectFn;
   }
 
-  setOnClientClose(onClientCloseFn: (ws: AliveWebSocket) => void) {
+  /** Register a callback invoked when a client disconnects. */
+  setOnClientClose(onClientCloseFn: (ws: AliveWebSocket) => void): void {
     this._onClientClose = onClientCloseFn;
   }
 
-  send(data: string | Buffer) {
+  /** Broadcast a message to all currently connected clients. */
+  send(data: string | Buffer): void {
     this._wss?.clients.forEach((client: WebSocket) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(data);
@@ -81,7 +85,8 @@ export default class Wss {
     });
   }
 
-  open(server: HttpsServer | null = null, _app = null) {
+  /** Start the WebSocket server. Attaches to an existing HTTP/HTTPS server when provided. */
+  open(server: HttpsServer | null = null, _app: unknown = null): this {
     const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE } = process.env;
     // biome-ignore lint/suspicious/noImplicitAnyLet: assigned in catch block below
     let err;
@@ -138,7 +143,8 @@ export default class Wss {
     return this;
   }
 
-  close() {
+  /** Gracefully shut down the WebSocket server: broadcasts shutdown, terminates all clients, resets singleton. */
+  close(): void {
     try {
       // Clear interval before close to avoid accessing _wss which is already null
       if (this._keepAliveInterval) {

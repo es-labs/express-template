@@ -1,10 +1,5 @@
 // Aliyun OSS interface - https://github.com/ali-sdk/ali-oss
 // suitable for files that are not large... limit to 10Mb file size
-//
-// res.status = 204 no content but still success
-// res.status = 200
-// res.statusMessage = 200
-// TDB signatureUrlV4 & usage
 
 import crypto from 'node:crypto';
 import OSS from 'ali-oss';
@@ -21,171 +16,152 @@ const store =
       })
     : null;
 
+interface OssResult {
+  status: number;
+  statusMessage?: string;
+}
+
+interface CallbackConfig {
+  callback_url?: string;
+  body?: Record<string, unknown>;
+}
+
 /**
- * get count of objects in a bucket.
- * @param {{ bucketName: string }}
- * @returns {{ status: Number, count: Number }}
+ * Get the total object count of a bucket.
+ *
+ * @param bucketName - Target bucket name. Defaults to the configured OSS_BUCKET.
  */
-const countBucketObjects = async (bucketName = null) => {
+const countBucketObjects = async (bucketName: string | null = null): Promise<{ status: number; count: number }> => {
   try {
-    const result = await store.getBucketStat(bucketName);
-    return { status: 200, count: result?.stat?.ObjectCount };
+    const result = await store?.getBucketStat(bucketName ?? undefined);
+    return { status: 200, count: result?.stat?.ObjectCount ?? 0 };
   } catch (e) {
-    // status 404, code: NoSuchBucket
-    return { status: e.status, count: 0 };
+    return { status: (e as { status: number }).status ?? 500, count: 0 };
   }
 };
 
 /**
- * A point on a two dimensional plane.
- * @typedef {Object} ListV2Object
- * @property {string} name - e.g. arco/a5.wav
- * @property {string} url - e.g. http://my-bucket.oss-ap-southeast-1.aliyuncs.com/test/a5.wav
- * @property {string} lastModified - e.g. 2024-09-03T02:34:24.000Z
- * @property {string} etag - e.g. "3A627F876FD033F4B5CB81F063F9F883"
- * @property {string} type - e.g. Normal
- * @property {Number} size - e.g. 948328
- * @property {string} storageClass - e.g. Standard
- * @property {string} owner - e.g. null
+ * List objects in the configured bucket.
+ *
+ * @param prefix - Key prefix filter.
+ * @param maxKeys - Maximum number of keys to return.
  */
-
-/**
- * get count of objects in a bucket.
- * @param {{ prefix: string, maxKeys: Number }}
- * @returns {{ status: Number, statusMessage: string, [objects]: ListV2Object[] }}
- */
-const listObjects = async ({ prefix = '', maxKeys = 10 } = {}) => {
-  logger.info(prefix, maxKeys);
+const listObjects = async ({
+  prefix = '',
+  maxKeys = 10,
+}: {
+  prefix?: string;
+  maxKeys?: number;
+} = {}): Promise<OssResult & { objects?: unknown[] }> => {
   try {
-    const result = await store.listV2({
-      prefix,
-      'max-keys': maxKeys,
-    });
-    logger.info(result.res);
-    const { status, statusMessage } = result.res;
-    return {
-      status,
-      statusMessage,
-      objects: result.objects,
-    };
+    const result = await store?.listV2({ prefix, 'max-keys': maxKeys });
+    const { status, statusMessage } = result?.res ?? {};
+    return { status: status ?? 200, statusMessage, objects: result?.objects };
   } catch (e) {
-    logger.info('ali - listObjects', e);
-    return { status: 500, statusMessage: e.toString() };
+    return { status: 500, statusMessage: String(e) };
   }
 };
 
 /**
- * put object in a bucket.
- * @param {string} key - the object key - e.g. test/hello.txt
- * @param {string|Buffer|ReadableStream} payload - file data
- * @returns {{ status: Number, statusMessage: string }}
+ * Upload an object to the configured bucket.
+ *
+ * @param key - Object key, e.g. `'folder/file.txt'`.
+ * @param payload - File data as string, Buffer, or ReadableStream.
  */
-const putObject = async (key, payload) => {
-  // if (!store) return null
+const putObject = async (key: string, payload: string | Buffer | NodeJS.ReadableStream): Promise<OssResult> => {
   try {
-    const result = await store.put(key, payload); //
-    logger.info(result);
-    const { status, statusMessage } = result.res;
-    return { status, statusMessage };
+    const result = await store?.put(key, payload);
+    const { status, statusMessage } = result?.res ?? {};
+    return { status: status ?? 200, statusMessage };
   } catch (e) {
-    logger.info('ali - putObject', e);
-    return { status: 500, statusMessage: e.toString() };
+    return { status: 500, statusMessage: String(e) };
   }
 };
 
 /**
- * get object.
- * @param {string} key - the object key - e.g. test/hello.txt
- * @param {string|Buffer|ReadableStream} payload - file data
- * @returns {{ status: Number, statusMessage: string, [buffer]: Buffer }}
+ * Download an object from the configured bucket.
+ *
+ * @param key - Object key, e.g. `'folder/file.txt'`.
  */
-const getObject = async key => {
-  // if (!store) return null
+const getObject = async (key: string): Promise<OssResult & { buffer?: Buffer }> => {
   try {
-    const result = await store.get(key);
-    logger.info(typeof result.content, result.content.toString('utf-8')); // content is Buffer object
-    logger.info(Buffer.isBuffer(result.content));
-    logger.info(result);
-    const { status, statusMessage } = result?.res || {};
-    return {
-      status,
-      statusMessage,
-      buffer: result?.content,
-    };
+    const result = await store?.get(key);
+    const { status, statusMessage } = result?.res ?? {};
+    return { status: status ?? 200, statusMessage, buffer: result?.content };
   } catch (e) {
-    logger.info('ali - getObject', e);
-    return { status: 500, statusMessage: e.toString() };
+    return { status: 500, statusMessage: String(e) };
   }
 };
 
 /**
- * get object.
- * @param {string[]} keys - the object keys - e.g. ['test/hello.txt','abc/d123.txt']
- * @returns {{ status: Number, statusMessage: string, [deleted]: { Key: string }[] }}
+ * Delete multiple objects from the configured bucket.
+ *
+ * @param keys - Array of object keys to delete.
  */
-const deleteObjects = async keys => {
-  // if (!store) return null
+const deleteObjects = async (keys: string[]): Promise<OssResult & { deleted?: unknown[] }> => {
   try {
-    const result = await store.deleteMulti(keys, {});
-    logger.info(result);
-    const { status, statusMessage } = result?.res || {};
-    return {
-      status,
-      statusMessage,
-      deleted: result.deleted,
-    };
+    const result = await store?.deleteMulti(keys, {});
+    const { status, statusMessage } = result?.res ?? {};
+    return { status: status ?? 200, statusMessage, deleted: result?.deleted };
   } catch (e) {
-    logger.info('ali - deleteObjects', e);
-    return { status: 500, statusMessage: e.toString() };
+    return { status: 500, statusMessage: String(e) };
   }
 };
 
-// (method, expires[, request, objectName, additionalHeaders])
 /**
- * get signed URL.
- * @param {string} method - GET or PUT
- * @param {number} expires - expiration in seconds
- * @param {string} key - the object key - e.g. test/hello.txt
+ * Generate a pre-signed URL for direct client access.
+ *
+ * @param method - HTTP method: `'GET'` or `'PUT'`.
+ * @param expires - Expiry in seconds.
+ * @param key - Object key.
+ * @param headers - Optional request headers.
+ * @param additional - Optional additional signed headers.
  */
-const getSignedUrl = async (method, expires, key, headers = null, additional = null) => {
-  const signedUrl = await store.signatureUrlV4(method, expires, headers, key, additional);
-  logger.info(signedUrl);
-  return signedUrl;
+const getSignedUrl = async (
+  method: string,
+  expires: number,
+  key: string,
+  headers: Record<string, unknown> | null = null,
+  additional: string[] | null = null,
+): Promise<string> => {
+  const signedUrl = await store?.signatureUrlV4(method, expires, headers ?? undefined, key, additional ?? undefined);
+  return signedUrl ?? '';
 };
 
 /**
- * get a signed URL to write a file to OSS.
- * @param {string} directory - the directory in OSS.
- * @param {string} filename - the filename
- * @param {string} contentType - the content type of the file
- * @param {string} [action='write'] - 'write' or 'read'
- * @param {number} [expiration=7200] - the expiration time of the signed URL
- * @param {object} [callbackConfig] - the callback config for write action, example: { callback_url: 'https://example.com', body: { foo: 'bar' } }
- * @returns {{ url: string, error?: string }}
+ * Generate a pre-signed upload URL for a client to PUT a file directly to OSS.
+ *
+ * @param directory - Target directory prefix in the bucket.
+ * @param filename - Original filename (used to derive the stored name and extension).
+ * @param contentType - MIME type of the file.
+ * @param action - `'write'` (default) or `'read'`.
+ * @param expiration - URL expiry in seconds. Defaults to 7200.
+ * @param callbackConfig - Optional OSS callback config for write actions.
  */
-const getUploadURL = async (directory, filename, contentType, action = 'write', expiration = 7200, callbackConfig) => {
-  if (!action || !filename) {
-    return { error: 'filename and action required' };
-  }
+const getUploadURL = async (
+  directory: string,
+  filename: string,
+  contentType: string,
+  action = 'write',
+  expiration = 7200,
+  callbackConfig?: CallbackConfig,
+): Promise<{ url?: string; error?: string }> => {
+  if (!action || !filename) return { error: 'filename and action required' };
 
   try {
     // biome-ignore lint/suspicious/noImplicitAnyLet: assigned conditionally below
     let url;
 
-    // write / new file action
     if (action === 'write') {
       const arr = filename.split('.');
-
       arr[0] = crypto
         .createHash('sha256')
         .update(arr[0] + Date.now())
         .digest('hex');
-
       const newFilename = arr.join('.');
-
       const fullPath = directory ? `${directory}/${newFilename}` : newFilename;
 
-      url = await store.signatureUrl(fullPath, {
+      url = await store?.signatureUrl(fullPath, {
         expires: expiration,
         method: 'PUT',
         'Content-Type': contentType,
@@ -196,80 +172,13 @@ const getUploadURL = async (directory, filename, contentType, action = 'write', 
         },
       });
     } else {
-      url = await store.signatureUrl(filename);
+      url = await store?.signatureUrl(filename);
     }
 
     return { url };
   } catch (e) {
-    return { error: e.toString() };
+    return { error: String(e) };
   }
 };
 
-const test = async () => {
-  // [bucket count]
-  // const bucketObjCount = await countBucketObjects('no-such-bucket') // non-existing bucket, also test with existing bucket
-  // logger.info('bucketObjCount', bucketObjCount); // -1 if error ?
-
-  // [put] - if put same object name will replace...
-  // const testFile1 = new File(['Hello, world 1!'], 'hello.txt', { type: 'text/plain' })
-  // const testData1 = await testFile1.arrayBuffer()
-  // const putRes1 = await putObject('hello1.txt', Buffer.from(testData1))
-  // logger.info('putRes1', putRes1);
-
-  // const testFile2 = new File(['Hello, world 2!'], 'hello.txt', { type: 'text/plain' })
-  // const testData2 = await testFile2.arrayBuffer()
-  // const putRes2 = await putObject('hello2.txt', Buffer.from(testData2))
-  // logger.info('putRes2', putRes2);
-
-  // [list objects]
-  // const listRes = await listObjects({ prefix: 'hello' })
-  // logger.info('listRes.objects', listRes?.objects?.length, listRes?.objects?.map(item => item.name));
-
-  // [get object]
-  // const data1 = await getObject('hello1.txt')
-  // logger.info('data1', data1?.buffer?.toString());
-  // const data2 = await getObject('hello2.txt')
-  // logger.info('data2', data2?.buffer?.toString());
-
-  // [delete objects]
-  // const deleteRes = await deleteObjects(['ahello1.txt', 'ahello2.txt', 'ahello3.txt'])
-  // logger.info(deleteRes);
-
-  const url = await getSignedUrl('GET', 60, 'hello1.txt');
-  /*
-  // -------------------------------------------------
-  //  PutObject
-  const putObejctUrl = await store.signatureUrlV4('PUT', 60, undefined, 'your obejct name');
-  logger.info(putObejctUrl);
-  // --------------------------------------------------
-  const putObejctUrl = await store.signatureUrlV4(
-    'PUT',
-    60,
-    {
-      headers: {
-        'Content-Type': 'text/plain',
-        'Content-MD5': 'xxx',
-        'Content-Length': 1
-      }
-    },
-    'your obejct name',
-    ['Content-Length']
-  );
-  logger.info(putObejctUrl);
-  */
-};
-
-// test()
-
-// async function listBucketInventory() {
-//   const bucket = 'Your Bucket Name'
-//   let nextContinuationToken
-//   // list all inventory of the bucket
-//   do {
-//     const result = await store.listBucketInventory(bucket, nextContinuationToken)
-//     logger.info(result.inventoryList)
-//     nextContinuationToken = result.nextContinuationToken
-//   } while (nextContinuationToken)
-// }
-// listBucketInventory()
 export { countBucketObjects, deleteObjects, getObject, getSignedUrl, getUploadURL, listObjects, putObject };

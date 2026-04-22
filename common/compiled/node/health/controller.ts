@@ -1,24 +1,29 @@
-// src/health/health.controller.js
-// import { checkDatabase } from './checks/database.check.ts';
-// import { checkRedis }    from './checks/redis.check.ts';
+import type { Request, Response } from 'express';
 import { checkDisk } from './checks/disk.ts';
 import { checkMemory } from './checks/memory.ts';
 
-// NODE_ENV ?
-// HTTPS_CERTIFICATE ?
-// API_PORT ?
 const VERSION = process.env.npm_package_version ?? '0.0.0';
-const SERVICE = process.env.npm_package_name ?? 'api'; // APP_NAME ? SERVICE_NAME?
+const SERVICE = process.env.npm_package_name ?? 'api';
 const START_AT = Date.now();
 
-// ─── Controllers ─────────────────────────────────────────────────────────────
+type CheckStatus = 'ok' | 'degraded' | 'unhealthy';
+
+interface CheckResult {
+  name: string;
+  status: CheckStatus;
+  message?: string;
+  latencyMs?: number;
+  meta?: Record<string, unknown>;
+}
+
+type CheckFn = () => Promise<CheckResult>;
 
 /**
  * GET /health
  * Lightweight liveness probe — no external checks.
  * Use this for load balancer / k8s liveness probes.
  */
-export async function liveness(req, res) {
+export async function liveness(_req: Request, res: Response): Promise<void> {
   res.status(200).json({
     status: 'ok',
     service: SERVICE,
@@ -32,24 +37,13 @@ export async function liveness(req, res) {
  * Full readiness probe — checks all dependencies.
  * Use this for k8s readiness probes and monitoring dashboards.
  */
-export async function readiness(req, res) {
-  const checks = await runChecks([
-    // checkDatabase,
-    // checkRedis,
-    checkDisk,
-    checkMemory,
-  ]);
+export async function readiness(_req: Request, res: Response): Promise<void> {
+  const checks = await runChecks([checkDisk, checkMemory]);
 
   const degraded = checks.some(c => c.status === 'degraded');
   const unhealthy = checks.some(c => c.status === 'unhealthy');
-
-  const overall = unhealthy ? 'unhealthy' : degraded ? 'degraded' : 'ok';
-
-  const statusCode = unhealthy
-    ? 503
-    : degraded
-      ? 207 // partial success
-      : 200;
+  const overall: CheckStatus = unhealthy ? 'unhealthy' : degraded ? 'degraded' : 'ok';
+  const statusCode = unhealthy ? 503 : degraded ? 207 : 200;
 
   res.status(statusCode).json({
     status: overall,
@@ -63,21 +57,18 @@ export async function readiness(req, res) {
 
 // ─── Runner ───────────────────────────────────────────────────────────────────
 
-async function runChecks(fns) {
+async function runChecks(fns: CheckFn[]): Promise<(CheckResult & { latencyMs: number })[]> {
   return Promise.all(
     fns.map(async fn => {
       const start = Date.now();
       try {
-        const result = await Promise.race([
-          fn(),
-          timeout(5_000, fn.name), // per-check 5 s timeout
-        ]);
+        const result = await Promise.race([fn(), timeout(5_000, fn.name)]);
         return { ...result, latencyMs: Date.now() - start };
       } catch (err) {
         return {
           name: fn.name,
-          status: 'unhealthy',
-          message: err.message,
+          status: 'unhealthy' as CheckStatus,
+          message: (err as Error).message,
           latencyMs: Date.now() - start,
         };
       }
@@ -87,7 +78,7 @@ async function runChecks(fns) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function formatChecks(checks) {
+function formatChecks(checks: (CheckResult & { latencyMs: number })[]): Record<string, unknown> {
   return Object.fromEntries(
     checks.map(({ name, status, message, latencyMs, meta }) => [
       name,
@@ -96,7 +87,7 @@ function formatChecks(checks) {
   );
 }
 
-function getUptime() {
+function getUptime(): string {
   const ms = Date.now() - START_AT;
   const s = Math.floor(ms / 1000);
   const m = Math.floor(s / 60);
@@ -104,6 +95,6 @@ function getUptime() {
   return `${h}h ${m % 60}m ${s % 60}s`;
 }
 
-function timeout(ms, name) {
+function timeout(ms: number, name: string): Promise<never> {
   return new Promise((_, reject) => setTimeout(() => reject(new Error(`${name} timed out after ${ms}ms`)), ms));
 }

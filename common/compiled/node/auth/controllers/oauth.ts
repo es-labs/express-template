@@ -1,13 +1,18 @@
+import type { Request, Response } from 'express';
 import { createToken, setTokensToHeader } from '../jwt.ts';
 import { findUser } from '../store.ts';
 
 const { AUTH_ERROR_URL } = globalThis.__config;
 const OAUTH_OPTIONS = globalThis.__config?.OAUTH_OPTIONS || {};
-// set callback URL on github to <schema://host:port>/api/oauth/callback
-// initiated from browser - window.location.replace('https://github.com/login/oauth/authorize?scope=user:email&client_id=XXXXXXXXXXXXXXXXXXXX')
 
-// /callback
-export const callbackOAuth = async (req, res) => {
+/**
+ * OAuth callback handler — exchanges the authorization code for an access token,
+ * fetches the OAuth provider's user profile, matches it to a local user, then
+ * issues JWT tokens and redirects back to the client.
+ *
+ * Mounted at: GET /oauth/callback
+ */
+export const callbackOAuth = async (req: Request, res: Response): Promise<void> => {
   try {
     const { code, state } = req.query;
     const result = await fetch(OAUTH_OPTIONS.URL, {
@@ -27,20 +32,24 @@ export const callbackOAuth = async (req, res) => {
         headers: { Authorization: `token ${data.access_token}` },
       });
       const oauthUser = await resultUser.json();
-      const oauthId = oauthUser[OAUTH_OPTIONS.USER_ID]; // github id, email
+      const oauthId = oauthUser[OAUTH_OPTIONS.USER_ID];
 
-      const user = await findUser({ [OAUTH_OPTIONS.FIND_ID]: oauthId }); // match github id (or email?) with our user in our application
-      if (!user) return res.status(401).json({ message: 'Unauthorized' });
+      const user = await findUser({ [OAUTH_OPTIONS.FIND_ID]: oauthId });
+      if (!user) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+      }
 
       const { id, roles } = user;
       const tokens = await createToken({ sub: id, roles: roles.split(',') });
       setTokensToHeader(res, tokens);
-      return res.redirect(
+      res.redirect(
         `${OAUTH_OPTIONS.CALLBACK}#${tokens.access_token};${tokens.refresh_token};${JSON.stringify(tokens.user_meta)}`,
-      ); // use url fragment...
+      );
+      return;
     }
-    return res.status(401).json({ message: 'Missing Token' });
-  } catch (e) {
-    return AUTH_ERROR_URL ? res.redirect(AUTH_ERROR_URL) : res.status(401).json({ error: 'NOT Authenticated' });
+    res.status(401).json({ message: 'Missing Token' });
+  } catch (_e) {
+    AUTH_ERROR_URL ? res.redirect(AUTH_ERROR_URL) : res.status(401).json({ error: 'NOT Authenticated' });
   }
 };

@@ -1,28 +1,35 @@
 import webPush from 'web-push';
 
 // npx web-push generate-vapid-keys
-const vapidKeys = webPush.generateVAPIDKeys(); // We use webpush to generate our public and private keys
+const vapidKeys = webPush.generateVAPIDKeys();
 const { publicKey, privateKey } = vapidKeys;
 const { WEBPUSH_VAPID_SUBJ } = process.env;
 
 if (WEBPUSH_VAPID_SUBJ) {
-  webPush.setVapidDetails(WEBPUSH_VAPID_SUBJ, publicKey, privateKey); // We are giving webpush the required information to encrypt our data
+  webPush.setVapidDetails(WEBPUSH_VAPID_SUBJ, publicKey, privateKey);
 }
 
-// This function takes a subscription object and a payload as an argument. It will try to encrypt the payload
-// then attempt to send a notification via the subscription's endpoint
-// will throw exception if error
-const send = async (subscription, payload, options = { TTL: 60 }) => {
-  // This means we won't resend a notification if the client is offline
-  // what if TTL = 0 ?
-  // web-push's sendNotification function does all the work for us
+/**
+ * Send a Web Push notification to a subscriber.
+ * Throws if the push service returns an error (e.g. 410 Gone for expired subscriptions).
+ *
+ * @param subscription - PushSubscription object saved from the browser's `pushManager.subscribe()`.
+ * @param payload - Notification payload (string, Buffer, or null for keyless subscriptions).
+ * @param options - Optional web-push request options (e.g. `{ TTL: 60 }`).
+ */
+const send = async (
+  subscription: webPush.PushSubscription,
+  payload: string | Buffer | null,
+  options: webPush.RequestOptions = { TTL: 60 },
+): Promise<webPush.SendResult> => {
   if (!subscription.keys) {
     payload = payload || null;
   }
-  return await webPush.sendNotification(subscription, payload, options); // will throw if error
+  return webPush.sendNotification(subscription, payload ?? undefined, options);
 };
 
-const getPubKey = () => vapidKeys.publicKey;
+/** Returns the VAPID public key to share with browser clients. */
+const getPubKey = (): string => vapidKeys.publicKey;
 
 export { getPubKey, send };
 

@@ -1,40 +1,46 @@
-// middleware/errorHandler.js
+import type { NextFunction, Request, Response } from 'express';
 import { NotFoundError } from './AppError.ts';
 
 const isDev = process.env.NODE_ENV !== 'production';
 
-// To Delete?
-// export const errorHandlerToDelete = (err, _req, res, _next) => {
-//   if (err instanceof AppError) {
-//     logger.warn('Application error', { code: err.code, message: err.message });
-//     return res.status(err.statusCode).json({ error: { code: err.code, message: err.message } });
-//   }
-//   logger.error('Unhandled error', { message: err.message, stack: err.stack });
-//   return res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' } });
-// }
+interface NormalizedError {
+  statusCode: number;
+  code: string;
+  message: string;
+  details?: unknown;
+  stack?: string;
+  isOperational: boolean;
+}
 
 /**
- * Normalize any thrown value into a consistent shape.
- * Express v5 auto-forwards async rejections, but the thrown
- * value might not always be an AppError.
+ * Normalize any thrown value into a consistent NormalizedError shape.
+ * Express v5 auto-forwards async rejections, but the thrown value may not be an AppError.
  */
-function normalizeError(err) {
-  // Already a structured AppError
-  if (err.isOperational) return err;
+function normalizeError(err: unknown): NormalizedError {
+  const e = err as Record<string, unknown>;
 
-  // Express body-parser / JSON parse errors
-  if (err.type === 'entity.parse.failed') {
+  if (e?.isOperational) {
+    return {
+      statusCode: Number(e.statusCode) || 500,
+      code: String(e.code || 'INTERNAL_ERROR'),
+      message: String(e.message || 'An unexpected error occurred'),
+      details: e.details,
+      stack: typeof e.stack === 'string' ? e.stack : undefined,
+      isOperational: true,
+    };
+  }
+
+  if (e?.type === 'entity.parse.failed') {
     return { statusCode: 400, code: 'INVALID_JSON', message: 'Malformed JSON in request body', isOperational: true };
   }
 
-  // Express v5 enforces valid status codes — map unknown ones safely
-  const status = Number.isInteger(err.status) && err.status >= 400 && err.status < 600 ? err.status : 500;
+  const status = typeof e?.status === 'number' && e.status >= 400 && e.status < 600 ? e.status : 500;
 
   return {
     statusCode: status,
-    code: err.code || 'INTERNAL_ERROR',
-    message: isDev ? err.message : 'An unexpected error occurred',
-    stack: err.stack,
+    code: typeof e?.code === 'string' ? e.code : 'INTERNAL_ERROR',
+    message: isDev ? String(e?.message ?? 'Unknown error') : 'An unexpected error occurred',
+    stack: typeof e?.stack === 'string' ? e.stack : undefined,
     isOperational: false,
   };
 }
@@ -43,16 +49,14 @@ function normalizeError(err) {
  * Central error-handling middleware.
  * Must have exactly 4 parameters so Express recognises it as an error handler.
  */
-export const errorHandler = (err, req, res, next) => {
-  // If the response stream has already started, delegate to Express default
+export const errorHandler = (err: unknown, req: Request, res: Response, _next: NextFunction) => {
   if (res.headersSent) {
-    return next(err);
+    return _next(err);
   }
 
   const error = normalizeError(err);
   const statusCode = error.statusCode ?? 500;
 
-  // Always log server errors; conditionally log client errors
   if (statusCode >= 500) {
     logger.error({
       type: 'server_error',
@@ -76,7 +80,7 @@ export const errorHandler = (err, req, res, next) => {
     error: {
       code: error.code,
       message: error.message,
-      ...(error.details && { details: error.details }),
+      ...(error.details !== undefined && error.details !== null && { details: error.details }),
       ...(isDev && { stack: error.stack }),
     },
   };
@@ -84,9 +88,7 @@ export const errorHandler = (err, req, res, next) => {
   res.status(statusCode).json(body);
 };
 
-/**
- * Catch-all 404 handler — place this after all your routes.
- */
-export const notFoundHandler = (req, res, next) => {
+/** Catch-all 404 handler — place this after all your routes. */
+export const notFoundHandler = (req: Request, _res: Response, next: NextFunction) => {
   next(new NotFoundError(req.path));
 };

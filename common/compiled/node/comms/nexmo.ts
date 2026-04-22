@@ -5,8 +5,7 @@ import crypto from 'node:crypto';
 // nexmo.ismsSend('6596935500', 'Blah ' + new Date())
 const { NEXMO_KEY, NEXMO_SECRET, NEXMO_SENDER = 'SMSnotice' } = process.env;
 
-// sms = 6511112222
-// one at a time...
+/** Send an SMS via the Nexmo REST API. */
 export const send = async (sms: string, message: string, from?: string) => {
   if (!from) from = NEXMO_SENDER;
   if (sms && message) {
@@ -17,8 +16,7 @@ export const send = async (sms: string, message: string, from?: string) => {
   }
 };
 
-// sms = 6511112222
-// one at a time...
+/** Send an SMS via the iSMS gateway (era.sg). */
 export const ismsSend = async (sms: string, message: string, from?: string) => {
   const url = 'https://sms.era.sg/isms_mt.php?';
   try {

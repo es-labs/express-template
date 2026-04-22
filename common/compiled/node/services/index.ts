@@ -1,3 +1,6 @@
+import type { Server as HttpServer } from 'node:http';
+import type { Server as HttpsServer } from 'node:https';
+import type { Application } from 'express';
 import Wss from '../ws/index.ts';
 import StoreKeyV from './db/keyv.ts';
 import StoreKnex from './db/knex.ts';
@@ -7,9 +10,15 @@ import StoreRedis from './db/redis.ts';
 
 type ServiceConfig = { type: string; options: string };
 let servicesConfig: Record<string, ServiceConfig> = {};
+// biome-ignore lint/suspicious/noExplicitAny: service instances vary by type (StoreKnex | StoreRedis | StoreKeyV | Wss) with incompatible open() signatures
 const services: Record<string, any> = {};
 
-const start = async (app, server, config = globalThis.__config?.SERVICES_CONFIG || {}) => {
+/** Start all configured services (DB, cache, WebSocket) based on SERVICES_CONFIG. */
+const start = async (
+  app: Application,
+  server: HttpServer | HttpsServer,
+  config = globalThis.__config?.SERVICES_CONFIG || {},
+) => {
   try {
     servicesConfig = config;
     for (const [name, svc] of Object.entries(servicesConfig)) {
@@ -32,6 +41,7 @@ const start = async (app, server, config = globalThis.__config?.SERVICES_CONFIG 
   }
 };
 
+/** Gracefully stop all running services. */
 const stop = async () => {
   logger.info('services - stop - begin');
   try {
@@ -43,8 +53,10 @@ const stop = async () => {
   logger.info('services - stop - end');
 };
 
-const get = service => services[service]?.get() || null;
+/** Returns the underlying store instance for a named service, or null if not found. */
+const get = (service: string) => services[service]?.get() || null;
 
+/** Returns the current services configuration map. */
 const list = () => servicesConfig;
 
 export { get, list, start, stop };
