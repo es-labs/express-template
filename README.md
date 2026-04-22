@@ -1,6 +1,6 @@
 ## Description
 
-This repository is a monorepo template for building full-stack JavaScript applications, micro-services and frontends with Node.js (**version 24 or Higher**).
+This repository is based on a monorepo [template](https://github.com/es-labs/express-template) for building full-stack JavaScript applications, micro-services and frontends with Node.js (**version 24 or Higher**).
 
 The folders contents are as follows:
 - `apps`: userland backend and frontend application workspaces
@@ -12,12 +12,12 @@ The folders contents are as follows:
 
 Getting started with
 - Sample API [backend](docs/install.md#Run-Sample-API)
-- Sample Vue [minimal frontend](docs/install.md#Run-Sample-Vue)
-- Sample Vue [full frontend](docs/install.md#Run-Sample-Vue)
+- Mininal Vue [minimal frontend](docs/install.md#run-minimal-vue-application)
+- Sample Vue [full frontend](docs/install.md#install--run-sample-vue-application)
 
 Creating your own apps/services
 - API [backend](docs/install.md#Create-New-Backend-App-Or-Service)
-- Vue [frontend](docs/install.md#Create New Web or Vue Frontend)
+- Vue [frontend](docs/install.md#create-new-web-or-vue-frontend)
 
 Publish common/** workspace to [npm](docs/install.md#Publishing-packages-to-npm). **for template maintainers ONLY**
 
@@ -30,7 +30,7 @@ End Users: **BEFORE** making **ANY** changes. Read the following:
   - [git hooks](docs/git.md#hooks-setup-and-usage)
   - [template updating](.github/workflows/update-template.yml)
   - [branching-and-protection](docs/git.md#branch-and-protection-rules)
-  - [commit message lint](docs/git.md/#commit-message)
+  - [commit message lint](docs/git.md#commit-message)
   - [release automation](docs/git.md#release-automation)
   - [secret scanning](https://docs.github.com/en/enterprise-cloud@latest/code-security/concepts/secret-security/about-secret-scanning)
   - [security](https://github.com/settings/security_analysis)

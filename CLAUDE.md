@@ -236,7 +236,6 @@ Route middleware available after `authUser`:
 | `.github/CONTRIBUTING.md` | Contributor workflow, hooks, issue reporting, PR rules |
 | `docs/conventions.md` | Coding, tooling, commit, and runtime standards |
 | `docs/git.md` | Git workflow, branch/tag patterns, merge strategy |
-| `docs/install-apps.md` | Backend and frontend setup and development guide |
-| `docs/install-common.md` | Shared code and workspace reference |
-| `docs/authz.md` | Authorization — RBAC and FGA: setup, JWT payload, roles fallback chain, usage |
+| `docs/install.md` | Backend, frontend setup, development guide, and workspace reference |
+| `docs/design/authz.md` | Authorization — RBAC and FGA: setup, JWT payload, roles fallback chain, usage |
 | `docs/NOTES.md` | Design decisions, caveats, open questions, TODOs |

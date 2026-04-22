@@ -50,7 +50,7 @@ This document is for
 - Support
   - postgres as primary RDBMS, mysql as secondary.
   - redis or keyv
-- DB audit logging [strategy](design/pg-audit-implementation)
+- DB audit logging [strategy](design/pg-audit-implementation.md)
 - Authorization [strategy](design/authz.md)
   - RBAC, FGA, and legacy roles fallback
   - multi-tenant, scopes
