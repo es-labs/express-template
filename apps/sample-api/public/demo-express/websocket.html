@@ -18,16 +18,16 @@
 
 <script>
   const output = document.querySelector('#output')
-  let socket = new WebSocket('ws://127.0.0.1:3000')
-  socket.onopen = function (e) {
+  const socket = new WebSocket('ws://127.0.0.1:3000')
+  socket.onopen = (e) => {
     output.innerHTML = '[open] Connection established'
   };
 
-  socket.onmessage = function (event) {
+  socket.onmessage = (event) => {
     console.log(JSON.parse(event.data))
     output.innerHTML = `[message] Data received from server: ${event.data}`
   };
-  socket.onclose = function (event) {
+  socket.onclose = (event) => {
     if (event.wasClean) {
       output.innerHTML = `[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`
      } else {
@@ -37,7 +37,7 @@
     }
   };
 
-  socket.onerror = function (error) {
+  socket.onerror = (error) => {
     output.innerHTML = `[error] ${error.toString()}`
   };
 

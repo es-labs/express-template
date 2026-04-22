@@ -33,21 +33,18 @@ scripts/           # DB deployment, OpenAPI generation tooling
 ## Setup
 
 ```bash
-# 1. run once after clone/fork/git init to enable upstream template merges
-./setup-upstream.sh
-
-# 2. install all workspace dependencies
+# 1. install all workspace dependencies
 npm i
 
-# 3. configure git hooks (also runs automatically via npm prepare)
+# 2. configure git hooks (also runs automatically via npm prepare)
 chmod +x .githooks/setup.sh && ./.githooks/setup.sh
 # or manually:
 # git config core.hooksPath .githooks
 
-# 4. run the sample backend
+# 3. run the sample backend
 cd apps/sample-api && npm run start
 
-# 5. run the minimal Vue frontend
+# 4. run the minimal Vue frontend
 cd apps/sample-vue-minimal && npm run dev
 ```
 
@@ -55,14 +52,10 @@ cd apps/sample-vue-minimal && npm run dev
 
 ```bash
 # linting and formatting (biome)
-npm run lint           # lint all workspaces
-npm run lint:fix       # auto-fix unsafe lint rules
-npm run format         # format all workspaces
 npm run check          # biome check with auto-fix (lint + format)
 npm run ci             # biome ci (used in CI/CD)
 
 # testing
-npm run test:workspace      # run tests in apps/sample-api
 npm run test:workspaces     # run tests in all workspaces
 
 # openapi docs
@@ -149,7 +142,7 @@ Hooks live in `.githooks/` and are activated by `npm install` (via `npm prepare`
 - Schema validation tests for affected schema directories
 
 **Pre-push** (runs on `git push`):
-- Unit tests (`npm run test:workspace`)
+- Unit tests (`npm run test:workspaces`)
 - Schema validation tests
 
 Skip hooks temporarily:

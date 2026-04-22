@@ -43,9 +43,8 @@
   </a-form>
 </template>
 <script setup>
-import { SettingOutlined } from '@ant-design/icons-vue';
 import { http } from '@common/vue/plugins/fetch.js';
-import { onMounted, reactive, ref, toRaw } from 'vue';
+import { onMounted, reactive, toRaw } from 'vue';
 
 const { VITE_API_URL } = import.meta.env;
 

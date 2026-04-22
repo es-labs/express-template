@@ -3,36 +3,12 @@
   "tasks": [
     // ── Root ────────────────────────────────────────────────────────────────
     {
-      "label": "lint",
-      "type": "shell",
-      "command": "npm run lint",
-      "group": "build",
-      "presentation": { "reveal": "always", "panel": "shared" },
-      "problemMatcher": ["$eslint-stylish"]
-    },
-    {
       "label": "check (lint + format)",
       "type": "shell",
       "command": "npm run check",
       "group": "build",
       "presentation": { "reveal": "always", "panel": "shared" },
       "problemMatcher": ["$eslint-stylish"]
-    },
-    {
-      "label": "format",
-      "type": "shell",
-      "command": "npm run format",
-      "group": "build",
-      "presentation": { "reveal": "always", "panel": "shared" },
-      "problemMatcher": []
-    },
-    {
-      "label": "test:workspace (sample-api)",
-      "type": "shell",
-      "command": "npm run test:workspace",
-      "group": { "kind": "test", "isDefault": true },
-      "presentation": { "reveal": "always", "panel": "shared" },
-      "problemMatcher": []
     },
     {
       "label": "test:workspaces (all)",

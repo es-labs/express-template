@@ -101,7 +101,6 @@
 </template>
 
 <script setup>
-import { InboxOutlined } from '@ant-design/icons-vue';
 import { http } from '@common/vue/plugins/fetch.js';
 import { ws } from '@common/vue/plugins/ws.js';
 import { computed, onBeforeUnmount, onMounted, reactive, ref, toRaw, watch } from 'vue';

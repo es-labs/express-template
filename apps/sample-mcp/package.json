@@ -10,7 +10,7 @@
     "dist"
   ],
   "scripts": {
-    "lint": "biome check --config-path ../biome.json",
+    "lint": "biome check --config-path ../../biome-node.json",
     "start": "node --watch --watch-preserve-output --trace-warnings index.js",
     "test:unit": "echo \"Error: no test specified\" && exit 0",
     "test:integration": "echo \"Error: no test specified\" && exit 0",
