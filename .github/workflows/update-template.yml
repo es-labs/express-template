@@ -12,6 +12,29 @@ name: Sync upstream template
 # Trigger: run manually via workflow_dispatch.
 # Protected branches: safe — changes are pushed to chore/sync-upstream, never directly
 #   to the target branch. A human reviews and merges the PR as normal.
+#
+# Required secret: SYNC_TOKEN
+#   The built-in GITHUB_TOKEN cannot create or update workflow files (.github/workflows/).
+#   A personal access token with the `workflow` scope is required instead.
+#
+#   Setup:
+#     Classic PAT:
+#       1. GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+#       2. Generate new token → tick the `workflow` scope (includes `repo`)
+#       3. Copy the token value.
+#
+#     Fine-grained PAT (repo-scoped):
+#       1. GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
+#       2. Set Resource owner to the repo's owner, Repository access to this repo only.
+#       3. Under Permissions → Repository permissions, grant:
+#            - Contents: Read and write
+#            - Pull requests: Read and write
+#            - Workflows: Read and write
+#       4. Copy the token value.
+#
+#     Add to repo:
+#       Repository → Settings → Secrets and variables → Actions → New repository secret
+#       Name: SYNC_TOKEN   Value: <token copied above>
 
 on:
   # schedule:
@@ -32,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SYNC_TOKEN }}
 
       - name: Add upstream remote
         run: git remote add upstream ${{ env.UPSTREAM_URL }}
@@ -65,7 +88,7 @@ jobs:
       - name: Create PR
         if: steps.changes.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
           SYNC_BRANCH: chore/sync-upstream
           UPSTREAM_BRANCH: ${{ github.event.inputs.upstream_branch || 'main' }}
           BASE_BRANCH: ${{ github.ref_name }}
