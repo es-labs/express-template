@@ -23,25 +23,24 @@ Publish common/** workspace to [npm](docs/install.md#Publishing-packages-to-npm)
 
 ## Read Me First
 
-- Contributors: read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) before opening issues or pull requests.
-- End Users: **BEFORE** making **ANY** changes. Read the following:
+- Contributors: read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) and [.github/SECURITY.md](.github/SECURITY.md) before opening issues or pull requests.
+End Users: **BEFORE** making **ANY** changes. Read the following:
 
 - SETUP
-  - [git hooks](docs/git.md#hooks-usage)
-  - [branch protection](docs/git.md#branch-protection-rules)
+  - [git hooks](docs/git.md#hooks-setup-and-usage)
+  - [template updating](.github/workflows/update-template.yml)
+  - [branching-and-protection](docs/git.md#branch-and-protection-rules)
+  - [commit message lint](docs/git.md/#commit-message)
   - [release automation](docs/git.md#release-automation)
   - [secret scanning](https://docs.github.com/en/enterprise-cloud@latest/code-security/concepts/secret-security/about-secret-scanning)
+  - [security](https://github.com/settings/security_analysis)
+  - [repo custom properties](https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization)
 - Read
-  - [branching instructions](docs/git.md#branching)
-  - [merge strategy](docs/git.md#rebase-or-merge)
-  - [engineering standards](docs/conventions.md)
-  - format, lint, commit message, language, tooling, etc.
-  - [triggering release](docs/git.md#releasable-commits)
-  - [workflows](docs/git.md#ci-action-shape)
-  - [template updating details](.github/workflows/update-template.yml)
-  - [docs/NOTES.md](docs/NOTES.md) - design features, internal notes, caveats.
-  - [Design Features](docs/NOTES.md#Design-Features)
-  - [roadmap](docs/ROADMAP.md)
+  - [Merge strategy](docs/git.md#rebase-or-merge)
+  - [Engineering standards](docs/conventions.md) format, lint, commit message, language, tooling, etc.
+  - [Workflows](docs/git.md#ci)
+  - [Design Features](docs/NOTES.md#design-features)
+  - [Roadmap](docs/NOTES.md#roadmap)
 
 The `apps` folder is for **userland** content. E.g workspace codes, documents, scripts, schemas, etc.
 

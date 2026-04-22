@@ -1,14 +1,74 @@
-## Workflow
+## Hooks Setup And Usage
 
-Contributor-facing branch, pull request, and merge guidance now lives in [.github/CONTRIBUTING.md](../.github/CONTRIBUTING.md).
+- Pre-commit runs Biome checks on affected directories and schema validation tests where applicable.
+- Pre-push runs workspace tests and schema validation checks.
+- `npm install` also runs `npm prepare`, which configures the hooks path automatically.
+To skip hooks temporarily:
+```bash
+git commit --no-verify
+git push --no-verify
+```
 
-Repository-wide coding and runtime conventions now live in [docs/conventions.md](./conventions.md).
 
-This document keeps the repo's git workflow reference, branch/tag patterns, hooks notes, and merge-strategy discussion.
+This repository uses native Git hooks in `.githooks/`.
+
+After cloning, activate the hooks by
+
+**OPTION 1 - Running Setup Script**
+
+```bash
+# Make the setup script executable and run it
+chmod +x .githooks/setup.sh
+./.githooks/setup.sh
+```
+
+**OPTION 2 - Manually Installation**
+
+```bash
+# remove hooks path
+git config --local --unset-all core.hooksPath
+
+# set hooks path explicitly
+git config --local core.hooksPath .githooks
+chmod +x .githooks/pre-commit .githooks/pre-push
+```
+
+**OPTION 3 - Via NPM prepare script**
+
+Running `npm install` will also run `npm prepare`, which configures the hooks path automatically.
+
+
+### pre-commit hook
+
+Runs automatically on every `git commit`:
+
+| Check | Details |
+|-------|---------|
+| **Biome format & lint** | Runs `npx biome check` on each affected directory (`common/iso`, `common/node`, `common/vue`, `common/web`, `apps`, `scripts`). Run `npm run check` to auto-fix. |
+| **Schema validation tests** | Runs `npm run test:schemas -- <folder>` for each affected schema directory (`common/schema`, `common/schemas`, `apps/*/schema`, `apps/*/schemas`). |
+
+To skip the pre-commit hook temporarily:
+```bash
+git commit --no-verify
+```
+
+### pre-push hook
+
+Runs automatically on every `git push`:
+
+| Check | Details |
+|-------|---------|
+| **Unit tests** | Runs `npm run test:workspaces` (or `npm test`). |
+| **Schema validation tests** | Runs `npm run test:schemas` if the script exists. |
+
+To skip the pre-push hook temporarily:
+```bash
+git push --no-verify
+```
 
 ---
 
-## Branching
+## Branching And Protection
 
 ### Branch tags used
 
@@ -50,11 +110,58 @@ hotfix/payment-crash (check out from main)
   → cherry-pick to rel/2.0 (backport)
 ```
 
+### Branch Protection Rules
+
+Edit branch protection rules in **Settings** → **Branches** → **Add branch protection rule** to prevent merges when CI checks fail.
+
+Match the following patterns:
+
+1. **Pattern:** `main`
+2. **Pattern:** `rel/*`
+
+For each pattern, enable:
+
+| Setting | Action |
+|---------|--------|
+| **Require a pull request before merging** | Enable. Require 1 approval. Dismiss stale approvals on new commits. |
+| **Require status checks to pass** | Enable. Require branches to be up to date. |
+| | Add required checks: `Commit Message Format`, `Biome Checks`, `Schema Validation Tests`, `Unit Tests`, `Integration Tests`, `E2E Tests` |
+| **Require conversation resolution before merging** | Enable. |
+| **Include administrators** | Enable. Prevents bypass by repo admins. |
+
+---
+
+## Commit Message
+
+For standardized [Conventional Commits](https://www.conventionalcommits.org/) messages, use **czg** instead of `git commit -m "…"`:
+
+```bash
+# Interactive prompt (guided commit message)
+npx czg
+
+# AI-generated commit message (requires API key configured in czg)
+npx czg --ai
+```
+
+Install globally for convenience:
+```bash
+npm install -g czg
+```
+
+Use the repository commit conventions in [docs/conventions.md](../docs/conventions.md) for allowed commit types and breaking-change notation.
+
+When choosing a scope in `czg`:
+
+- Prefer a real workspace scope such as `apps/...` or `common/...` when the change is limited to one workspace.
+- Use `docs` for documentation-only changes.
+- Use `ci` for workflow, hook, or automation changes.
+- Use `repo` for root-level or cross-cutting changes that do not fit a single workspace.
+
 ---
 
 ## Release Automation
 
-Release automation is handled by the `release-please` job in [.github/workflows/ci.yml](../.github/workflows/ci.yml), using the [release-please](https://github.com/googleapis/release-please-action) github action.
+Changelog and tag automation are handled by the [`release-please`](https://github.com/googleapis/release-please-action) job in [.github/workflows/ci.yml](../.github/workflows/ci.yml).
 
 - The existing handwritten changelog stays grouped under version `0.1.0` in [CHANGELOG.md](../CHANGELOG.md).
 - The workflow runs `release-please-action` in manifest mode using
@@ -68,7 +175,7 @@ Release automation is handled by the `release-please` job in [.github/workflows/
 
 1. A commit lands on `main` or `rel/*`.
 2. The `release-please` job scans merged Conventional Commits for each configured workspace.
-3. If releasable commits exist for one or more workspaces, it opens or updates workspace-scoped release PRs.
+3. If [releasable commits](#releasable-commits) exist for one or more workspaces, it opens or updates workspace-scoped release PRs.
 4. When release PRs are merged, `release-please` updates changelogs, creates workspace-scoped tags, and publishes GitHub releases.
 
 ### Releasable Commits
@@ -97,31 +204,6 @@ If the variable or secret is missing, the workflow fails early instead of fallin
 
 ---
 
-## Hooks Usage
-
-```bash
-# remove hooks path
-git config --local --unset-all core.hooksPath
-# set hooks path explicitly
-git config --local core.hooksPath .githooks
-# or let npm prepare configure it during npm install
-```
-
-This repository uses native hooks from `.githooks/`.
-
-- Pre-commit runs Biome checks on affected directories and schema validation tests where applicable.
-- Pre-push runs workspace tests and schema validation checks.
-- `npm install` also runs `npm prepare`, which configures the hooks path automatically.
-
-To skip hooks temporarily:
-
-```bash
-git commit --no-verify
-git push --no-verify
-```
-
-For the exact hook behavior, see [.github/CONTRIBUTING.md](../.github/CONTRIBUTING.md).
-
 ## Rebase Or Merge
 
 Use the repo workflow rather than a per-team merge style.
@@ -135,38 +217,41 @@ This keeps release history predictable for `release-please` and matches the cont
 
 ---
 
-## Branch Protection Rules
+## CI
 
-Edit branch protection rules in **Settings** → **Branches** → **Add branch protection rule** to prevent merges when CI checks fail.
+Please read the following scripts for information on the CI workflows
 
-### Protection for `main` and `rel/*`
+1. CI Meta workflow [ci-meta.yml](../.github/workflows/ci-meta.yml)
 
-Create two rules:
+Changes must be only to `.github/workflows` OR `.github/actions` folder
 
-1. **Pattern:** `main`
-2. **Pattern:** `rel/*`
+2. CI workflow [ci.yml](../.github/workflows/ci.yml)
 
-For each pattern, enable:
-
-| Setting | Action |
-|---------|--------|
-| **Require a pull request before merging** | Enable. Require 1 approval. Dismiss stale approvals on new commits. |
-| **Require status checks to pass** | Enable. Require branches to be up to date. |
-| | Add required checks: `Commit Message Format`, `Biome Checks`, `Schema Validation Tests`, `Unit Tests`, `Integration Tests`, `E2E Tests` |
-| **Require conversation resolution before merging** | Enable. |
-| **Include administrators** | Enable. Prevents bypass by repo admins. |
-
-## CI Action Shape
-
-Please read the following scripts for more information
-- CI workflow for non-CI file changes [ci.yml](../.github/workflows/ci.yml)
-- CI workflow for CI file changes [ci-meta.yml](../.github/workflows/ci-meta.yml)
-
-> **Note:** tests (unit, integration, e2e) are run for touched workspaces only, identified by the `detect-touched-workspaces`, Skip test if npm script for test not found.
-
-### Result
+Changes must not be to `.github/workflows` AND `.github/actions` folders
 
 Once configured:
 - PRs show red X if any required check fails.
 - Merges are blocked until all checks pass and approvals are met.
 - The branch protection rules apply uniformly across day-to-day work (`rel/*` branches), production merges (`main`), and emergency hotfixes.
+
+> **Note:** tests (unit, integration, e2e) are run for touched workspaces only, identified by the `detect-touched-workspaces`, Skip test if npm script for test not found.
+
+### CI Workflow
+
+1. PR submitted to main or release branches
+2. CI runs on PR submitted
+  - repo-wide format check, no autofix
+  - repo-wide lint check, no autofix
+  - repo-wide schema check, no autofix
+  - repo-wide testing, no autofix
+  - repo-side package audit, no autofix?
+3. Only allow merge if all checks pass
+
+### CI Meta Workflow
+
+1. Make CI changes on a `chore/ci/<name>` branch.
+2. Use commit messages in Conventional Commit format, for example `chore(ci): tighten workflow validation`.
+3. Run `act` locally to validate before pushing.
+4. Push `chore/ci/<name>` to trigger [ci-meta.yml](./workflows/ci-meta.yml). This workflow only runs for changes under `.github/workflows/**` and `.github/actions/**`.
+5. Open a PR from `chore/ci/<name>` to `ci-staging` and confirm the workflow is green end-to-end.
+6. After validation, open a PR from `ci-staging` to `main`.

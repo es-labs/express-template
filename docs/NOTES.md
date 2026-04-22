@@ -7,7 +7,7 @@ This document is for
 - migration notes
 - ideas that are not yet stable policy
 
-### Design Features
+## Design Features
 
 - Fully ES Modules - JS Standards Compliant
 - Named exports preferred (default exports for class, config, or a plugin)
@@ -42,7 +42,8 @@ This document is for
 - global logger
   - no console log for backend
   - no logs in frontend production, errors sent to Sentry
-- biome vs prettier+eslint
+- use biome for formatting and linting
+  - biome vs prettier+eslint
 - testing
   - use native node test runner
   - playwright for e2e testing
@@ -55,49 +56,27 @@ This document is for
   - multi-tenant, scopes
 - jsdoc for typing and autocomplete on IDE ?
 
-## precommits
+## Roadmap
 
-- use biome for formatting and linting
+- **IN PROGRESS**
+  - JSON in env, refactor to use something else
+  - fix typescript noExplicit any
+  - Clean up auth and documentations
+- **TO TEST** 
+  - add RBAC and FGA
+  - Typescript to zod, convert code to TS for node runtime...
+  - audit_logs
+- **BACKLOG**
+  - safeJSON
+  - remove barrel index.js files...
+- **REVIEW**
+  - visualize package sizes with rollup-plugin-visualizer
+  - revisit biome when vueJS support is available
+  - S3/OSS
 
-## pushes / PR merges to main and release branches
+### To Consider
 
-- run ci before merge
-  - repo-wide format check, no autofix
-  - repo-wide lint check, no autofix
-  - repo-wide schema check, no autofix
-  - repo-wide testing, no autofix
-  - repo-side package audit, no autofix?
-- do not allow PR merge if checks fail
-
-
-## TODOS
-
-### linting auto fix
-
-safe - useArrowFunction, useConst
-unsafe - useTemplate, useNodejsImportProtocol, useOptionalChain,  
-
-```
-npx biome <format/lint/check> common apps scripts
-npx biome lint common apps scripts --only=useTemplate --write --unsafe
-```
-
-### logger usage
-
-- apps/* - use backend logger for backend, frontend logger not implemented
-- common/iso - both (should be simple files remove console.log)
-- common/node - backend (use backend logger)
-- common/vue - frontend VueJS (allow console.log, remove in prod)
-- common/web - frontend plainJS (allow console.log, remove in prod)
-- common/scripts
-
-
-### Github Related Readings
-
-- [security](https://github.com/settings/security_analysis)
-- [repo custom properties](https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization)
-
-### Handling Globals
+1. Use namespace, Symbol with globalThis
 
 ```js
 # Check if namespace exists, if not create it.
@@ -108,11 +87,28 @@ const _logger = Symbol('logger');
 globalThis.__myApp[_logger] = myLogger;
 ```
 
-Currently we choose to do so without namespace.
+2. Use [testcontainers](https://testcontainers.com/guides/getting-started-with-testcontainers-for-nodejs/)
 
-### CAVEATS!
-- to fix dependency design issue between common/* projects
-- workflow might need to be tested when structure changes
-- use named exports, unless single class or function then use export default
-- do not create barrel index.js files
-- do not use named exports and export default in same file
+- Runs many services for test purposes
+- Data is not persisted
+
+3. linting auto fix
+
+```bash
+# safe - useArrowFunction, useConst
+# unsafe - useTemplate, useNodejsImportProtocol, useOptionalChain,  
+npx biome <format/lint/check> common apps scripts
+npx biome lint common apps scripts --only=useTemplate --write --unsafe
+```
+
+---
+
+<!--
+on:
+  push:
+    branches: [TODO]
+    paths:
+      - 'services/auth-service/**'
+      - 'shared/**'
+      - '.github/workflows/deploy-auth-service.yml'
+-->

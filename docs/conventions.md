@@ -26,7 +26,7 @@ Read this document before making code changes. Use [.github/CONTRIBUTING.md](../
 ## Language Standard
 
 - Use of ES Modules is mandated.
-- NodeJS applications or applications requiring compilation like Vue / React may use Native NodeJS Typescript (recommended) or Javascript
+- NodeJS applications or applications requiring compilation like Vue / React may use Native NodeJS **Typescript** (recommended) or **Javascript**
   - NodeJS TS (runtime) + `tsc --noEmit` (static type check) + `zod` (dynamic validation)  
   - `common/compiled` folder uses Typescript
 - Browser and Isomorphic code must use Javascript only
@@ -44,6 +44,22 @@ Read this document before making code changes. Use [.github/CONTRIBUTING.md](../
 - Secrets must be stored in environment variables or a secret manager.
 - JSON config files must be used only for non-sensitive structured settings.
 
-## Security
+### Logging Restrictions
 
-- strip `console.*` from Browser runtime applications in production
+- use `common/node/logger` for node runtime applications in the folders below
+  - common/node
+  - common/scripts
+  - scripts/*
+  - apps/* - if node runtime
+- strip `console.*` for browser runtime applications in the folders below (in production)
+  - common/vue - frontend VueJS
+  - common/web - frontend plainJS
+  - common/iso - simple files used in both browser and node runtimes
+  - apps/* - if browser runtime
+
+## OTHER IMPORTANT CAVEATS!
+
+- to fix dependency design issue between common/* projects
+- use named exports, unless single class or function then use export default
+- do not create barrel index.js files
+- do not use named exports and export default in same file
