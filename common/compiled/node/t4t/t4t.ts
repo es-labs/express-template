@@ -1,5 +1,6 @@
 // const path = require('path')
 import fs from 'node:fs';
+import type { NextFunction, Request, Response } from 'express';
 import express from 'express';
 import yaml from 'js-yaml';
 import multer from 'multer';
@@ -9,9 +10,21 @@ import * as svc from '../../services/index.ts';
 const { CONFIGS_FOLDER_PATH, CONFIGS_CSV_SIZE, CONFIGS_UPLOAD_SIZE, CUSTOM_PATH } = globalThis.__config?.T4T || {};
 
 import base from './t4t-base.ts';
+import type { T4TRequest } from './t4t-utils.ts';
 import { noAuthFunc, processJson, roleOperationMatch } from './t4t-utils.ts';
 
-const custom = {};
+interface FileUiConfig {
+  multer: {
+    folder?: string;
+    options?: { limits?: { files?: number } };
+  };
+}
+
+interface T4TOptions {
+  authFunc?: (req: Request, res: Response, next: NextFunction) => void;
+}
+
+const custom: Record<string, Record<string, (req: T4TRequest, res: Response) => Promise<void>>> = {};
 // const custom = CUSTOM_PATH ? (await import(CUSTOM_PATH)).default : { };
 // const custom = CUSTOM_PATH ? require(CUSTOM_PATH) : { }
 const uploadMemory = {
@@ -24,22 +37,25 @@ const storageUpload = () => {
     storage: multer.diskStorage({
       destination: (req, file, cb) => {
         const key = file.fieldname;
-        const { folder } = req.table.fileConfigUi[key].multer; // logger.info('folder, file', folder, file)
-        return cb(null, folder);
+        const fileUiConfig = (req as T4TRequest).table.fileConfigUi[key] as FileUiConfig;
+        const { folder } = fileUiConfig.multer;
+        return cb(null, folder ?? '');
       },
-      filename: (req, file, cb) => cb(null, file.originalname), // file.fieldname, file.originalname
+      filename: (_req, file, cb) => cb(null, file.originalname), // file.fieldname, file.originalname
     }),
     fileFilter: (req, file, cb) => {
       // TODO check on individual file size
       const key = file.fieldname;
-      const { options } = req.table.fileConfigUi[key].multer;
-      if (!req.fileCount) req.fileCount = {};
-      if (!req.fileCount[key]) req.fileCount[key] = 0;
+      const t4tReq = req as T4TRequest;
+      const fileUiConfig = t4tReq.table.fileConfigUi[key] as FileUiConfig;
+      const { options } = fileUiConfig.multer;
+      if (!t4tReq.fileCount) t4tReq.fileCount = {};
+      if (!t4tReq.fileCount[key]) t4tReq.fileCount[key] = 0;
       const maxFileLimit = options?.limits?.files || 1;
-      if (req.fileCount[key] >= maxFileLimit) {
-        return cb(new Error(`Maximum Number Of Files Exceeded`), false);
+      if (t4tReq.fileCount[key] >= maxFileLimit) {
+        return cb(new Error(`Maximum Number Of Files Exceeded`));
       }
-      req.fileCount[key]++; // Increment the file count for each processed file
+      t4tReq.fileCount[key]++; // Increment the file count for each processed file
       // TODO validate binary file type... using npm file-type?
       // https://dev.to/ayanabilothman/file-type-validation-in-multer-is-not-safe-3h8l
       // if (!['image/png', 'image/jpeg'].includes(file.mimetype)) {
@@ -60,7 +76,7 @@ let orgIdKey = '';
 
 // __key is reserved property for identifying row in a table
 // | is reserved for seperating columns that make the multiKey
-const generateTable = async (req, res, next) => {
+const generateTable = async (req: T4TRequest, _res: Response, next: NextFunction): Promise<void> => {
   // TODO get config info from a table
   const tableKey = req.params.table; // 'books' // its the table name also
 
@@ -80,18 +96,18 @@ const generateTable = async (req, res, next) => {
   req.table.db = database || filename || 'DB Not Found';
 
   // permissions settings
-  req.table.view = roleOperationMatch(req.user[roleKey], req.table.view);
+  req.table.view = roleOperationMatch((req.user?.[roleKey] ?? '') as string, req.table.view);
   const acStr = '/autocomplete';
   const acLen = acStr.length;
   if (req.path.substring(req.path.length - acLen) === acStr) {
     logger.info('auto complete here...');
     return next();
   }
-  req.table.create = roleOperationMatch(req.user[roleKey], req.table.create);
-  req.table.update = roleOperationMatch(req.user[roleKey], req.table.update);
-  req.table.delete = roleOperationMatch(req.user[roleKey], req.table.delete);
-  req.table.import = roleOperationMatch(req.user[roleKey], req.table.import);
-  req.table.export = roleOperationMatch(req.user[roleKey], req.table.export);
+  req.table.create = roleOperationMatch((req.user?.[roleKey] ?? '') as string, req.table.create);
+  req.table.update = roleOperationMatch((req.user?.[roleKey] ?? '') as string, req.table.update);
+  req.table.delete = roleOperationMatch((req.user?.[roleKey] ?? '') as string, req.table.delete);
+  req.table.import = roleOperationMatch((req.user?.[roleKey] ?? '') as string, req.table.import);
+  req.table.export = roleOperationMatch((req.user?.[roleKey] ?? '') as string, req.table.export);
 
   // sanitize
   req.table.deleteLimit = Number(req.table.deleteLimit) || -1;
@@ -111,16 +127,16 @@ const generateTable = async (req, res, next) => {
     if (col.required) req.table.required.push(key);
     if (col?.ui?.tag === 'files') req.table.fileConfigUi[key] = col?.ui;
 
-    col.editor = !(col.editor && !roleOperationMatch(req.user[roleKey], col.editor, key));
+    col.editor = !(col.editor && !roleOperationMatch((req.user?.[roleKey] ?? '') as string, col.editor, key));
     if (!col.editor && col.edit) col.edit = 'readonly';
-    col.creator = !(col.creator && !roleOperationMatch(req.user[roleKey], col.creator, key));
+    col.creator = !(col.creator && !roleOperationMatch((req.user?.[roleKey] ?? '') as string, col.creator, key));
     if (!col.creator && col.add) col.add = 'readonly';
   }
   // logger.info(req.table)
   return next();
 };
 
-const routes = options => {
+const routes = (options?: T4TOptions): express.Router => {
   const authUser = options?.authFunc || noAuthFunc;
   roleKey = 'roles';
   idKey = 'sub';
@@ -128,13 +144,14 @@ const routes = options => {
 
   return express
     .Router()
-    .get('/healthcheck', (req, res) => res.send('t4t ok - 0.0.1'))
+    .get('/healthcheck', (_req, res) => res.send('t4t ok - 0.0.1'))
     .get('/config/:table', authUser, generateTable, async (req, res) => {
-      if (!req.table.view) throw new Error('Forbidden - Table Info');
-      res.json(req.table); // return the table info...
+      if (!(req as T4TRequest).table.view) throw new Error('Forbidden - Table Info');
+      res.json((req as T4TRequest).table); // return the table info...
     })
     .post('/autocomplete/:table', authUser, generateTable, async (req, res) => {
-      const { table } = req;
+      const t4tReq = req as T4TRequest;
+      const { table } = t4tReq;
       const { key, text, search, parentTableColName, parentTableColVal, limit = 20 } = req.body;
       // TODO use key to parentTable Col
 
@@ -146,7 +163,7 @@ const routes = options => {
       let rows = await query.clone().limit(limit); // TODO orderBy
       rows = rows.map(row => {
         const textKeys = text?.split(',');
-        const texts = [];
+        const texts: { type: string; value: unknown }[] = [];
         for (const tk of textKeys) {
           if (table.cols[tk]) {
             texts.push({
@@ -165,10 +182,14 @@ const routes = options => {
     })
     .get('/find/:table', authUser, generateTable, async (req, res) => {
       // page is 1 based
-      return custom[req?.table?.name]?.find ? custom[req.table.name].find(req, res) : base.find(req, res);
+      const t4tReq = req as T4TRequest;
+      return custom[t4tReq?.table?.name]?.find ? custom[t4tReq.table.name].find(t4tReq, res) : base.find(t4tReq, res);
     })
     .get('/find-one/:table', authUser, generateTable, async (req, res) => {
-      return custom[req?.table?.name]?.findOne ? custom[req.table.name].findOne(req, res) : base.findOne(req, res);
+      const t4tReq = req as T4TRequest;
+      return custom[t4tReq?.table?.name]?.findOne
+        ? custom[t4tReq.table.name].findOne(t4tReq, res)
+        : base.findOne(t4tReq, res);
     })
     .patch(
       '/update/:table{/:id}',
@@ -177,17 +198,35 @@ const routes = options => {
       storageUpload().any(), // TODO what about multiple files? also need to find the column involved...
       processJson,
       async (req, res) => {
-        return custom[req?.table?.name]?.update ? custom[req.table.name].update(req, res) : base.update(req, res);
+        const t4tReq = req as T4TRequest;
+        return custom[t4tReq?.table?.name]?.update
+          ? custom[t4tReq.table.name].update(t4tReq, res)
+          : base.update(t4tReq, res);
       },
     )
     .post('/create/:table', authUser, generateTable, storageUpload().any(), processJson, async (req, res) => {
-      return custom[req?.table?.name]?.create ? custom[req.table.name].create(req, res) : base.create(req, res);
+      const t4tReq = req as T4TRequest;
+      return custom[t4tReq?.table?.name]?.create
+        ? custom[t4tReq.table.name].create(t4tReq, res)
+        : base.create(t4tReq, res);
     })
     .post('/remove/:table', authUser, generateTable, async (req, res) => {
-      return custom[req?.table?.name]?.remove ? custom[req.table.name].remove(req, res) : base.remove(req, res);
+      const t4tReq = req as T4TRequest;
+      return custom[t4tReq?.table?.name]?.remove
+        ? custom[t4tReq.table.name].remove(t4tReq, res)
+        : base.remove(t4tReq, res);
     })
-    .post('/upload/:table', authUser, generateTable, memoryUpload(uploadMemory).single('csv-file'), async (req, res) =>
-      custom[req?.table?.name]?.upload ? custom[req?.table?.name]?.upload(req, res) : base.upload(req, res),
+    .post(
+      '/upload/:table',
+      authUser,
+      generateTable,
+      memoryUpload(uploadMemory).single('csv-file'),
+      async (req, res) => {
+        const t4tReq = req as T4TRequest;
+        return custom[t4tReq?.table?.name]?.upload
+          ? custom[t4tReq?.table?.name]?.upload(t4tReq, res)
+          : base.upload(t4tReq, res);
+      },
     );
 
   // delete file
