@@ -18,14 +18,13 @@
   },
   "type": "module",
   "exports": {
-    ".": "./index.ts",
     "./auth": "./auth/index.ts",
-    "./logger": "./logger/index.ts",
+    "./logger": "./logger.ts",
     "./services": "./services/index.ts",
     "./*": "./*.ts",
     "./**/*": "./**/*.ts"
   },
-  "main": "index.ts",
+  "main": "logger.ts",
   "scripts": {
     "test": "node --experimental-test-coverage --test-reporter=spec --test __test__/*.test.ts",
     "cover": "node --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info --test __test__/*.spec.ts",

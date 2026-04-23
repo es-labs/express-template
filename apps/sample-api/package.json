@@ -42,8 +42,5 @@
     "csv-parse": "^6.2.1",
     "fido2-lib": "^3.5.9",
     "pdfkit": "^0.18.0"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.6"
   }
 }
