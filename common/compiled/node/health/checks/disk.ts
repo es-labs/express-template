@@ -1,14 +1,8 @@
 import { statfs } from 'node:fs/promises';
+import type { CheckResult } from '../types.ts';
 
 const WARN_THRESHOLD = 0.8;
 const FATAL_THRESHOLD = 0.95;
-
-interface CheckResult {
-  name: string;
-  status: 'ok' | 'degraded' | 'unhealthy';
-  message: string;
-  meta: Record<string, string>;
-}
 
 /** Check disk usage on the root filesystem. Returns degraded above 80%, unhealthy above 95%. */
 export async function checkDisk(): Promise<CheckResult> {

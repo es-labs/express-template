@@ -1,20 +1,11 @@
 import type { Request, Response } from 'express';
 import { checkDisk } from './checks/disk.ts';
 import { checkMemory } from './checks/memory.ts';
+import type { CheckResult, CheckStatus } from './types.ts';
 
 const VERSION = process.env.npm_package_version ?? '0.0.0';
 const SERVICE = process.env.npm_package_name ?? 'api';
 const START_AT = Date.now();
-
-type CheckStatus = 'ok' | 'degraded' | 'unhealthy';
-
-interface CheckResult {
-  name: string;
-  status: CheckStatus;
-  message?: string;
-  latencyMs?: number;
-  meta?: Record<string, unknown>;
-}
 
 type CheckFn = () => Promise<CheckResult>;
 

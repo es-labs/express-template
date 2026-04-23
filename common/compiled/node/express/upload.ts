@@ -1,3 +1,5 @@
+// upload.ts — Multer helpers for memory and disk storage with sensible defaults
+
 import type { Options } from 'multer';
 import multer from 'multer';
 

@@ -119,10 +119,9 @@ interface UserWebSocket extends WebSocket {
 /** Push a notification payload to all sockets belonging to a specific user. */
 export function pushToUser(userId: number, payload: unknown): void {
   const data = JSON.stringify(payload);
-  for (const client of notifWSS.clients) {
-    const ws = client as UserWebSocket;
-    if (ws.userId === userId && ws.readyState === ws.OPEN) {
-      ws.send(data);
+  for (const client of notifWSS.clients as Set<UserWebSocket>) {
+    if (client.userId === userId && client.readyState === client.OPEN) {
+      client.send(data);
     }
   }
 }

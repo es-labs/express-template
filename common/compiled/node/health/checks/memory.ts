@@ -1,12 +1,7 @@
+import type { CheckResult } from '../types.ts';
+
 const WARN_THRESHOLD_MB = 400;
 const FATAL_THRESHOLD_MB = 700;
-
-interface CheckResult {
-  name: string;
-  status: 'ok' | 'degraded' | 'unhealthy';
-  message: string;
-  meta: Record<string, number>;
-}
 
 /** Check Node.js heap usage. Returns degraded above 400 MB, unhealthy above 700 MB. */
 export async function checkMemory(): Promise<CheckResult> {

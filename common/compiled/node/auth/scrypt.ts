@@ -5,6 +5,10 @@ const HASH_KEYLEN = 64;
 /**
  * Derive a hex-encoded scrypt hash from a plaintext password and hex-encoded salt.
  * Store both the returned hash and the salt in the database.
+ *
+ * @param password - Plaintext password to hash.
+ * @param salt - Hex-encoded salt to use during derivation.
+ * @returns Hex-encoded scrypt hash.
  */
 export const setScryptHash = (password: string, salt: string): Promise<string> => {
   const saltBuffer = Buffer.from(salt, 'hex');
