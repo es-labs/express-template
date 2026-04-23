@@ -23,6 +23,7 @@
 
 <script type="module">
 import * as mod from '/esm/upload-fe-testing.js'
+
 // https://kongaraju.blogspot.com/2012/07/large-file-upload-more-than-1gb-using.html
 var worker = new Worker('js/wfileupload.js', { type: "module" })
 
@@ -36,11 +37,12 @@ function handleFileSelect(evt) {
   // console.log('handleFileSelect', files)
   worker.postMessage({ 'files' : files })
   //Sending File list to worker
-  var output = []
-  for (var i = 0, f; f = files[i]; i++) {
+  var output = [], i, f
+  for (i = 0; i < files.length; i++) {
+    f = files[i]
     output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ', f.size, ' bytes, last modified: ', f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a', '</li>')
   }
-  document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>'
+  document.getElementById('list').innerHTML = `<ul>${output.join('')}</ul>`
 }
 
 function handleDragOver(evt) {

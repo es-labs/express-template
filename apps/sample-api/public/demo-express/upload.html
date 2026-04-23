@@ -10,10 +10,10 @@
 
 <body>
   <h1>File Uploads <a href="index.html">Back</a></h1>
-  Upload Memory <input id="btn-upload-memory" type="file"></br>
-  Upload Single (+ body JSON) <input id="btn-upload-single" type="file"></br>
-  Upload Multiple (+ body JSON) <input id="btn-upload-multiple" type="file" multiple></br>
-  <button id="btn-json">Send JSON (application/json)</button>
+  Upload Memory <input id="btn-upload-memory" type="file"><br />
+  Upload Single (+ body JSON) <input id="btn-upload-single" type="file"><br />
+  Upload Multiple (+ body JSON) <input id="btn-upload-multiple" type="file" multiple><br />
+  <button type="button" id="btn-json">Send JSON (application/json)</button>
   <p>
     check console for logs or... <a href="/uploads" target="_blank">View Local Uploads</a>
   </p>
@@ -21,9 +21,9 @@
   <h2>Upload to GCP using signed URL</h2>
   <p>Need to set CORS first: gsutil cors set [JSON_FILE_NAME].json gs://[BUCKET_NAME]</p>
   Upload To Google Storage <input id="input-gcp-upload" type="file"><br>
-  <button id="btn-gcp-read">Read Google</button><br>
-  <button id="btn-gcp-delete">Delete Google</button><br>  
-  Enter filename in Google Storage <input id="file-name" onchange="setFileName" /><button id="btn-clear">Clear Input</button><br>
+  <button type="button" id="btn-gcp-read">Read Google</button><br>
+  <button type="button" id="btn-gcp-delete">Delete Google</button><br>
+  Enter filename in Google Storage <input id="file-name" onchange="setFileName" /><button type="button" id="btn-clear">Clear Input</button><br>
 </body>
 
 <script type="module">

@@ -7,16 +7,18 @@ This document is for
 - migration notes
 - ideas that are not yet stable policy
 
-### Design
+## Design Features
+
 - Fully ES Modules - JS Standards Compliant
 - Named exports preferred (default exports for class, config, or a plugin)
 - Use Native as much as viable (test runners, datetime, fetch / xhr, npm, git hooks)
-- Option to use Javascript or Typescript (using NodeJS native typescript) for backend.
-  - For TS
-    - avoid enums, instead... use const object pattern / string literal unions
-    - avoid legacy decorators
-    - no any, use unknown
-    - use tsc --noEmit for type checking 
+- Option to use Javascript or Typescript for backend.
+- For Typescript
+  - avoid compilation, Use NodeJS native typescript
+  - use `tsc --noEmit` for type checking and `zod` for runtime validation
+  - avoid enums, instead... use const object pattern / string literal unions
+  - avoid legacy decorators
+  - avoid using <any>, use <unknown>
 - npm workspaces (microservices & shared libraries)
   - apps : microservices or applications (frontend or backend)
     - shared-<tenant1>
@@ -29,83 +31,52 @@ This document is for
     - default port 3000
   - common/shared code and schemas
   - sripts
-- web frontends ? to include? can be quite heavy
 - use zod for validation and openapi generation...
 - automation
-  - non-critical
-    - commit messages - czg
-    - changelog - release-please workflow
-    - release - release-please workflow
-    - code review AI - TODO
+  - commit messages - czg
+  - changelog - release-please workflow
+  - release - release-please workflow
+  - code review AI - TODO
   - api documentation
   - unit and integration test generation
 - global logger
   - no console log for backend
   - no logs in frontend production, errors sent to Sentry
-- biome vs prettier+eslint
-- zod
-  - validation
-  - openapi schema generation (zod-openapi)
-- NO Typescript unless it becomes runtime-native
+- use biome for formatting and linting
+  - biome vs prettier+eslint
 - testing
   - use native node test runner
   - playwright for e2e testing
-- Support postgres as primary RDBMS, mysql as secondary.
-  - DO NOT USE mongoDB
-- DB audit logging [strategy](decs/pg-audit-implementation)
-- Authorization
+- Support
+  - postgres as primary RDBMS, mysql as secondary.
+  - redis or keyv
+- DB audit logging [strategy](design/pg-audit-implementation)
+- Authorization [strategy](design/authz.md)
   - RBAC, FGA, and legacy roles fallback
   - multi-tenant, scopes
 - jsdoc for typing and autocomplete on IDE ?
 
+## Roadmap
 
-## precommits
+- **IN PROGRESS**
+  - JSON in env, refactor to use something else
+  - fix typescript noExplicit any
+  - Clean up auth and documentations
+- **TO TEST** 
+  - add RBAC and FGA
+  - Typescript to zod, convert code to TS for node runtime...
+  - audit_logs
+- **BACKLOG**
+  - safeJSON
+  - remove barrel index.js files...
+- **REVIEW**
+  - visualize package sizes with rollup-plugin-visualizer
+  - revisit biome when vueJS support is available
+  - S3/OSS
 
-- use biome for formatting and linting
+### To Consider
 
-## pushes / PR merges to main and release branches
-
-- run ci before merge
-  - repo-wide format check, no autofix
-  - repo-wide lint check, no autofix
-  - repo-wide schema check, no autofix
-  - repo-wide testing, no autofix
-  - repo-side package audit, no autofix?
-- do not allow PR merge if checks fail
-
-## Secrets Security
-
-- git guardian (use native Github for now)
-
-
-## TODOS
-
-### linting auto fix
-
-safe - useArrowFunction, useConst
-unsafe - useTemplate, useNodejsImportProtocol, useOptionalChain,  
-
-```
-npx biome <format/lint/check> common apps scripts
-npx biome lint common apps scripts --only=useTemplate --write --unsafe
-```
-
-### logger usage
-
-- apps/* - use backend logger for backend, frontend logger not implemented
-- common/iso - both (should be simple files remove console.logs)
-- common/node - backend (use backend logger)
-- common/vue -frontend VueJS (allow console, remove in prod)
-- common/web -frontend plainJS (allow console, remove in prod)
-- common/scripts
-
-
-### Github Related Readings
-
-- https://github.com/settings/security_analysis
-- https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization
-
-### Handling Globals
+1. Use namespace, Symbol with globalThis
 
 ```js
 # Check if namespace exists, if not create it.
@@ -116,11 +87,28 @@ const _logger = Symbol('logger');
 globalThis.__myApp[_logger] = myLogger;
 ```
 
-Currently we choose to do so without namespace.
+2. Use [testcontainers](https://testcontainers.com/guides/getting-started-with-testcontainers-for-nodejs/)
 
-### CAVEATS!
-- to fix dependency design issue between common/* projects
-- workflow might need to be tested when structure changes
-- use named exports, unless single class or function then use export default
-- do not create barrel index.js files
-- do not use named exports and export default in same file
+- Runs many services for test purposes
+- Data is not persisted
+
+3. linting auto fix
+
+```bash
+# safe - useArrowFunction, useConst
+# unsafe - useTemplate, useNodejsImportProtocol, useOptionalChain,  
+npx biome <format/lint/check> common apps scripts
+npx biome lint common apps scripts --only=useTemplate --write --unsafe
+```
+
+---
+
+<!--
+on:
+  push:
+    branches: [TODO]
+    paths:
+      - 'services/auth-service/**'
+      - 'shared/**'
+      - '.github/workflows/deploy-auth-service.yml'
+-->

@@ -1,4 +1,4 @@
-name: Commit Lint
+name: Call - Commit Lint
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: Biome
+name: Call - Biome
 
 on:
   workflow_call:

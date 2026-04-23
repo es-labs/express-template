@@ -32,13 +32,13 @@
   const outputEl = document.querySelector('#output')
 
   function testCors() {
-    let requestBody = JSON.stringify({"aa": "a1", "bb": "b2"})
+    const requestBody = JSON.stringify({"aa": "a1", "bb": "b2"})
     const request = new XMLHttpRequest()
     request.open('POST', 'http://127.0.0.1:3000/api/sample-api/tests/test-cors-post')
     request.setRequestHeader('Access-Control-Allow-Origin', '<origin> | *')
     request.setRequestHeader("Content-Type", "application/json")
     request.responseType = 'text'
-    request.onload = function() {
+    request.onload = () => {
       outputEl.innerHTML = JSON.stringify(request.response, null, 2)
     }
     request.send(requestBody)
@@ -68,7 +68,7 @@
           function pump() {
             return reader.read().then(({ done, value }) => {
               if (value) {
-                outputEl.innerHTML += value + '<br/>'
+                outputEl.innerHTML += `${value}<br/>`
               }
               // When no more data needs to be consumed, close the stream
               if (done) {

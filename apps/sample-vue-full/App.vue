@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { computed, shallowRef } from 'vue';
+import { shallowRef } from 'vue';
 import { http } from '../common/plugins/fetch.js';
 import { provideI18n } from '../common/plugins/i18n.js';
 // :key="$route.fullPath" // this is causing problems

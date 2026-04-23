@@ -16,7 +16,7 @@
 # - bucket (bucket name - e.g. test-www-dev)
 # - env (development, statging, production)
 #
-name: IN USE - Deploy To Bucket
+name: DEPLOY - Bucket
 
 # on: [push]
 on:

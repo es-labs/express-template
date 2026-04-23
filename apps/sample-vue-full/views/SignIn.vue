@@ -182,16 +182,6 @@ const oauthLogin = () => {
   background: lightgray;
 }
 
-.form-box-flex > div > a-input,
-.form-box-flex > div > .buttons-box-flex {
-  margin-top: 15px;
-}
-
-.form-box-flex > div > a-input {
-  flex: 1 1 auto;
-  font-size: 20px;
-}
-
 .buttons-box-flex {
   display: flex;
   flex-direction: row;
@@ -200,6 +190,16 @@ const oauthLogin = () => {
 
 .buttons-box-flex > div > a-button {
   flex: 0 1 95px;
+  font-size: 20px;
+}
+
+.form-box-flex > div > a-input,
+.form-box-flex > div > .buttons-box-flex {
+  margin-top: 15px;
+}
+
+.form-box-flex > div > a-input {
+  flex: 1 1 auto;
   font-size: 20px;
 }
 </style>

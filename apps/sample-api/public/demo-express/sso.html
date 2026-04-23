@@ -31,15 +31,15 @@
     <hr />
     <p>Testing SSO Login</p>
     <div>
-      <button id="btn-oauth">OAUTH (GIthub)</button>
+      <button type="button" id="btn-oauth">OAUTH (GIthub)</button>
     </div>
     <br />
     <div>
-      <button id="btn-oidc">OpenID Connect</button>
+      <button type="button" id="btn-oidc">OpenID Connect</button>
     </div>
     <br />
     <div>
-      <button id="btn-saml">SAML 2</button>
+      <button type="button" id="btn-saml">SAML 2</button>
     </div>
     <hr />
     <h2>Result</h2>
@@ -51,6 +51,7 @@
 <script type="module">
   import Fetch from '/esm/fetch.js';
   import parseJwt from '/esm/parse-jwt.js'
+
   console.log('v1.1')
 
   const http = new Fetch({
