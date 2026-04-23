@@ -1,39 +1,40 @@
 import history from 'connect-history-api-fallback';
+import type { Application } from 'express';
 import serveIndex from 'serve-index';
 import { errorHandler, notFoundHandler } from '../errors/error.middleware.ts';
 
-const postRoute = (app, express) => {
+type ExpressLib = typeof import('express');
+
+/**
+ * Register post-route middleware: static file serving, history API fallback,
+ * 404 handler, and central error handler.
+ * Call this after all application routes are registered.
+ */
+const postRoute = (app: Application, express: ExpressLib) => {
   const { UPLOAD_STATIC = null, WEB_STATIC = null } = globalThis.__config;
-  // app.set('case sensitive routing', true)
 
-  // Upload URL, Should use Signed URL and get from cloud storage instead
   if (UPLOAD_STATIC) {
-    // connect-history-api-fallback causes problems, so do upload first
-
-    UPLOAD_STATIC.forEach(item => {
-      const { url, folder, list, listOptions } = item;
-      if (url && folder) {
-        const authPlaceHolder = (req, res, next) => next(); // TODO add auth here...
-        app.use(url, authPlaceHolder, express.static(folder));
-        if (list) app.use(url, serveIndex(folder, listOptions)); // allow file and directory to be listed
-      }
-    });
+    UPLOAD_STATIC.forEach(
+      (item: { url: string; folder: string; list?: boolean; listOptions?: Record<string, unknown> }) => {
+        const { url, folder, list, listOptions } = item;
+        if (url && folder) {
+          const authPlaceHolder = (_req: unknown, _res: unknown, next: () => void) => next(); // TODO add auth here...
+          app.use(url, authPlaceHolder as Parameters<typeof app.use>[1], express.static(folder));
+          if (list) app.use(url, serveIndex(folder, listOptions));
+        }
+      },
+    );
   }
 
   if (WEB_STATIC?.length) {
-    app.use(history()); // causes problems when using postman - set header accept application/json in postman
-    WEB_STATIC.forEach(item => {
-      app.use(item.url, express.static(item.folder, item.options)); // { extensions: ['html'], index: false }
+    app.use(history());
+    WEB_STATIC.forEach((item: { url: string; folder: string; options?: Record<string, unknown> }) => {
+      app.use(item.url, express.static(item.folder, item.options));
     });
   }
 
-  // app.use(":wildcard", (req, res) => res.status(404).json({ Error: '404 Not Found...' }))
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-  // 'Bad Request': 400, 'Unauthorized': 401, 'Forbidden': 403, 'Not Found': 404, 'Conflict': 409, 'Unprocessable Entity': 422, 'Internal Server Error': 500,
-  app.use(notFoundHandler); // 404 — must come after all valid routes
+  app.use(notFoundHandler);
   app.use(errorHandler);
-
-  return this;
 };
 
 export default postRoute;

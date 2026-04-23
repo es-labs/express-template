@@ -1,16 +1,8 @@
-// import path from 'node:path';
-// import { readFileSync } from 'node:fs';
-// import { fileURLToPath } from 'node:url'
-// import packageJson from '../package.json' with { type: 'json' };
-export const name = process.env.npm_package_name;
-export const version = process.env.npm_package_version;
-export const dependencies = process.env.npm_package_dependencies;
+/** Package name from `npm_package_name` env var (set by npm at runtime). */
+export const name: string | undefined = process.env.npm_package_name;
 
-// export default async function (app_path) {
-//   // TODO: this to be refactored
-//   const packageJsonPath = path.join(app_path, 'package.json');
-//   const packageJsonContent = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
-//   const { version, name } = packageJsonContent;
-//   process.env.APP_VERSION = version;
-//   process.env.APP_NAME = name;
-// }
+/** Package version from `npm_package_version` env var (set by npm at runtime). */
+export const version: string | undefined = process.env.npm_package_version;
+
+/** Serialised dependencies string from `npm_package_dependencies` env var. */
+export const dependencies: string | undefined = process.env.npm_package_dependencies;

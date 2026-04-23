@@ -17,6 +17,7 @@ import {
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import type { Request, Response } from 'express';
 import express from 'express';
 
 const app = express();
@@ -25,8 +26,8 @@ app.use(express.json());
 const s3 = new S3Client({
   region: process.env.AWS_REGION || 'us-east-1',
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
   },
 });
 
@@ -37,7 +38,7 @@ const URL_EXPIRY = 3600; // signed URL valid for 1 hour
 // POST /api/s3/sign
 // Body: { type, key, contentType?, size?, uploadId?, partNumber?, parts? }
 
-app.post('/api/s3/sign', async (req, res) => {
+app.post('/api/s3/sign', async (req: Request, res: Response) => {
   const { type, key, contentType, size, uploadId, partNumber, parts } = req.body;
 
   try {
@@ -114,7 +115,8 @@ app.post('/api/s3/sign', async (req, res) => {
         return res.status(400).json({ error: `Unknown type: ${type}` });
     }
   } catch (err) {
-    logger.error('[S3 sign error]', err);
-    res.status(500).json({ error: err.message });
+    const e = err as Error;
+    logger.error('[S3 sign error]', e);
+    res.status(500).json({ error: e.message });
   }
 });

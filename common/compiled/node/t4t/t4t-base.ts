@@ -1,26 +1,32 @@
 import { Parser } from '@json2csv/plainjs';
 import { parse } from 'csv-parse';
+import type { Response } from 'express';
 import * as svc from '../../services/index.ts';
+import type { T4TRequest } from './t4t-utils.ts';
 import { formUniqueKey, isInvalidInput, kvDb2Col, mapRelation } from './t4t-utils.ts';
 
 //import csvParse from "csv-parse";
 const csvParse = parse;
 
-const upload = async (req, res) => {
+const upload = async (req: T4TRequest, res: Response): Promise<void> => {
   logger.info('base upload');
   const { table } = req;
   if (!table.import) throw new Error('Forbidden - Upload');
+  if (!req.file) {
+    res.status(400).json({ error: 'No file uploaded' });
+    return;
+  }
   const csv = req.file.buffer.toString('utf-8');
-  const output = [];
-  const errors = [];
-  let keys = [];
+  const output: string[][] = [];
+  const errors: string[] = [];
+  let keys: string[] = [];
   let line = 0;
   let columnsError = false; // flag as true
-  const keyMap = {};
+  const keyMap: Record<string, boolean> = {};
   csvParse(csv)
     .on('error', e => logger.error(e.message))
     .on('readable', function () {
-      let record = this.read();
+      let record = this.read() as string[] | null;
       while (record) {
         line++;
         if (line === 1) {
@@ -54,16 +60,16 @@ const upload = async (req, res) => {
             errors.push(`${line},Column Count Mismatch`);
           }
         }
-        record = this.read();
+        record = this.read() as string[] | null;
       }
     })
     .on('end', async () => {
       let _line = 0;
-      const writes = [];
+      const writes: Promise<unknown>[] = [];
       for (const row of output) {
         _line++;
         try {
-          const obj = {};
+          const obj: Record<string, string> = {};
           for (let i = 0; i < keys.length; i++) {
             const colName = keys[i];
             // const col = table.cols[colName]
@@ -74,7 +80,7 @@ const upload = async (req, res) => {
           }
           writes.push(svc.get(table.conn)(table.name).insert(obj));
         } catch (e) {
-          errors.push(`L2-${_line},Caught exception: ${e.toString()}`);
+          errors.push(`L2-${_line},Caught exception: ${String(e)}`);
         }
       }
       try {
@@ -85,26 +91,29 @@ const upload = async (req, res) => {
           });
         }
       } catch (e) {
-        errors.push(`-2,General write error: ${e.toString()}`);
+        errors.push(`-2,General write error: ${String(e)}`);
       }
-      return res.status(200).json({ errorCount: errors.length, errors });
+      return void res.status(200).json({ errorCount: errors.length, errors });
     });
 };
 
-const find = async (req, res) => {
+const find = async (req: T4TRequest, res: Response): Promise<void> => {
   if (!req.table.view) throw new Error('Forbidden - List All');
   const { table } = req;
-  let { page = 1, limit = 25, filters = null, sorter = null, csv = '' } = req.query;
-  page = parseInt(page); // 1-based
-  limit = parseInt(limit);
+  const rawQuery = req.query as { page?: string; limit?: string; filters?: string; sorter?: string; csv?: string };
+  let page = parseInt(rawQuery.page ?? '1'); // 1-based
+  const limit = parseInt(rawQuery.limit ?? '25');
   // logger.info('t4t filters and sort', filters, sorter, table.name, page, limit)
-  filters = JSON.parse(filters ? filters : null); // ignore where col === null, sort it 'or' first then 'and' // [ { col, op, val,andOr } ]
-  sorter = JSON.parse(sorter ? sorter : '[]'); // [ { column, order: 'asc' } ] / [] order = asc, desc
+  const filters: { col: string; op: string; val: unknown; andOr?: string }[] | null = JSON.parse(
+    rawQuery.filters ?? 'null',
+  ); // ignore where col === null, sort it 'or' first then 'and' // [ { col, op, val,andOr } ]
+  let sorter: unknown[] = JSON.parse(rawQuery.sorter ?? '[]'); // [ { column, order: 'asc' } ] / [] order = asc, desc
+  const csv = rawQuery.csv ?? '';
   if (req.table?.defaultSort && sorter.length === 0 && req.table.defaultSort.length > 0) {
     sorter = req.table.defaultSort;
   }
   if (page < 1) page = 1;
-  const rv = { results: [], total: 0 };
+  const rv: { results: Record<string, unknown>[]; total: number } = { results: [], total: 0 };
   // biome-ignore lint/suspicious/noImplicitAnyLet: assigned from knex query below
   let rows;
   let query = svc.get(table.conn)(table.name);
@@ -116,7 +125,7 @@ const find = async (req, res) => {
 
   // TODO handle filters for joins...
   let prevFilter: Record<string, unknown> = {};
-  const joinCols = {};
+  const joinCols: Record<string, string> = {};
   if (filters?.length)
     for (const filter of filters) {
       const key = filter.col;
@@ -161,34 +170,33 @@ const find = async (req, res) => {
   if (csv) {
     const parser = new Parser({});
     const csvRows = parser.parse(rows);
-    return res.json({ csv: csvRows });
+    return void res.json({ csv: csvRows });
   } else {
     rv.results = rows.map(row => {
       // make column for UI to identify each row
       if (table.pk) {
         row.__key = row[table.pk];
       } else {
-        const val = [];
+        const val: unknown[] = [];
         for (const k of table.multiKey) val.push(row[k]);
         row.__key = val.join('|');
       }
       return row;
     });
-    return res.json(rv);
+    return void res.json(rv);
   }
 };
 
-const findOne = async (req, res) => {
+const findOne = async (req: T4TRequest, res: Response): Promise<void> => {
   if (!req.table.view) throw new Error('Forbidden - List One');
   const { table } = req;
-  const where = formUniqueKey(table, req.query.__key);
-  if (!where) return res.status(400).json({}); // bad request
+  const where = formUniqueKey(table, req.query.__key as string);
+  if (!where) return void res.status(400).json({}); // bad request
   let columns = [`${table.name}.*`];
   if (table.select) columns = table.select.split(','); // custom columns... TODO need to add table name?
   let query = svc.get(table.conn)(table.name).where(where);
-  const joinCols = {};
+  const joinCols: Record<string, string> = {};
   for (const key in table.cols) {
-    const col = table.cols[key];
     const rel = mapRelation(key, table.cols[key]);
     if (rel) {
       // if has relation and is key-value
@@ -201,16 +209,16 @@ const findOne = async (req, res) => {
   }
   let rv = await query.column(...columns).first();
   rv = rv ? kvDb2Col(rv, joinCols, table.cols) : null; // return null if not found
-  return res.status(rv ? 200 : 404).json(rv);
+  return void res.status(rv ? 200 : 404).json(rv);
 };
 
-const remove = async (req, res) => {
+const remove = async (req: T4TRequest, res: Response): Promise<void> => {
   if (!req.table.delete) throw new Error('Forbidden - Delete');
   const { table } = req;
-  const { ids } = req.body;
+  const { ids }: { ids: string[] } = req.body;
   if (table.deleteLimit > 0 && ids.length > table.deleteLimit)
-    return res.status(400).json({ error: `Select up to ${table.deleteLimit} items` });
-  if (ids.length < 1) return res.status(400).json({ error: 'No item selected' });
+    return void res.status(400).json({ error: `Select up to ${table.deleteLimit} items` });
+  if (ids.length < 1) return void res.status(400).json({ error: 'No item selected' });
 
   // TODO delete relations junction, do not delete if value is in use... // use Foreign Key...
   const trx = await svc.get(table.conn).transaction();
@@ -222,7 +230,7 @@ const remove = async (req, res) => {
     } else {
       const keys = ids.map(id => {
         const id_a = id.split('|');
-        const multiKey = {};
+        const multiKey: Record<string, string> = {};
         for (let i = 0; i < id_a.length; i++) {
           const keyName = table.multiKey[i];
           multiKey[keyName] = id_a[i];
@@ -233,7 +241,7 @@ const remove = async (req, res) => {
       await Promise.allSettled(keys);
     }
     await trx.commit();
-    return res.json({
+    return void res.json({
       deletedRows: ids.length,
     });
   } catch (e) {
@@ -243,13 +251,13 @@ const remove = async (req, res) => {
   }
 };
 
-const update = async (req, res) => {
+const update = async (req: T4TRequest, res: Response): Promise<void> => {
   if (!req.table.update) throw new Error('Forbidden - Update');
   const { body, table } = req;
-  const where = formUniqueKey(table, req.query.__key);
+  const where = formUniqueKey(table, req.query.__key as string);
   let count = 0;
 
-  if (!where) return res.status(400).json({}); // bad request
+  if (!where) return void res.status(400).json({}); // bad request
   for (const key in table.cols) {
     // formally used table.cols, add in auto fields?
     if (body[key] !== undefined) {
@@ -259,16 +267,16 @@ const update = async (req, res) => {
       else if (col?.hide === 'blank' && !body[key]) delete body[key];
       else {
         const invalid = isInvalidInput(col, body[key], key);
-        if (invalid) return res.status(400).json(invalid);
+        if (invalid) return void res.status(400).json(invalid);
         if (col.auto && col.auto === 'user') {
           body[key] = req?.user?.sub || 'unknown';
         } else if (col.auto && col.auto === 'ts') {
           body[key] = new Date().toISOString();
         } else {
           // TRANSFORM INPUT
-          body[key] = ['integer', 'decimal'].includes(col.type)
+          body[key] = ['integer', 'decimal'].includes(col.type ?? '')
             ? Number(body[key])
-            : ['datetime', 'date', 'time'].includes(col.type)
+            : ['datetime', 'date', 'time'].includes(col.type ?? '')
               ? body[key]
                 ? new Date(body[key])
                 : null
@@ -293,10 +301,10 @@ const update = async (req, res) => {
   if (!count) {
     // nothing was updated..., if (table.upsert) do insert ?
   }
-  return res.json({ count });
+  return void res.json({ count });
 };
 
-const create = async (req, res) => {
+const create = async (req: T4TRequest, res: Response): Promise<void> => {
   if (!req.table.create) throw new Error('Forbidden - Create');
   const { table, body } = req;
   for (const key in table.cols) {
@@ -306,16 +314,16 @@ const create = async (req, res) => {
     else if (col.auto && col.auto === 'pk' && key in body) delete body[key];
     else {
       const invalid = isInvalidInput(col, body[key], key);
-      if (invalid) return res.status(400).json(invalid);
+      if (invalid) return void res.status(400).json(invalid);
       if (col.auto && col.auto === 'user') {
         body[key] = req?.user?.sub || 'unknown';
       } else if (col.auto && col.auto === 'ts') {
         body[key] = new Date().toISOString();
       } else {
         // TRANSFORM INPUT
-        body[key] = ['integer', 'decimal'].includes(table.cols[key].type)
+        body[key] = ['integer', 'decimal'].includes(table.cols[key].type ?? '')
           ? Number(body[key])
-          : ['datetime', 'date', 'time'].includes(table.cols[key].type)
+          : ['datetime', 'date', 'time'].includes(table.cols[key].type ?? '')
             ? body[key]
               ? new Date(body[key])
               : null
@@ -340,7 +348,7 @@ const create = async (req, res) => {
   // if (table.pk) query = query.returning(table.pk)
   // rv = await query.clone()
   // const recordKey = rv?.[0] // id - also... disallow link tables input... for creation
-  return res.status(201).json(rv);
+  return void res.status(201).json(rv);
 };
 
 export default {

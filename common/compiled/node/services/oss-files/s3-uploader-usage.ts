@@ -14,20 +14,20 @@ const uploader = new S3Uploader({
 
 // ─── Basic upload ─────────────────────────────────────────────────────────────
 
-async function uploadFile(file) {
+async function uploadFile(file: File): Promise<void> {
   try {
     const result = await uploader.upload(file, {
       key: `uploads/${Date.now()}-${file.name}`, // custom S3 key (optional)
       onProgress: pct => {
         logger.info(`Upload progress: ${pct}%`);
-        document.getElementById('progress').value = pct;
+        (document.getElementById('progress') as HTMLProgressElement).value = String(pct);
       },
     });
 
     logger.info('Upload complete!', result);
     // result = { key: 'uploads/...', location: 'https://bucket.s3.amazonaws.com/...' }
   } catch (err) {
-    logger.error('Upload failed:', err.message);
+    logger.error('Upload failed:', (err as Error).message);
   }
 }
 
@@ -36,7 +36,7 @@ async function uploadFile(file) {
 // biome-ignore lint/suspicious/noImplicitAnyLet: assigned in uploadWithCancel below
 let controller;
 
-async function uploadWithCancel(file) {
+async function uploadWithCancel(file: File): Promise<void> {
   controller = new AbortController();
 
   try {
@@ -48,24 +48,26 @@ async function uploadWithCancel(file) {
     });
     logger.info('Done:', result);
   } catch (err) {
-    if (err.name === 'AbortError') {
+    const e = err as Error;
+    if (e.name === 'AbortError') {
       logger.info('Upload cancelled by user');
       // Optionally call your backend to abort the multipart upload in S3
       // to avoid storage costs for incomplete uploads
     } else {
-      logger.error('Error:', err);
+      logger.error('Error:', e);
     }
   }
 }
 
-function cancelUpload() {
+function cancelUpload(): void {
   controller?.abort();
 }
 
 // ─── Wire up to a file input ──────────────────────────────────────────────────
 
-document.getElementById('fileInput').addEventListener('change', e => {
-  const file = e.target.files[0];
+document.getElementById('fileInput')?.addEventListener('change', e => {
+  const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
   if (file) uploadWithCancel(file);
 });
 

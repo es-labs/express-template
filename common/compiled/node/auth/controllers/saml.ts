@@ -2,6 +2,7 @@
 // no refresh token, issue own OAuth2 like JWT server
 
 import { SAML } from '@node-saml/node-saml';
+import type { Request, Response } from 'express';
 import { createToken, setTokensToHeader } from '../jwt.ts';
 
 const { SAML_CERTIFICATE, SAML_PRIVATE_KEY } = process.env;
@@ -19,57 +20,50 @@ if (samlOptions) {
 
 const saml = samlOptions ? new SAML(samlOptions) : null;
 
-// /login
-export const login = async (req, res) => {
-  // return res.redirect('/' + token...) // for faking, bypass real callback
-  // console.debug(req.header('referer'), req.query.RelayState)
-  // getAuthorizeUrlAsync(RelayState: string, host: string | undefined, options: AuthOptions)
+/**
+ * Redirect the user to the SAML IdP authorization URL.
+ * Mounted at: GET /saml/login
+ */
+export const login = async (req: Request, res: Response): Promise<void> => {
   // biome-ignore lint/suspicious/noExplicitAny: saml type definitions are incomplete
-  const authUrl = await (saml as any)?.getAuthorizeUrlAsync(req.query.RelayState); // validatePostResponseAsync (calls..., processValidlySignedPostRequestAsync)
+  const authUrl = await (saml as any)?.getAuthorizeUrlAsync(req.query.RelayState);
   res.redirect(authUrl);
 };
 
-// POST /callback
-export const auth = async (req, res) => {
+/**
+ * Handle the SAML IdP POST callback, validate the assertion, then issue a local JWT.
+ * Mounted at: POST /saml/callback
+ */
+export const auth = async (req: Request, res: Response): Promise<void> => {
   try {
     const parsedResponse = await saml?.validatePostResponseAsync(req.body);
-
-    // TEST
-    // logger.info(typeof parsedResponse, parsedResponse)
-    // res.json({ message: 'testing node-saml ok', parsedResponse })
-
-    // Callback
     try {
-      const TO = req.body.RelayState;
-      const authenticated = !parsedResponse.loggedOut;
+      const TO = req.body.RelayState as string;
+      const authenticated = !parsedResponse?.loggedOut;
       const user = {
-        sub: parsedResponse.profile[samlJwtMap.id], // id: req.user.nameID, // string
-        roles: parsedResponse.profile[samlJwtMap.groups], // groups: req.user.Role, // comma seperated string or array or object...
+        sub: parsedResponse?.profile[samlJwtMap.id],
+        roles: parsedResponse?.profile[samlJwtMap.groups],
       };
       if (!TO) {
-        // if no RelayState, then it is a test
-        return res.status(200).json({
-          authenticated,
-          user,
-        });
+        res.status(200).json({ authenticated, user });
+        return;
       }
-      // logger.info(TO, user, authenticated, samlJwtMap, parsedResponse['Role'])
       if (authenticated) {
         const tokens = await createToken(user);
         setTokensToHeader(res, tokens);
-        return res.redirect(`${TO}#${tokens.access_token};${tokens.refresh_token};${JSON.stringify(tokens.user_meta)}`); // use url fragment...
-      } else {
-        return AUTH_ERROR_URL ? res.redirect(AUTH_ERROR_URL) : res.status(401).json({ error: 'NOT Authenticated' });
+        res.redirect(`${TO}#${tokens.access_token};${tokens.refresh_token};${JSON.stringify(tokens.user_meta)}`);
+        return;
       }
-    } catch (e) {
-      //   return AUTH_ERROR_URL ? res.redirect(AUTH_ERROR_URL) : res.status(500).json({ error: e.toString() })
+      AUTH_ERROR_URL ? res.redirect(AUTH_ERROR_URL) : res.status(401).json({ error: 'NOT Authenticated' });
+    } catch (_inner) {
+      // inner parse errors swallowed — outer catch handles redirect
     }
   } catch (e) {
-    // logger.info('SAML callback error', e)
     res.json({
-      message: e.toString(),
+      message: String(e),
       note: 'Currently it always triggers invalid document signature fix is on the way',
     });
+    return;
   }
   res.send('ok');
 };

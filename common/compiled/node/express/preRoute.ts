@@ -1,6 +1,7 @@
 // ? caution - avoid name clashes with native JS libraries, other libraries, other globals
 import http from 'node:http';
 import https from 'node:https';
+import type { Duplex } from 'node:stream';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -9,9 +10,13 @@ import pathToRegexp from 'path-to-regexp';
 import * as authService from '../auth/jwt.ts';
 import * as shutdown from '../errors/shutdown.ts';
 import { healthRouter } from '../health/router.ts';
-import { loggerMiddleware } from '../logger/index.ts';
+import { loggerMiddleware } from '../logger.ts';
 import * as services from '../services/index.ts';
 
+/**
+ * Bootstrap the Express app: registers security, CORS, body parsing middleware and starts services.
+ * @returns The configured Express app, the express module, and the underlying HTTP(S) server.
+ */
 const preRoute = () => {
   const DEFAULT_STACK_TRACE_LIMIT = 3; // default limit error stack trace to 3 level
   const { STACK_TRACE_LIMIT = DEFAULT_STACK_TRACE_LIMIT } = process.env;
@@ -19,16 +24,14 @@ const preRoute = () => {
   // setup stacktrace limit
   Error.stackTraceLimit = Number(STACK_TRACE_LIMIT) || DEFAULT_STACK_TRACE_LIMIT;
 
-  // biome-ignore lint/suspicious/noImplicitAnyLet: assigned below after server creation
-  let server;
+  let server: http.Server | https.Server;
   shutdown.setup(
     () => server,
     () => services,
   ); // both resolved lazily — safe to call before server/services exist
 
   const { HTTPS_PRIVATE_KEY, HTTPS_CERTIFICATE, HTTPS_CA } = process.env;
-  // biome-ignore lint/suspicious/noExplicitAny: flexible https options object
-  const https_opts: Record<string, any> = {};
+  const https_opts: https.ServerOptions = {};
   if (HTTPS_CERTIFICATE) https_opts.cert = HTTPS_CERTIFICATE;
   if (HTTPS_PRIVATE_KEY) https_opts.key = HTTPS_PRIVATE_KEY;
   if (HTTPS_CA) https_opts.ca = HTTPS_CERTIFICATE;
@@ -36,7 +39,7 @@ const preRoute = () => {
   server = HTTPS_CERTIFICATE ? https.createServer(https_opts, app) : http.createServer(app);
 
   // intercept upgrades before Express sees them
-  server.on('upgrade', (req, socket, head) => {
+  server.on('upgrade', (req: http.IncomingMessage, socket: Duplex, _head: Buffer) => {
     // Let the WS server handle it — do nothing here if services.start sets up WS internally
     // This prevents Express middleware from touching upgrade requests
     if (req.headers.upgrade?.toLowerCase() !== 'websocket') {
@@ -53,7 +56,7 @@ const preRoute = () => {
   app.use(loggerMiddleware); // HTTP Request and Websocket Related logging
 
   // skip middleware for WebSocket upgrade requests
-  app.use((req, res, next) => {
+  app.use((req, _res, next) => {
     // if (req.headers.upgrade?.toLowerCase() === 'websocket') return next('route');
     if (req.headers.upgrade?.toLowerCase() === 'websocket') return next(); // let WS server handle it
     next();
@@ -93,7 +96,7 @@ const preRoute = () => {
   try {
     const resHeadersAdd = globalThis.__config?.RES_HEADERS_ADD;
     if (Object.keys(resHeadersAdd)?.length) {
-      app.use((req, res, next) => {
+      app.use((_req, res, next) => {
         for (const key in resHeadersAdd) {
           if (!res.get(key)) res.set(key, resHeadersAdd[key]);
         }
@@ -112,7 +115,9 @@ const preRoute = () => {
   // client request body must match request content-type, if applicaion/json, body cannot be null/undefined
   try {
     app.use((req, res, next) => {
-      const rawMatch = BODYPARSER_RAW_ROUTES?.split(',')?.find(route => pathToRegexp.match(route)(req.originalUrl));
+      const rawMatch = BODYPARSER_RAW_ROUTES?.split(',')?.find((route: string) =>
+        pathToRegexp.match(route)(req.originalUrl),
+      );
       if (rawMatch) {
         // raw routes - ignore bodyparser json
         next();

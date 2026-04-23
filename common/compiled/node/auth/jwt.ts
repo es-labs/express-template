@@ -2,7 +2,7 @@
 import crypto from 'node:crypto';
 // TODO JWK and JOSE
 import { createRemoteJWKSet, exportJWK, importSPKI, jwtVerify } from 'jose';
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import * as keyStore from './keystore.ts';
 import * as fga from './openfga.ts';
 import * as rbac from './rbac.ts';
@@ -57,8 +57,7 @@ export const getSecret = mode => {
 
 export const createToken = async user => {
   const user_meta = {};
-  // biome-ignore lint/suspicious/noExplicitAny: jwt options shape varies
-  const options: Record<string, any> = {};
+  const options: SignOptions = {};
 
   const sub = user[AUTH_USER_FIELD_ID_FOR_JWT];
 

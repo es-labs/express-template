@@ -60,7 +60,7 @@ class OSSUploader {
    * @param {AbortSignal} [opts.signal]    - AbortController signal to cancel
    * @returns {Promise<{ key: string, location: string }>}
    */
-  async upload(file, opts: OSSUploadOpts = {}) {
+  async upload(file: File | Blob, opts: OSSUploadOpts = {}): Promise<{ key: string; location: string }> {
     const key = opts.key || file.name;
     const onProgress = opts.onProgress || (() => {});
     const signal = opts.signal || null;
@@ -73,7 +73,12 @@ class OSSUploader {
 
   // ─── Single-Part Upload (≤5MB) ───────────────────────────────────────────────
 
-  async _singleUpload(file, key, onProgress, signal) {
+  async _singleUpload(
+    file: File | Blob,
+    key: string,
+    onProgress: (pct: number) => void,
+    signal: AbortSignal | null,
+  ): Promise<{ key: string; location: string }> {
     onProgress(0);
 
     const { signedUrl, location } = await this._callBackend({
@@ -99,7 +104,12 @@ class OSSUploader {
 
   // ─── Multipart Upload (>5MB) ─────────────────────────────────────────────────
 
-  async _multipartUpload(file, key, onProgress, signal) {
+  async _multipartUpload(
+    file: File | Blob,
+    key: string,
+    onProgress: (pct: number) => void,
+    signal: AbortSignal | null,
+  ): Promise<{ key: string; location: string }> {
     // Step 1 — Initiate: backend calls CreateMultipartUpload, returns uploadId
     const { uploadId } = await this._callBackend({
       type: 'initiate',
@@ -116,12 +126,14 @@ class OSSUploader {
     };
 
     // Step 2 — Upload parts concurrently
-    const completedParts = [];
+    const completedParts: Array<{ PartNumber: number; ETag: string | null | undefined }> = [];
     const queue = chunks.map((chunk, i) => ({ chunk, partNumber: i + 1, index: i }));
 
     const worker = async () => {
       while (queue.length > 0) {
-        const { chunk, partNumber, index } = queue.shift();
+        const item = queue.shift();
+        if (!item) break;
+        const { chunk, partNumber, index } = item;
 
         if (signal?.aborted) throw new DOMException('Upload aborted', 'AbortError');
 
@@ -147,8 +159,7 @@ class OSSUploader {
         );
 
         // OSS sometimes returns ETag without surrounding quotes — normalise
-        const rawETagStr = rawETag as string;
-        const etag = rawETagStr?.replace(/"/g, '') ? `"${rawETagStr.replace(/"/g, '')}"` : rawETagStr;
+        const etag = rawETag?.replace(/"/g, '') ? `"${rawETag.replace(/"/g, '')}"` : rawETag;
 
         completedParts.push({ PartNumber: partNumber, ETag: etag });
       }
@@ -179,15 +190,15 @@ class OSSUploader {
 
   // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-  _splitFile(file) {
-    const chunks = [];
+  _splitFile(file: File | Blob): Blob[] {
+    const chunks: Blob[] = [];
     for (let offset = 0; offset < file.size; offset += this.chunkSize) {
       chunks.push(file.slice(offset, offset + this.chunkSize));
     }
     return chunks;
   }
 
-  async _callBackend(payload) {
+  async _callBackend(payload: Record<string, unknown>) {
     const res = await fetch(this.signEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -209,7 +220,14 @@ class OSSUploader {
    *
    * @returns {Promise<string|undefined>} ETag value when returnETag=true
    */
-  _putBlob(signedUrl, blob, contentType, onProgress, signal, returnETag = false) {
+  _putBlob(
+    signedUrl: string,
+    blob: Blob,
+    contentType: string,
+    onProgress: (loaded: number) => void,
+    signal: AbortSignal | null,
+    returnETag = false,
+  ): Promise<string | null | undefined> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open('PUT', signedUrl);

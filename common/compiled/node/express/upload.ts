@@ -1,21 +1,16 @@
-// import path from 'path'
-// path.extname('index.html')
-// returns '.html'
-// req.file / req.files[index]
-// {
-//   fieldname: 'kycfile',
-//   originalname: 'todo.txt',
-//   encoding: '7bit',
-//   mimetype: 'text/plain',
-//   destination: 'uploads/',
-//   filename: 'kycfile-1582238409067',
-//   path: 'uploads\\kycfile-1582238409067',
-//   size: 110
-// }
+// upload.ts — Multer helpers for memory and disk storage with sensible defaults
 
+import type { Options } from 'multer';
 import multer from 'multer';
 
-const memoryUpload = options =>
+/**
+ * Returns a Multer instance configured for in-memory storage.
+ * Defaults to 1 file and 500 KB limit. Pass `options` to override.
+ *
+ * @example
+ * router.post('/upload', memoryUpload().single('file'), handler)
+ */
+const memoryUpload = (options?: Partial<Options>) =>
   multer(
     Object.assign(
       {
@@ -26,31 +21,30 @@ const memoryUpload = options =>
     ),
   );
 
-// TODO
-
-const storageUpload = ({ folder, options }) => {
-  // validate binary file type... using npm file-type?
-  // https://dev.to/ayanabilothman/file-type-validation-in-multer-is-not-safe-3h8l
-  // const fileFilter = (req, file, cb) => {
-  //   if (['image/png', 'image/jpeg'].includes(file.mimetype)) {
-  //     cb(null, true);
-  //   } else {
-  //     cb(new Error('Invalid file type!'), false)
-  //   }
-  // }
-  return multer(
+/**
+ * Returns a Multer instance configured for disk storage.
+ * Defaults to 1 file and 8 MB limit. Pass `options` to override.
+ *
+ * @param folder - Destination directory for uploaded files.
+ * @param options - Additional Multer options to merge.
+ *
+ * @example
+ * router.post('/upload', storageUpload({ folder: 'uploads/' }).single('file'), handler)
+ */
+const storageUpload = ({ folder, options }: { folder: string; options?: Partial<Options> }) =>
+  multer(
     Object.assign(
       {
         storage: multer.diskStorage({
-          // fileFilter
-          destination: (req, file, cb) => cb(null, folder),
-          filename: (req, file, cb) => cb(null, file.originalname), // file.fieldname, file.originalname
+          destination: (_req: unknown, _file: unknown, cb: (err: Error | null, dest: string) => void) =>
+            cb(null, folder),
+          filename: (_req: unknown, file: Express.Multer.File, cb: (err: Error | null, name: string) => void) =>
+            cb(null, file.originalname),
         }),
         limits: { files: 1, fileSize: 8000000 },
       },
       options,
     ),
   );
-};
 
 export { memoryUpload, storageUpload };
