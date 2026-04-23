@@ -9,7 +9,7 @@
     "tobermory.es6-string-html",
     "github.vscode-github-actions",
     "connor4312.nodejs-testing",
-    "ms-vscode-remote.remote-ssh",
+    "ms-vscode-remote.remote-ssh"
   ],
   "unwantedRecommendations": [
     "ms-vscode-remote.remote-ssh-edit",

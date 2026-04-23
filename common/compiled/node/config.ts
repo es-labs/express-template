@@ -2,21 +2,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { loadEnvFile } from 'node:process';
 
-// 1. TODO create namespace for glbalThis
-// 2. Load optional structured, non-sensitive config into globalThis.__config.
-// 3. Keep secrets and scalar values in process.env.
-
-// Merge json configs into process.env - Object.assign(process.env, config);
-// Caveats: JSON cannot be nested, only flat key-value pairs, Coerces all values to string
-process.env.NODE_ENV = process.env.NODE_ENV || 'development'; // default to development if NODE_ENV is not set
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 const envFilePath = path.resolve(process.cwd(), '.env');
 
 if (process.env.NODE_ENV === 'development') {
-  // will throw if file doesn't exist, only use for development
+  loadEnvFile(`${envFilePath}.local`);
   loadEnvFile(envFilePath);
 }
 
-const normalizeJsonc = source => {
+/** Strip `//` line comments from a JSONC string, preserving strings and newlines. */
+const normalizeJsonc = (source: string): string => {
   let result = '';
   let inString = false;
   let isEscaped = false;
@@ -53,18 +48,20 @@ const normalizeJsonc = source => {
   return result;
 };
 
-const parseJsoncObject = (raw, filePath) => {
+/** Parse a JSONC string into a plain config object. Throws if the result is not an object. */
+const parseJsoncObject = (raw: string, filePath: string): Record<string, unknown> => {
   const normalized = normalizeJsonc(raw).trim();
   if (!normalized) return {};
 
-  const config = JSON.parse(normalized);
+  const config: unknown = JSON.parse(normalized);
   if (!config || typeof config !== 'object' || Array.isArray(config)) {
     throw new TypeError(`JSON config must be a top-level object: ${filePath}`);
   }
-  return config;
+  return config as Record<string, unknown>;
 };
 
-const loadJsonConfigFile = filePath => {
+/** Read and parse a `.env.json` / `.env.jsonc` file. Returns `{}` if the file does not exist. */
+const loadJsonConfigFile = (filePath: string): Record<string, unknown> => {
   if (!fs.existsSync(filePath)) return {};
 
   const raw = fs.readFileSync(filePath, 'utf8').trim();
@@ -73,9 +70,7 @@ const loadJsonConfigFile = filePath => {
   return parseJsoncObject(raw, filePath);
 };
 
-// Load and Parse the JSON, let error throw
-// To improve with deep freeze and validation if needed
-var __config = Object.freeze(loadJsonConfigFile(`${envFilePath}.json`));
+const __config = Object.freeze(loadJsonConfigFile(`${envFilePath}.json`));
 globalThis.__config = __config;
 
 export { __config };

@@ -52,7 +52,7 @@ class S3Uploader {
    * @param {AbortSignal} [opts.signal]  - AbortController signal to cancel upload
    * @returns {Promise<{ key: string, location: string }>}
    */
-  async upload(file, opts: S3UploadOpts = {}) {
+  async upload(file: File | Blob, opts: S3UploadOpts = {}): Promise<{ key: string; location: string }> {
     const key = opts.key || file.name;
     const onProgress = opts.onProgress || (() => {});
     const signal = opts.signal || null;
@@ -65,7 +65,12 @@ class S3Uploader {
 
   // ─── Single-Part Upload (≤5MB) ───────────────────────────────────────────────
 
-  async _singleUpload(file, key, onProgress, signal) {
+  async _singleUpload(
+    file: File | Blob,
+    key: string,
+    onProgress: (pct: number) => void,
+    signal: AbortSignal | null,
+  ): Promise<{ key: string; location: string }> {
     onProgress(0);
 
     // 1. Get signed PUT URL from your backend
@@ -85,7 +90,12 @@ class S3Uploader {
 
   // ─── Multipart Upload (>5MB) ─────────────────────────────────────────────────
 
-  async _multipartUpload(file, key, onProgress, signal) {
+  async _multipartUpload(
+    file: File | Blob,
+    key: string,
+    onProgress: (pct: number) => void,
+    signal: AbortSignal | null,
+  ): Promise<{ key: string; location: string }> {
     // 1. Initiate multipart upload — get uploadId from your backend
     const { uploadId } = await this._requestSignedUrl({
       type: 'initiate',
@@ -103,13 +113,14 @@ class S3Uploader {
     };
 
     // 2. Upload parts with concurrency control
-    const partNumber = 1;
-    const completedParts = [];
+    const completedParts: Array<{ PartNumber: number; ETag: string | null }> = [];
     const queue = [...chunks.entries()]; // [[index, blob], ...]
 
     const uploadWorker = async () => {
       while (queue.length > 0) {
-        const [index, chunk] = queue.shift();
+        const item = queue.shift();
+        if (!item) break;
+        const [index, chunk] = item;
         const currentPart = index + 1;
 
         if (signal?.aborted) throw new DOMException('Upload aborted', 'AbortError');
@@ -160,8 +171,8 @@ class S3Uploader {
   // ─── Helpers ─────────────────────────────────────────────────────────────────
 
   /** Split a File/Blob into chunks */
-  _splitFile(file) {
-    const chunks = [];
+  _splitFile(file: File | Blob): Blob[] {
+    const chunks: Blob[] = [];
     let offset = 0;
     while (offset < file.size) {
       chunks.push(file.slice(offset, offset + this.chunkSize));
@@ -174,7 +185,7 @@ class S3Uploader {
    * Call your backend to get signed URLs / manage multipart lifecycle.
    * Adapt the request/response shape to match your backend API.
    */
-  async _requestSignedUrl(payload) {
+  async _requestSignedUrl(payload: Record<string, unknown>) {
     const res = await fetch(this.endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -192,7 +203,14 @@ class S3Uploader {
    * PUT a blob to a pre-signed S3 URL, reporting progress.
    * Returns ETag if returnEtag=true (needed for multipart complete).
    */
-  _putToS3(signedUrl, blob, contentType, onChunkProgress, signal, returnEtag = false) {
+  _putToS3(
+    signedUrl: string,
+    blob: Blob,
+    contentType: string,
+    onChunkProgress: (loaded: number) => void,
+    signal: AbortSignal | null,
+    returnEtag = false,
+  ): Promise<string | null> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
 

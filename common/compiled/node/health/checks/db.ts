@@ -1,6 +1,12 @@
-// import { db } from '../../db/client.ts';   // your db client
-export async function checkDatabase() {
-  // await db.raw('SELECT 1');   // or db.execute / pool.query etc.
+interface CheckResult {
+  name: string;
+  status: 'ok' | 'degraded' | 'unhealthy';
+  message: string;
+}
+
+/** Placeholder database health check. Replace the body with a real query. */
+export async function checkDatabase(): Promise<CheckResult> {
+  // await db.raw('SELECT 1');
   return {
     name: 'checkDatabase',
     status: 'ok',

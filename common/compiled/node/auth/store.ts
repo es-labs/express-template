@@ -18,7 +18,7 @@ const knex = () => _lookup?.(_userServiceName); // knex instance for user table
  *   userServiceName  — service name from SERVICES_CONFIG (e.g. 'knex1')
  *   lookup           — services.get — resolves a name to the underlying store instance
  */
-// biome-ignore lint/suspicious/noExplicitAny: external service lookup return type
+// biome-ignore lint/suspicious/noExplicitAny: lookup returns different service instance types (knex, redis, keyv)
 export const setup = (tokenServiceName: string, userServiceName: string, lookup: (name: string) => any) => {
   _tokenServiceName = tokenServiceName;
   _tokenServiceType = globalThis.__config?.SERVICES_CONFIG?.[tokenServiceName]?.type ?? 'keyv';
@@ -27,29 +27,33 @@ export const setup = (tokenServiceName: string, userServiceName: string, lookup:
   _lookup = lookup;
 };
 
-// id field must be unique; upsert for PostgreSQL/MySQL
-export const setRefreshToken = async (id, refresh_token) => {
+/** Persist or replace a user's refresh token. Uses upsert for knex, set for keyv. */
+export const setRefreshToken = async (id: string | number, refresh_token: string) => {
   if (_tokenServiceType === 'knex')
     await tokenStore()(JWT_REFRESH_STORE_NAME).insert({ id, refresh_token }).onConflict('id').merge();
   else await tokenStore().set(id, refresh_token);
 };
 
-export const getRefreshToken = async id => {
+/** Retrieve the stored refresh token for a user. */
+export const getRefreshToken = async (id: string | number) => {
   if (_tokenServiceType === 'knex')
     return (await tokenStore()(JWT_REFRESH_STORE_NAME).where({ id }).first()).refresh_token;
   else return tokenStore().get(id);
 };
 
-export const revokeRefreshToken = async id => {
+/** Delete a user's refresh token, effectively invalidating their session. */
+export const revokeRefreshToken = async (id: string | number) => {
   if (_tokenServiceType === 'knex') await tokenStore()(JWT_REFRESH_STORE_NAME).where({ id }).delete();
   else await tokenStore().delete(id);
 };
 
-export const findUser = async where => {
+/** Find a single user record matching the given fields. Returns null if not found. */
+export const findUser = async (where: Record<string, unknown>) => {
   if (_userServiceType === 'knex') return knex()(AUTH_USER_STORE_NAME).where(where).first();
   return null;
 };
 
-export const updateUser = async (where, payload) => {
+/** Update fields on a user record matching the given fields. */
+export const updateUser = async (where: Record<string, unknown>, payload: Record<string, unknown>) => {
   if (_userServiceType === 'knex') return knex()(AUTH_USER_STORE_NAME).where(where).update(payload);
 };

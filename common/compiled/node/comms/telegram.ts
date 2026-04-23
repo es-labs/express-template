@@ -1,42 +1,25 @@
 // Setting up webhook: https://api.telegram.org/bot{my_bot_token}/setWebhook?url={url_to_send_updates_to}
 // Querying webhook: https://api.telegram.org/bot{my_bot_token}/getWebhookInfo
-/*
-{
-  update_id: 165679876,
-  message: {
-    message_id: 3,
-    from: {
-      id: 123456789,
-      is_bot: false,
-      first_name: 'A',
-      last_name: 'G',
-      username: 'aaronjxz',
-      language_code: 'en'
-    },
-    chat: {
-      id: 123456789,
-      first_name: 'A',
-      last_name: 'G',
-      username: 'aaronjxz',
-      type: 'private'
-    },
-    date: 1694045266,
-    text: 'test'
-  }
-}
-*/
 
 const { TELEGRAM_API_KEY, TELEGRAM_CHANNEL_ID } = process.env;
 
-export const sendMsg = async (text, chatId = '') => {
+/**
+ * Send a text message to a Telegram chat via the Bot API.
+ * Falls back to TELEGRAM_CHANNEL_ID when no chatId is provided.
+ *
+ * @param text - Message text to send.
+ * @param chatId - Target chat/channel ID. Defaults to TELEGRAM_CHANNEL_ID env var.
+ */
+export const sendMsg = async (text: string, chatId: string | number = ''): Promise<Response | { err: string }> => {
   try {
-    // logger.info('text, chatId', text, chatId)
-    //NOSONAR { id, date, pts, seq }
-    if (!chatId) chatId = TELEGRAM_CHANNEL_ID; // channel message
-    return await fetch(`https://api.telegram.org/bot${TELEGRAM_API_KEY}/sendMessage?chat_id=${chatId}&text=${text}`);
+    const target = chatId || TELEGRAM_CHANNEL_ID;
+    return await fetch(
+      `https://api.telegram.org/bot${TELEGRAM_API_KEY}/sendMessage?chat_id=${target}&text=${encodeURIComponent(text)}`,
+    );
   } catch (e) {
-    return { err: e.toString() };
+    return { err: String(e) };
   }
 };
 
-export const sendChannelMsg = async text => await sendMsg(text); // TODEPRECATE
+/** @deprecated Use `sendMsg(text)` directly. */
+export const sendChannelMsg = async (text: string): Promise<Response | { err: string }> => sendMsg(text);

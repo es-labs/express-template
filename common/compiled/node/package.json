@@ -18,14 +18,13 @@
   },
   "type": "module",
   "exports": {
-    ".": "./index.ts",
     "./auth": "./auth/index.ts",
-    "./logger": "./logger/index.ts",
+    "./logger": "./logger.ts",
     "./services": "./services/index.ts",
     "./*": "./*.ts",
     "./**/*": "./**/*.ts"
   },
-  "main": "index.ts",
+  "main": "logger.ts",
   "scripts": {
     "test": "node --experimental-test-coverage --test-reporter=spec --test __test__/*.test.ts",
     "cover": "node --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info --test __test__/*.spec.ts",
@@ -36,6 +35,10 @@
     "@node-saml/node-saml": "^5.1.0",
     "@openfga/sdk": "^0.9.5",
     "@scalar/express-api-reference": "^0.9.9",
+    "@types/connect-history-api-fallback": "^1.5.4",
+    "@types/multer": "^2.1.0",
+    "@types/serve-index": "^1.9.4",
+    "@types/web-push": "^3.6.4",
     "ali-oss": "^6.23.0",
     "connect-history-api-fallback": "^2.0.0",
     "cookie-parser": "^1.4.7",
@@ -60,6 +63,10 @@
     "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node-fetch": "^2.6.13",
     "@types/ws": "^8.18.1"
   }
 }

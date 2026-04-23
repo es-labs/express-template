@@ -32,6 +32,7 @@ import {
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import type { Request, Response } from 'express';
 import express from 'express';
 
 const app = express();
@@ -58,8 +59,8 @@ const ossClient = new S3Client({
   forcePathStyle: false,
 
   credentials: {
-    accessKeyId: process.env.OSS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.OSS_ACCESS_KEY_SECRET,
+    accessKeyId: process.env.OSS_ACCESS_KEY_ID ?? '',
+    secretAccessKey: process.env.OSS_ACCESS_KEY_SECRET ?? '',
   },
 });
 
@@ -67,7 +68,7 @@ const ossClient = new S3Client({
 // POST /api/oss/sign
 // Body: { type, key, contentType?, size?, uploadId?, partNumber?, parts? }
 
-app.post('/api/oss/sign', async (req, res) => {
+app.post('/api/oss/sign', async (req: Request, res: Response) => {
   const { type, key, contentType, size, uploadId, partNumber, parts } = req.body;
 
   if (!key) return res.status(400).json({ error: 'key is required' });
@@ -153,8 +154,9 @@ app.post('/api/oss/sign', async (req, res) => {
         return res.status(400).json({ error: `Unknown type: "${type}"` });
     }
   } catch (err) {
-    logger.error('[OSS sign error]', err);
-    res.status(500).json({ error: err.message });
+    const e = err as Error;
+    logger.error('[OSS sign error]', e);
+    res.status(500).json({ error: e.message });
   }
 });
 
