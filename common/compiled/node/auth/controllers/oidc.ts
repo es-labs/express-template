@@ -68,6 +68,7 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
   payload.append('grant_type', 'refresh_token');
   payload.append('refresh_token', refreshToken);
   payload.append('client_id', OIDC_OPTIONS.CLIENT_ID);
+  if (OIDC_OPTIONS.CLIENT_SECRET) payload.append('client_secret', OIDC_OPTIONS.CLIENT_SECRET);
 
   const result = await fetch(TOKEN_URL, {
     method: 'POST',
@@ -75,7 +76,7 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
     body: payload.toString(),
   });
   const data = await result.json();
-  const tokens = { access_token: data.access_token, refresh_token: data.refresh_token };
+  const tokens = { access_token: data.access_token, refresh_token: data.refresh_token ?? refreshToken };
   setTokensToHeader(res, tokens);
   res.json(tokens);
 };

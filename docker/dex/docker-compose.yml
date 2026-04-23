@@ -1,0 +1,13 @@
+services:
+  dex:
+    image: ghcr.io/dexidp/dex:v2.38.0
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./dex.yml:/etc/dex/config.docker.yaml:ro
+    command: ["dex", "serve", "/etc/dex/config.docker.yaml"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5556/dex/.well-known/openid-configuration || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
