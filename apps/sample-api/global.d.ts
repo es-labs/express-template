@@ -7,6 +7,8 @@ declare var logger: {
 // biome-ignore lint/suspicious/noExplicitAny: global config shape is dynamic at runtime
 declare var __config: Readonly<Record<string, any>>;
 
+declare module 'oidc-provider';
+
 declare namespace Express {
   interface Request {
     user?: {
