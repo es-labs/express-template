@@ -41,7 +41,7 @@ export default express
   })
   .get('/error', (req, res) => {
     // error caught by error middleware
-    (req as any).something.missing = 10;
+    (req as unknown as { something: { missing: number } }).something.missing = 10;
     res.json({ message: 'OK' });
   })
   .get('/error-handled-rejection', async (req, res) => {

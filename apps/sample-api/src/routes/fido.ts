@@ -55,7 +55,12 @@ const f2l = new Fido2Lib({
   authenticatorUserVerification: 'required',
 });
 
-let testInfo: Record<string, any> = {};
+interface FidoTestInfo {
+  credId?: ArrayBuffer;
+  counter?: number;
+  publicKey?: string;
+}
+let testInfo: FidoTestInfo = {};
 
 // TODO make below scalable
 const registerChallenge = '33EHav-jZ1v9qwH783aU-j0ARx6r5o-YHh-wd7C6jPbd7Wh6ytbIZosIIACehwf9-s6hXhySHO-HHUjEwZS29w'; //  base64url
@@ -155,11 +160,12 @@ export default express
       userHandle: 'test',
     };
 
-    const credentialId = b_b64(ab_b(testInfo.credId));
+    const credentialId = b_b64(ab_b(testInfo.credId as ArrayBuffer));
     assertionExpectations.allowCredentials = [];
     assertionExpectations.allowCredentials.push({ type: 'public-key', id: credentialId });
 
     // const authnResult =
+    // biome-ignore lint/suspicious/noExplicitAny: fido2-lib AssertionExpectations type does not match runtime shape
     await f2l.assertionResult(regResponse, assertionExpectations as any); // will throw on error
     // logger.info(authnResult)
     res.json({ msg: 'validate ok' });

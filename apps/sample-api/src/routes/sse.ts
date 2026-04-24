@@ -1,6 +1,7 @@
+import type { Response } from 'express';
 import express from 'express';
 
-let clients: { id: number; res: any }[] = [];
+let clients: { id: number; res: Response }[] = [];
 
 function sendEventsToAll(data: unknown) {
   logger.info('Send SSE', { data });
