@@ -101,8 +101,6 @@ That usually means one of these changed unexpectedly:
 2. The repository history on the target branch changed unexpectedly.
 3. The workflow was switched and release-please is now calculating from a different previous release.
 
-This repo is intentionally bootstrapped so handwritten release history stays grouped under `0.1.0` in [../CHANGELOG.md](../CHANGELOG.md).
-
 ## Symptom: The Changelog Looks Wrong
 
 Check these sources in order:

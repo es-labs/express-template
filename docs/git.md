@@ -163,7 +163,6 @@ When choosing a scope in `czg`:
 
 Changelog and tag automation are handled by the [`release-please`](https://github.com/googleapis/release-please-action) job in [.github/workflows/ci.yml](../.github/workflows/ci.yml).
 
-- The existing handwritten changelog stays grouped under version `0.1.0` in [CHANGELOG.md](../CHANGELOG.md).
 - The workflow runs `release-please-action` in manifest mode using
   - [release-please-config.json](../release-please-config.json) and
   - [.release-please-manifest.json](../.release-please-manifest.json)
