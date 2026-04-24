@@ -37,7 +37,7 @@ describe.only('categoryController.find', () => {
   });
 
   it.only('should return status 200 and authors', async () => {
-    await CategoryController.find(req, res);
+    await CategoryController.find(req, res, () => {});
     assert.strictEqual(res.statusCode, 200);
   });
 });

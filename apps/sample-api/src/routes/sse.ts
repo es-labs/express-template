@@ -1,9 +1,10 @@
+import type { Response } from 'express';
 import express from 'express';
 
-let clients = [];
+let clients: { id: number; res: Response }[] = [];
 
-function sendEventsToAll(data) {
-  logger.info('Send SSE', clients, data);
+function sendEventsToAll(data: unknown) {
+  logger.info('Send SSE', { data });
   clients.forEach(client => {
     client.res.write(`data: ${JSON.stringify(data)}`);
   });

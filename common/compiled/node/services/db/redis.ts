@@ -1,7 +1,7 @@
-import { Redis } from 'ioredis';
+import { Redis, type RedisOptions } from 'ioredis';
 
 interface RedisConfig {
-  opts: Record<string, unknown>;
+  opts: RedisOptions;
   retry?: { step: number; max: number };
   reconnect?: { targetError: string };
 }
@@ -27,7 +27,7 @@ export default class StoreRedis {
       const { targetError } = this._REDIS_CONFIG.reconnect;
       redisOpts.reconnectOnError = (err: Error) => err.message.includes(targetError);
     }
-    this._redis = new Redis(redisOpts as ConstructorParameters<typeof Redis>[0]);
+    this._redis = new Redis(redisOpts);
   }
 
   /** Returns the underlying ioredis instance, or null if not yet connected. */

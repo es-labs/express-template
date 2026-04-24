@@ -55,16 +55,22 @@ const f2l = new Fido2Lib({
   authenticatorUserVerification: 'required',
 });
 
-let testInfo = {};
+interface FidoTestInfo {
+  credId?: ArrayBuffer;
+  counter?: number;
+  publicKey?: string;
+}
+let testInfo: FidoTestInfo = {};
 
 // TODO make below scalable
 const registerChallenge = '33EHav-jZ1v9qwH783aU-j0ARx6r5o-YHh-wd7C6jPbd7Wh6ytbIZosIIACehwf9-s6hXhySHO-HHUjEwZS29w'; //  base64url
-let validateChallenge = ''; // ab
+let validateChallenge: unknown = ''; // ab
 
 export default express
   .Router()
   .get('/register', async (req, res) => {
-    const registrationOptions = await f2l.attestationOptions();
+    // biome-ignore lint/suspicious/noExplicitAny: fido2-lib types don't match runtime shape
+    const registrationOptions = (await f2l.attestationOptions()) as any;
     const userId = 'bXl1c2Vy'; // base64url // 'aaronjxz' // (convert to Uint8Array on client side)
 
     registrationOptions.challenge = registerChallenge;
@@ -87,7 +93,8 @@ export default express
       factor: 'either',
     };
 
-    const regResult = await f2l.attestationResult(regResponse, attestationExpectations);
+    // biome-ignore lint/suspicious/noExplicitAny: fido2-lib Factor type requires cast
+    const regResult = await f2l.attestationResult(regResponse, attestationExpectations as any);
 
     // registration complete!
     // save publicKey and counter from regResult to user's info for future authentication calls
@@ -101,12 +108,13 @@ export default express
       counter,
       publicKey,
     };
-    logger.info(credId, counter, publicKey);
+    logger.info('registration data', { credId, counter, publicKey });
 
     res.json({ msg: 'register ok' });
   })
   .get('/validate', async (req, res) => {
-    const authnOptions = await f2l.assertionOptions();
+    // biome-ignore lint/suspicious/noExplicitAny: fido2-lib types don't match runtime shape
+    const authnOptions = (await f2l.assertionOptions()) as any;
     logger.info(authnOptions);
 
     validateChallenge = authnOptions.challenge; // store challenge
@@ -136,14 +144,15 @@ export default express
     const regResponse = req.body;
     regResponse.rawId = b_ab(b64url_b(regResponse.rawId));
 
-    const assertionExpectations = {
+    // biome-ignore lint/suspicious/noExplicitAny: fido2-lib types don't match runtime shape
+    const assertionExpectations: Record<string, any> = {
       // Remove the following comment if allowCredentials has been added into authnOptions so the credential received will be validate against allowCredentials array.
       // allowCredentials: [{
       //     id: "lTqW8H/lHJ4yT0nLOvsvKgcyJCeO8LdUjG5vkXpgO2b0XfyjLMejRvW5oslZtA4B/GgkO/qhTgoBWSlDqCng4Q==",
       //     type: "public-key",
       //     transports: ["usb"]
       // }],
-      challenge: b_b64url(ab_b(validateChallenge)), // "eaTyUNnyPDDdK8SNEgTEUvz1Q8dylkjjTimYd5X7QAo-F8_Z1lsJi3BilUpFZHkICNDWY8r9ivnTgW7-XZC3qQ", // validateChallenge
+      challenge: b_b64url(ab_b(validateChallenge as ArrayBuffer)), // "eaTyUNnyPDDdK8SNEgTEUvz1Q8dylkjjTimYd5X7QAo-F8_Z1lsJi3BilUpFZHkICNDWY8r9ivnTgW7-XZC3qQ", // validateChallenge
       origin,
       factor: 'either',
       publicKey: testInfo.publicKey,
@@ -151,12 +160,13 @@ export default express
       userHandle: 'test',
     };
 
-    const credentialId = b_b64(ab_b(testInfo.credId));
+    const credentialId = b_b64(ab_b(testInfo.credId as ArrayBuffer));
     assertionExpectations.allowCredentials = [];
     assertionExpectations.allowCredentials.push({ type: 'public-key', id: credentialId });
 
     // const authnResult =
-    await f2l.assertionResult(regResponse, assertionExpectations); // will throw on error
+    // biome-ignore lint/suspicious/noExplicitAny: fido2-lib AssertionExpectations type does not match runtime shape
+    await f2l.assertionResult(regResponse, assertionExpectations as any); // will throw on error
     // logger.info(authnResult)
     res.json({ msg: 'validate ok' });
   });
