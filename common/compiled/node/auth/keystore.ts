@@ -1,11 +1,6 @@
 import { generateKeyPairSync, randomUUID } from 'node:crypto';
 
-interface KeyEntry {
-  kid: string;
-  privateKey: string;
-  publicKey: string;
-  createdAt: Date;
-}
+import type { KeyEntry } from './types.ts';
 
 const keys = new Map<string, KeyEntry>();
 let currentKid: string | null = null;

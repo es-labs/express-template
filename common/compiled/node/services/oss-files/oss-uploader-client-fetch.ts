@@ -25,16 +25,7 @@
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB per part
 const MULTIPART_THRESHOLD = 5 * 1024 * 1024; // Use multipart above 5MB
 
-interface OSSUploaderOptions {
-  signEndpoint: string;
-  chunkSize?: number;
-  maxConcurrent?: number;
-}
-interface OSSUploadOpts {
-  key?: string;
-  onProgress?: (pct: number) => void;
-  signal?: AbortSignal | null;
-}
+import type { OSSUploaderOptions, OSSUploadOpts } from './types.ts';
 
 class OSSUploader {
   signEndpoint: string;
@@ -66,7 +57,7 @@ class OSSUploader {
    * @returns {Promise<{ key: string, location: string }>}
    */
   async upload(file: File | Blob, opts: OSSUploadOpts = {}): Promise<{ key: string; location: string }> {
-    const key = opts.key || file.name;
+    const key = opts.key || (file instanceof File ? file.name : '');
     const onProgress = opts.onProgress || (() => {});
     const signal = opts.signal || null;
 

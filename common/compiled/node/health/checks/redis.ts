@@ -1,8 +1,4 @@
-interface CheckResult {
-  name: string;
-  status: 'ok' | 'degraded' | 'unhealthy';
-  message: string;
-}
+import type { CheckResult } from '../types.ts';
 
 /** Placeholder Redis health check. Replace the body with a real PING call. */
 export async function checkRedis(): Promise<CheckResult> {

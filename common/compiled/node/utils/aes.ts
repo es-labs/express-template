@@ -56,7 +56,7 @@ export const genKey = (algorithm: string, password: string): Buffer => {
   const [size, algo] = algorithm.includes('256')
     ? [32, 'sha256']
     : algorithm.includes('128')
-      ? [32, 'md5']
+      ? [16, 'md5']
       : [32, 'sha256'];
   const hash = crypto.createHash(algo);
   hash.update(password);

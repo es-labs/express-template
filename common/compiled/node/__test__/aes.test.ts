@@ -20,10 +20,10 @@ describe('utils/aes.ts', () => {
     assert.strictEqual(key.length, 32);
   });
 
-  it('should derive a 256 bit key from password', () => {
+  it('should derive a 128 bit key from password', () => {
     const key = genKey('sha128', password);
     assert.ok(Buffer.isBuffer(key));
-    assert.strictEqual(key.length, 32);
+    assert.strictEqual(key.length, 16);
   });
 
   it('should encrypt and decrypt text correctly', () => {

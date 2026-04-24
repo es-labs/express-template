@@ -1,28 +1,17 @@
 // const path = require('path')
 import fs from 'node:fs';
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import express from 'express';
 import yaml from 'js-yaml';
 import multer from 'multer';
-import { memoryUpload } from '../../express/upload.ts';
-import * as svc from '../../services/index.ts';
+import { memoryUpload } from '../express/upload.ts';
+import * as svc from '../services/index.ts';
 
 const { CONFIGS_FOLDER_PATH, CONFIGS_CSV_SIZE, CONFIGS_UPLOAD_SIZE, CUSTOM_PATH } = globalThis.__config?.T4T || {};
 
 import base from './t4t-base.ts';
-import type { T4TRequest } from './t4t-utils.ts';
 import { noAuthFunc, processJson, roleOperationMatch } from './t4t-utils.ts';
-
-interface FileUiConfig {
-  multer: {
-    folder?: string;
-    options?: { limits?: { files?: number } };
-  };
-}
-
-interface T4TOptions {
-  authFunc?: (req: Request, res: Response, next: NextFunction) => void;
-}
+import type { FileUiConfig, T4TOptions, T4TRequest } from './types.ts';
 
 const custom: Record<string, Record<string, (req: T4TRequest, res: Response) => Promise<void>>> = {};
 // const custom = CUSTOM_PATH ? (await import(CUSTOM_PATH)).default : { };

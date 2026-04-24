@@ -33,16 +33,7 @@ let _lookup: ((name: string) => any) | null = null;
 
 const knex = () => _lookup?.(_userServiceName);
 
-interface TenantEntry {
-  tenant_id: number;
-  tenant_plan: string | null;
-  roles: Set<string>;
-}
-
-interface TenantRoleEntry {
-  roles: Set<string>;
-  permissions: Set<string>;
-}
+import type { TenantEntry, TenantRoleEntry } from './types.ts';
 
 /**
  * Initialise the RBAC service.

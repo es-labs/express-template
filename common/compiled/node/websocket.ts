@@ -78,7 +78,7 @@ function safeParseJSON2(
   raw: RawData,
   { maxBytes = MAX_BYTES } = {},
 ): { ok: boolean; error: string | null; value: unknown } {
-  const buf = Buffer.isBuffer(raw) ? raw : Buffer.from(raw as string);
+  const buf = Buffer.isBuffer(raw) ? raw : Array.isArray(raw) ? Buffer.concat(raw) : Buffer.from(raw);
   if (buf.length > maxBytes) {
     return { ok: false, error: 'PAYLOAD_TOO_LARGE', value: null };
   }
