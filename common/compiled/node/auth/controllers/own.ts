@@ -28,7 +28,7 @@ const logout = async (req: Request, res: Response): Promise<void> => {
     const access_token = (tmp as string).split(' ')[1];
     const user = jwt.decode(access_token) as Record<string, unknown>;
     id = user?.sub as string;
-    jwt.verify(access_token, getSecret('verify'), { algorithm: [JWT_ALG] });
+    jwt.verify(access_token, getSecret('verify'), { algorithms: [JWT_ALG] });
   } catch (e) {
     const err = e as Error & { name?: string };
     if (err.name !== 'TokenExpiredError') id = null;

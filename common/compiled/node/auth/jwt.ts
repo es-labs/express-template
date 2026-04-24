@@ -132,7 +132,9 @@ export const authUser = async (req, res, next) => {
   }
   if (access_token) {
     try {
-      const access_result = jwt.verify(access_token, getSecret('verify'), { algorithm: [JWT_ALG] });
+      const access_result = jwt.verify(access_token, getSecret('verify'), {
+        algorithms: [JWT_ALG],
+      }) as jwt.JwtPayload & { roles?: string[] };
       if (access_result) {
         req.user = access_result;
         // Attach a scoped FGA check helper so route handlers can do ad-hoc checks
@@ -165,12 +167,12 @@ export const authRefresh = async (req, res) => {
   try {
     const refresh_token = req.cookies?.refresh_token || req.header('refresh_token') || req.query?.refresh_token; // check refresh token & user - always stateful
     const access_token = req.cookies?.access_token || req.header('access_token') || req.query?.access_token; // check refresh token & user - always stateful
-    const user = jwt.decode(access_token);
+    const user = jwt.decode(access_token) as jwt.JwtPayload;
     const { sub, iat } = user;
     if (Math.floor(Date.now() / 1000) > iat + JWT_REFRESH_EXPIRY_SEC) {
       return res.status(401).json({ message: 'Refresh Token Expired' });
     }
-    const refreshToken = await getRefreshToken(sub);
+    const refreshToken = await getRefreshToken(sub as string);
     if (String(refreshToken) === String(refresh_token)) {
       const user = await findUser({ [AUTH_USER_FIELD_LOGIN]: sub });
       // TODO user also include tenant and other information
