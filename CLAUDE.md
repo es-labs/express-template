@@ -17,12 +17,15 @@ apps/              # backend and frontend apps (npm workspace)
   sample-mcp/        # MCP server example
   sample-vue-full/   # full-featured sample Vue app (port 8081)
   sample-vue-minimal/ # minimal Vue app (port 8080)
+  shared-sample/   # internal shared backend code for apps/* workspaces
 common/            # shared reusable code (npm workspaces)
-  iso/             # isomorphic utilities (runs in Node and browser)
-  node/            # Node.js modules, Express middleware and services
-  schemas/         # shared zod schemas
-  web/             # browser-only utilities and web components
-  vue/             # Vue-specific shared modules
+  compiled/        # modules that require a build step
+    node/          # Node.js modules, Express middleware and services (@common/node)
+    vue/           # Vue-specific shared modules (@common/vue)
+  vanilla/         # plain JS modules, no build step
+    iso/           # isomorphic utilities, runs in Node and browser (@common/iso)
+    web/           # browser-only utilities and web components
+  schemas/         # shared zod schemas (not a workspace — imported directly)
 docs/              # project documentation
 scripts/           # DB deployment, OpenAPI generation tooling
   dbdeploy/        # database migration and seed scripts
@@ -237,5 +240,9 @@ Route middleware available after `authUser`:
 | `docs/conventions.md` | Coding, tooling, commit, and runtime standards |
 | `docs/git.md` | Git workflow, branch/tag patterns, merge strategy |
 | `docs/install.md` | Backend, frontend setup, development guide, and workspace reference |
+| `docs/design/authn.md` | Authentication setup — SAML 2.0 and OIDC provider configuration |
 | `docs/design/authz.md` | Authorization — RBAC and FGA: setup, JWT payload, roles fallback chain, usage |
+| `docs/design/pg-audit-implementation.md` | PostgreSQL audit trail implementation (SOC2/HIPAA) |
+| `docs/cloud/` | Cloud deployment examples — AWS, Alibaba Cloud, Cloudflare |
+| `docs/release-troubleshooting.md` | Troubleshooting `release-please` CI job failures |
 | `docs/NOTES.md` | Design decisions, caveats, open questions, TODOs |
