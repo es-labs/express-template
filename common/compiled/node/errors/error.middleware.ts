@@ -1,16 +1,8 @@
 import type { NextFunction, Request, Response } from 'express';
 import { NotFoundError } from './AppError.ts';
+import type { NormalizedError } from './types.ts';
 
 const isDev = process.env.NODE_ENV !== 'production';
-
-interface NormalizedError {
-  statusCode: number;
-  code: string;
-  message: string;
-  details?: unknown;
-  stack?: string;
-  isOperational: boolean;
-}
 
 /**
  * Normalize any thrown value into a consistent NormalizedError shape.

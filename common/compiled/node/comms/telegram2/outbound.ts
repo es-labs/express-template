@@ -110,46 +110,9 @@ export function forceReply(input_field_placeholder = '', selective = false) {
   return JSON.stringify({ force_reply: true, input_field_placeholder, selective });
 }
 
-// ─── Shared Message Options ───────────────────────────────────────────────────
+import type { ContactData, MediaGroupItem, TelegramMessageOpts, VenueData } from './types.ts';
 
-interface TelegramMessageOpts {
-  parse_mode?: string;
-  caption?: string;
-  caption_parse_mode?: string;
-  reply_to_message_id?: number;
-  allow_sending_without_reply?: boolean;
-  reply_markup?: string;
-  disable_notification?: boolean;
-  protect_content?: boolean;
-  message_thread_id?: number;
-  business_connection_id?: string;
-  has_spoiler?: boolean;
-  duration?: number;
-  width?: number;
-  height?: number;
-  thumbnail?: string;
-  supports_streaming?: boolean;
-  performer?: string;
-  title?: string;
-  disable_content_type_detection?: boolean;
-  length?: number;
-  emoji?: string;
-  disable_web_page_preview?: boolean;
-  entities?: unknown[];
-  horizontal_accuracy?: number;
-  live_period?: number;
-  heading?: number;
-  proximity_alert_radius?: number;
-  type?: string;
-  is_anonymous?: boolean;
-  allows_multiple_answers?: boolean;
-  correct_option_id?: number;
-  explanation?: string;
-  explanation_parse_mode?: string;
-  open_period?: number;
-  close_date?: number;
-  is_closed?: boolean;
-}
+// ─── Shared Message Options ───────────────────────────────────────────────────
 
 function commonOpts({
   parse_mode, // "HTML" | "Markdown" | "MarkdownV2"
@@ -403,14 +366,6 @@ export async function sendAnimation(
 
 // ─── Media Group (Album) ──────────────────────────────────────────────────────
 
-interface MediaGroupItem {
-  type: string;
-  file: string;
-  caption?: string;
-  parse_mode?: string;
-  has_spoiler?: boolean;
-}
-
 /**
  * Send 2–10 photos/videos as an album.
  *
@@ -502,17 +457,6 @@ export async function editLiveLocation(
 
 // ─── Venue ────────────────────────────────────────────────────────────────────
 
-interface VenueData {
-  latitude: number;
-  longitude: number;
-  title: string;
-  address: string;
-  foursquare_id?: string;
-  foursquare_type?: string;
-  google_place_id?: string;
-  google_place_type?: string;
-}
-
 export async function sendVenue(
   token: string,
   chatId: number | string,
@@ -527,13 +471,6 @@ export async function sendVenue(
 }
 
 // ─── Contact ──────────────────────────────────────────────────────────────────
-
-interface ContactData {
-  phone_number: string;
-  first_name: string;
-  last_name?: string;
-  vcard?: string;
-}
 
 export async function sendContact(
   token: string,

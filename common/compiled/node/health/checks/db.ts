@@ -1,8 +1,4 @@
-interface CheckResult {
-  name: string;
-  status: 'ok' | 'degraded' | 'unhealthy';
-  message: string;
-}
+import type { CheckResult } from '../types.ts';
 
 /** Placeholder database health check. Replace the body with a real query. */
 export async function checkDatabase(): Promise<CheckResult> {

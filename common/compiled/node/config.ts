@@ -6,8 +6,12 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 const envFilePath = path.resolve(process.cwd(), '.env');
 
 if (process.env.NODE_ENV === 'development') {
-  loadEnvFile(`${envFilePath}.local`);
-  loadEnvFile(envFilePath);
+  try {
+    loadEnvFile(`${envFilePath}.local`);
+  } catch {}
+  try {
+    loadEnvFile(envFilePath);
+  } catch {}
 }
 
 /** Strip `//` line comments from a JSONC string, preserving strings and newlines. */

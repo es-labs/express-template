@@ -10,16 +10,7 @@
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB per part (min 5MB for S3 multipart)
 const SINGLE_UPLOAD_LIMIT = 5 * 1024 * 1024; // Use multipart above 5MB
 
-interface S3UploaderOptions {
-  getSignedUrlEndpoint: string;
-  chunkSize?: number;
-  maxConcurrent?: number;
-}
-interface S3UploadOpts {
-  key?: string;
-  onProgress?: (pct: number) => void;
-  signal?: AbortSignal | null;
-}
+import type { S3UploaderOptions, S3UploadOpts } from './types.ts';
 
 class S3Uploader {
   endpoint: string;
@@ -53,7 +44,7 @@ class S3Uploader {
    * @returns {Promise<{ key: string, location: string }>}
    */
   async upload(file: File | Blob, opts: S3UploadOpts = {}): Promise<{ key: string; location: string }> {
-    const key = opts.key || file.name;
+    const key = opts.key || (file instanceof File ? file.name : '');
     const onProgress = opts.onProgress || (() => {});
     const signal = opts.signal || null;
 

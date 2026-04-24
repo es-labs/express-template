@@ -1,9 +1,9 @@
 import { Parser } from '@json2csv/plainjs';
 import { parse } from 'csv-parse';
 import type { Response } from 'express';
-import * as svc from '../../services/index.ts';
-import type { T4TRequest } from './t4t-utils.ts';
+import * as svc from '../services/index.ts';
 import { formUniqueKey, isInvalidInput, kvDb2Col, mapRelation } from './t4t-utils.ts';
+import type { T4TRequest } from './types.ts';
 
 //import csvParse from "csv-parse";
 const csvParse = parse;

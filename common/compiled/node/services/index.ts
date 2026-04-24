@@ -8,7 +8,8 @@ import StoreRedis from './db/redis.ts';
 
 // import '../auth/jwt.ts';
 
-type ServiceConfig = { type: string; options: string };
+import type { ServiceConfig } from './types.ts';
+
 let servicesConfig: Record<string, ServiceConfig> = {};
 // biome-ignore lint/suspicious/noExplicitAny: service instances vary by type (StoreKnex | StoreRedis | StoreKeyV | Wss) with incompatible open() signatures
 const services: Record<string, any> = {};

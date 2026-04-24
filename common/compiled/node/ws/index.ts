@@ -4,11 +4,7 @@
 
 import https, { type Server as HttpsServer } from 'node:https';
 import WebSocket, { type RawData, WebSocketServer } from 'ws';
-
-// Extend WebSocket to include isAlive for keep-alive ping/pong tracking
-interface AliveWebSocket extends WebSocket {
-  isAlive: boolean;
-}
+import type { AliveWebSocket } from './types.ts';
 
 export default class Wss {
   static _instance: Wss | null = null;

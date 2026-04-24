@@ -1,10 +1,5 @@
-import { Redis, type RedisOptions } from 'ioredis';
-
-interface RedisConfig {
-  opts: RedisOptions;
-  retry?: { step: number; max: number };
-  reconnect?: { targetError: string };
-}
+import { Redis } from 'ioredis';
+import type { RedisConfig } from '../types.ts';
 
 /** Wraps an ioredis connection, opened/closed by the services lifecycle. */
 export default class StoreRedis {
