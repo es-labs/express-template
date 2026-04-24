@@ -4,14 +4,14 @@
 import crypto from 'node:crypto';
 import OSS from 'ali-oss';
 
-const { OSS_AK_ID, OSS_AK_SECRET, OSS_REGION, OSS_BUCKET } = process.env;
+const { OSS_ACCESS_ID, OSS_ACCESS_KEY, OSS_REGION, OSS_BUCKET } = process.env;
 
 const store =
-  OSS_AK_ID && OSS_AK_SECRET && OSS_REGION
+  OSS_ACCESS_ID && OSS_ACCESS_KEY && OSS_REGION
     ? new OSS({
         region: OSS_REGION,
-        accessKeyId: OSS_AK_ID,
-        accessKeySecret: OSS_AK_SECRET,
+        accessKeyId: OSS_ACCESS_ID,
+        accessKeySecret: OSS_ACCESS_KEY,
         bucket: OSS_BUCKET,
       })
     : null;
