@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import * as s from '@common/node/services';
 import express from 'express';
 
@@ -17,7 +18,7 @@ export default express
   .get('/', (req, res) => res.send({ status: 'sample-api OK' }))
   .get('/healthcheck', (req, res) => res.send({ status: 'sample-api/healthcheck OK' }))
   .get('/check-db', async (req, res) => {
-    const connectionName = req.query.conn || 'knex1'; // refer to .env.sample file for this value
+    const connectionName = (req.query.conn as string) || 'knex1'; // refer to .env.sample file for this value
     const knexDB = s.get(connectionName); // knex object, can have more than 1
     const { config } = knexDB.context.client;
     const rv = await knexDB.raw('SELECT 1'); // also can try knexDB(<table name>).query()

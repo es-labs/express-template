@@ -35,7 +35,8 @@
     "test:integration:saml": "node --test-reporter=spec --test --test-only ./__tests__/integration/saml.routes.test.ts",
     "test:schema": "node ../../scripts/test-schemas.ts ./schemas",
     "test": "npm run test:unit && npm run test:integration && npm run test:schema",
-    "test:e2e": "start-server-and-test start http://localhost:8080 test"
+    "test:e2e": "start-server-and-test start http://localhost:8080 test",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@common/iso": "file:../../common/vanilla/iso",

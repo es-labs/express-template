@@ -34,14 +34,14 @@ export default express
   }) // check if send header as application/json but body is text
   .get('/outbound', async (req, res) => {
     // test outbound unblocked
-    const url = req.query.url || 'https://httpbin.org/get';
+    const url = (req.query.url as string) || 'https://httpbin.org/get';
     const rv = await fetch(url);
     const data = await rv.json();
     res.json(data);
   })
   .get('/error', (req, res) => {
     // error caught by error middleware
-    req.something.missing = 10;
+    (req as any).something.missing = 10;
     res.json({ message: 'OK' });
   })
   .get('/error-handled-rejection', async (req, res) => {
@@ -71,20 +71,20 @@ export default express
   })
   .get('/download', (req, res, next) => {
     // serve a file download, you can add authorization here to control downloads
-    const { filename } = req.query;
+    const { filename } = req.query as { filename: string };
     const fullPath = path.join(UPLOAD_STATIC[0].folder, filename);
 
     // Stream file instead
     const file = fs.createReadStream(fullPath);
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader(['Content-Disposition', `inline; filename="${filename}"`]);
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
     file.pipe(res);
   })
 
   // message queues
   .get('/mq-agenda', async (req, res) => {
     // test message queue - agenda
-    res.json({ job, note: 'TODO' });
+    res.json({ job: null, note: 'TODO' });
   })
 
   // test websocket broadcast
@@ -98,7 +98,7 @@ export default express
   // body action: 'read' | 'write', filename: 'my-file.txt', bucket: 'bucket name'
   .post('/upload-disk', storageUpload(UPLOAD_STATIC[0]).any(), (req, res) => {
     // avatar is form input name // single('filedata')
-    logger.info('files', req, req.files);
+    logger.info('upload', { files: req.files });
     // body is string, need to parse if json
     res.json({
       ok: true, // success
