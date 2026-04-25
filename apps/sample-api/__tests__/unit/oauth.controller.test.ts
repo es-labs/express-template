@@ -2,7 +2,7 @@ import '@common/node/config'; // loads .env.json → sets globalThis.__config (J
 import '@common/node/logger';
 import assert from 'node:assert';
 import { afterEach, beforeEach, describe, it, mock } from 'node:test';
-import httpMocks from 'node-mocks-http';
+import { createRequest, createResponse } from '@common/node/http-mocks';
 
 // Spread real config into mutable object, override OAuth fields
 // biome-ignore lint/suspicious/noExplicitAny: test setup for globalThis
@@ -33,21 +33,21 @@ const mockCreateToken = mock.fn(async () => ({
 const mockSetTokensToHeader = mock.fn();
 
 // Mock internal dependencies before importing the module under test
-mock.module('../../../../common/compiled/node/auth/store.ts', {
+mock.module('@common/node/auth/store.ts', {
   namedExports: { findUser: mockFindUser },
 });
-mock.module('../../../../common/compiled/node/auth/jwt.ts', {
+mock.module('@common/node/auth/jwt.ts', {
   namedExports: { createToken: mockCreateToken, setTokensToHeader: mockSetTokensToHeader },
 });
 
 const { callbackOAuth } = await import('@common/node/auth/controllers/oauth');
 
-// biome-ignore lint/suspicious/noExplicitAny: node-mocks-http types are intentionally loose in tests
+// biome-ignore lint/suspicious/noExplicitAny: mock types are intentionally loose in tests
 let req: any, res: any;
 
 beforeEach(() => {
-  req = httpMocks.createRequest({ query: { code: 'auth-code-123', state: 'state-abc' } });
-  res = httpMocks.createResponse();
+  req = createRequest({ query: { code: 'auth-code-123', state: 'state-abc' } });
+  res = createResponse();
   findUserResult = null;
   mockFindUser.mock.resetCalls();
   mockCreateToken.mock.resetCalls();

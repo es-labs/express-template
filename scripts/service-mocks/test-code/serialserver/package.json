@@ -1,0 +1,33 @@
+{
+  "name": "@sandbox/serialserver",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@es-labs/node": "^0.0.28",
+    "winston": "^3.10.0",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "not-working": {
+    "serialport": "^9.2.4"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  },
+  "bin": "serial-server.js",
+  "pkg": {
+    "assets": [
+      "node_modules/**/*",
+      "**/*"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ]
+  }
+}
