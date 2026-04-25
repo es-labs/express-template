@@ -2,8 +2,8 @@ import '@common/node/config'; // loads .env.json → sets globalThis.__config (J
 import '@common/node/logger';
 import assert from 'node:assert';
 import { afterEach, beforeEach, describe, it, mock } from 'node:test';
+import { createRequest, createResponse } from '@common/node/http-mocks';
 import jwtLib from 'jsonwebtoken';
-import httpMocks from 'node-mocks-http';
 
 // Set env vars before module load — own.ts captures these as module-level constants
 process.env.AUTH_USER_FIELD_LOGIN = 'username';
@@ -33,13 +33,13 @@ const mockSetTokensToHeader = mock.fn();
 const mockGetSecret = mock.fn(() => TEST_SECRET);
 
 // Mock internal dependencies before importing the module under test
-mock.module('../../../../common/compiled/node/auth/store.ts', {
+mock.module('@common/node/auth/store.ts', {
   namedExports: { findUser: mockFindUser, revokeRefreshToken: mockRevokeRefreshToken },
 });
-mock.module('../../../../common/compiled/node/auth/scrypt.ts', {
+mock.module('@common/node/auth/scrypt.ts', {
   namedExports: { matchScryptHash: mockMatchScryptHash },
 });
-mock.module('../../../../common/compiled/node/auth/jwt.ts', {
+mock.module('@common/node/auth/jwt.ts', {
   namedExports: { createToken: mockCreateToken, getSecret: mockGetSecret, setTokensToHeader: mockSetTokensToHeader },
 });
 mock.module('otplib', {
@@ -52,12 +52,12 @@ delete process.env.USE_OTP;
 
 const { login, logout, otp, refresh } = await import('@common/node/auth/controllers/own');
 
-// biome-ignore lint/suspicious/noExplicitAny: node-mocks-http types are intentionally loose in tests
+// biome-ignore lint/suspicious/noExplicitAny: mock types are intentionally loose in tests
 let req: any, res: any;
 
 beforeEach(() => {
-  req = httpMocks.createRequest();
-  res = httpMocks.createResponse();
+  req = createRequest();
+  res = createResponse();
   findUserResult = null;
   matchScryptResult = true;
   verifyOtpResult = true;
@@ -78,7 +78,7 @@ describe.only('own.login', () => {
   });
 
   it.only('returns 401 when user is not found', async () => {
-    req = httpMocks.createRequest({ body: { username: 'nobody', password: 'pw' } });
+    req = createRequest({ body: { username: 'nobody', password: 'pw' } });
     findUserResult = null;
 
     await login(req, res);
@@ -88,7 +88,7 @@ describe.only('own.login', () => {
   });
 
   it.only('returns 401 when password does not match', async () => {
-    req = httpMocks.createRequest({ body: { username: 'user1', password: 'wrong' } });
+    req = createRequest({ body: { username: 'user1', password: 'wrong' } });
     findUserResult = { id: 'u1', username: 'user1', salt: 's', password: 'h', roles: 'admin' };
     matchScryptResult = false;
 
@@ -99,7 +99,7 @@ describe.only('own.login', () => {
   });
 
   it.only('returns 401 when user is revoked', async () => {
-    req = httpMocks.createRequest({ body: { username: 'user1', password: 'correct' } });
+    req = createRequest({ body: { username: 'user1', password: 'correct' } });
     findUserResult = { id: 'u1', username: 'user1', salt: 's', password: 'h', roles: 'admin', revoked: true };
     matchScryptResult = true;
 
@@ -110,7 +110,7 @@ describe.only('own.login', () => {
   });
 
   it.only('returns 401 when user record has no id field', async () => {
-    req = httpMocks.createRequest({ body: { username: 'user1', password: 'correct' } });
+    req = createRequest({ body: { username: 'user1', password: 'correct' } });
     findUserResult = { username: 'user1', salt: 's', password: 'h', roles: 'admin' }; // no id
     matchScryptResult = true;
 
@@ -121,7 +121,7 @@ describe.only('own.login', () => {
   });
 
   it.only('returns 200 with tokens on successful login', async () => {
-    req = httpMocks.createRequest({ body: { username: 'user1', password: 'correct' } });
+    req = createRequest({ body: { username: 'user1', password: 'correct' } });
     findUserResult = { id: 'u1', username: 'user1', salt: 's', password: 'h', roles: 'admin', revoked: false };
     matchScryptResult = true;
 
@@ -147,7 +147,7 @@ describe.only('own.logout', () => {
 
   it.only('returns 200 and revokes token when a valid token is provided', async () => {
     const token = jwtLib.sign({ sub: 'user-1' }, TEST_SECRET);
-    req = httpMocks.createRequest({ headers: { Authorization: `Bearer ${token}` } });
+    req = createRequest({ headers: { Authorization: `Bearer ${token}` } });
 
     await logout(req, res);
 
@@ -176,7 +176,7 @@ describe.only('own.otp', () => {
   });
 
   it.only('returns 401 when user is not found', async () => {
-    req = httpMocks.createRequest({ body: { id: 'unknown', pin: '123456' } });
+    req = createRequest({ body: { id: 'unknown', pin: '123456' } });
     findUserResult = null;
 
     await otp(req, res);
@@ -186,7 +186,7 @@ describe.only('own.otp', () => {
   });
 
   it.only('returns 401 when OTP pin is wrong', async () => {
-    req = httpMocks.createRequest({ body: { id: 'u1', pin: '999999' } });
+    req = createRequest({ body: { id: 'u1', pin: '999999' } });
     findUserResult = { id: 'u1', ga_key: 'GA_SECRET', roles: 'admin' };
     verifyOtpResult = false;
 
@@ -197,7 +197,7 @@ describe.only('own.otp', () => {
   });
 
   it.only('returns 200 with tokens when OTP pin is correct', async () => {
-    req = httpMocks.createRequest({ body: { id: 'u1', pin: '123456' } });
+    req = createRequest({ body: { id: 'u1', pin: '123456' } });
     findUserResult = { id: 'u1', ga_key: 'GA_SECRET', roles: 'admin' };
     verifyOtpResult = true;
 

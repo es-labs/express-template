@@ -2,7 +2,6 @@ import '@common/node/config';
 import '@common/node/logger';
 import assert from 'node:assert';
 import { beforeEach, describe, it } from 'node:test';
-import httpMocks from 'node-mocks-http';
 import CategoryController, { _injectServices } from '../../src/controllers/category.ts';
 
 // Chainable query builder stub — resolves to an empty result set
@@ -27,8 +26,17 @@ _injectServices({
 let req: any, res: any;
 
 beforeEach(() => {
-  req = httpMocks.createRequest();
-  res = httpMocks.createResponse();
+  req = { query: {} };
+  res = {
+    statusCode: 0,
+    status(code: number) {
+      this.statusCode = code;
+      return this;
+    },
+    json(_data: unknown) {
+      return this;
+    },
+  };
 });
 
 describe.only('categoryController.find', () => {

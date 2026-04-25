@@ -2,7 +2,7 @@ import '@common/node/config'; // loads .env.json → sets globalThis.__config (J
 import '@common/node/logger';
 import assert from 'node:assert';
 import { afterEach, beforeEach, describe, it, mock } from 'node:test';
-import httpMocks from 'node-mocks-http';
+import { createRequest, createResponse } from '@common/node/http-mocks';
 
 // Spread real config (which may be frozen) into a new mutable object, then override OIDC fields
 // biome-ignore lint/suspicious/noExplicitAny: test setup for globalThis
@@ -22,12 +22,12 @@ import httpMocks from 'node-mocks-http';
 
 const { login, auth, refresh } = await import('@common/node/auth/controllers/oidc');
 
-// biome-ignore lint/suspicious/noExplicitAny: node-mocks-http types are intentionally loose in tests
+// biome-ignore lint/suspicious/noExplicitAny: mock types are intentionally loose in tests
 let req: any, res: any;
 
 beforeEach(() => {
-  req = httpMocks.createRequest();
-  res = httpMocks.createResponse();
+  req = createRequest();
+  res = createResponse();
 });
 
 afterEach(() => {
@@ -55,7 +55,7 @@ describe.only('oidc.auth', () => {
   });
 
   it.only('redirects with tokens in hash when provider returns access_token', async () => {
-    req = httpMocks.createRequest({ query: { code: 'auth-code-123' } });
+    req = createRequest({ query: { code: 'auth-code-123' } });
 
     mock.method(globalThis, 'fetch', async () => ({
       json: async () => ({ access_token: 'at-test', refresh_token: 'rt-test' }),
@@ -71,7 +71,7 @@ describe.only('oidc.auth', () => {
   });
 
   it.only('redirects to AUTH_ERROR_URL when fetch throws', async () => {
-    req = httpMocks.createRequest({ query: { code: 'bad-code' } });
+    req = createRequest({ query: { code: 'bad-code' } });
 
     mock.method(globalThis, 'fetch', async () => {
       throw new Error('Network error');
@@ -91,7 +91,7 @@ describe.only('oidc.refresh', () => {
   });
 
   it.only('returns new access_token and refresh_token', async () => {
-    req = httpMocks.createRequest({ headers: { refresh_token: 'rt-old' } });
+    req = createRequest({ headers: { refresh_token: 'rt-old' } });
 
     mock.method(globalThis, 'fetch', async () => ({
       json: async () => ({ access_token: 'at-new', refresh_token: 'rt-new' }),
