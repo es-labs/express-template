@@ -12,11 +12,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "@js-ak/kafkajs-mock": "^1.0.0",
-    "ioredis-mock": "^8.13.1"
-  },
   "dependencies": {
-    "kafkajs": "^2.2.4"
+    "@js-ak/kafkajs-mock": "^1.0.0",
+    "ioredis-mock": "^8.13.1",
+    "kafkajs": "^2.2.4",
+    "oidc-provider": "^9.8.2",
+    "saml-idp": "^1.2.1"
   }
 }

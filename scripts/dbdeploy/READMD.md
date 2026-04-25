@@ -1,5 +1,6 @@
+## Description
 
-
+This workspace is for database deployment. In real-life applications, it is probably better to have this as a seperate project with controls and permissions under a data management team instead.
 
 ## Reference
 
