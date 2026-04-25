@@ -14,7 +14,7 @@ function listDirs(parent) {
   }
 }
 
-const workspaceScopes = [...listDirs('apps'), ...listDirs('common'), ...listDirs('webs'), 'docs', 'ci', 'repo'];
+const workspaceScopes = [...listDirs('apps'), ...listDirs('common'), 'docs', 'ci', 'repo'];
 
 /** @type {import('czg').UserConfig} */
 export default {

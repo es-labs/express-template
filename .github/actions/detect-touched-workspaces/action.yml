@@ -133,20 +133,20 @@ runs:
           biome_targets+=("$target")
         }
 
-        if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^common/iso/'; then
-          add_biome_target "common/iso"
+        if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^common/vanilla/iso/'; then
+          add_biome_target "common/vanilla/iso"
         fi
-        if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^common/node/'; then
-          add_biome_target "common/node"
+        if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^common/compiled/node/'; then
+          add_biome_target "common/compiled/node"
         fi
         if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^common/schemas/'; then
           add_biome_target "common/schemas"
         fi
-        if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^common/vue/'; then
-          add_biome_target "common/vue"
+        if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^common/compiled/vue/'; then
+          add_biome_target "common/compiled/vue"
         fi
-        if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^common/web/'; then
-          add_biome_target "common/web"
+        if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^common/vanilla/web/'; then
+          add_biome_target "common/vanilla/web"
         fi
         if [[ ${#changed_files[@]} -gt 0 ]] && printf '%s\n' "${changed_files[@]}" | grep -q '^apps/'; then
           add_biome_target "apps"
